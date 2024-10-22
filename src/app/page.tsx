@@ -8,19 +8,24 @@ export default function Component() {
 	const [typedText, setTypedText] = useState("");
 	const fullText = "Welcome to my digital realm!";
 	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const timeoutRef = useRef<NodeJS.Timeout>();
 
 	useEffect(() => {
-		let i = 0;
-		const typingEffect = setInterval(() => {
-			if (i < fullText.length) {
-				setTypedText((prev) => prev + fullText.charAt(i));
-				i++;
-			} else {
-				clearInterval(typingEffect);
+		let current_index = 0;
+		const typeNextCharacter = () => {
+			if (current_index < fullText.length) {
+				setTypedText(fullText.slice(0, current_index + 1));
+				current_index++;
+				timeoutRef.current = setTimeout(typeNextCharacter, 100);
 			}
-		}, 100);
+		};
+		typeNextCharacter();
 
-		return () => clearInterval(typingEffect);
+		return () => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+		};
 	}, []);
 
 	useEffect(() => {
@@ -51,7 +56,7 @@ export default function Component() {
 			ctx.strokeStyle = "rgba(0, 255, 0, 0.5)";
 			ctx.lineWidth = 1;
 
-			raindrops.forEach((drop) => {
+			for (const drop of raindrops) {
 				ctx.beginPath();
 				ctx.moveTo(drop.x, drop.y);
 				ctx.lineTo(drop.x, drop.y + drop.length);
@@ -62,7 +67,7 @@ export default function Component() {
 					drop.y = -drop.length;
 					drop.x = Math.random() * canvas.width;
 				}
-			});
+			}
 
 			requestAnimationFrame(drawRain);
 		}
@@ -305,6 +310,7 @@ export default function Component() {
 				ref={canvasRef}
 				className="absolute top-0 left-0 w-full h-full pointer-events-none"
 				aria-hidden="true"
+				tabIndex={-1}
 			/>
 			<main className="container mx-auto relative z-10">
 				<header className="text-center mb-12">
@@ -342,9 +348,10 @@ export default function Component() {
 				<section className="text-center mb-12">
 					<h2 className="text-2xl font-bold mb-4">Projects</h2>
 					<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-						{["Coming soon", "Coming soon...", "Coming soon"].map(
-							(project, index) => (
-								<Card key={index} className="bg-gray-900 border-green-500">
+						{["Coming soon", "Coming soon...", "Coming soon"].map((project) => {
+							const uniqueKey = `${project}-${Math.random().toString(36).substr(2, 9)}`;
+							return (
+								<Card key={uniqueKey} className="bg-gray-900 border-green-500">
 									<CardContent className="p-6">
 										<h3 className="text-xl font-bold mb-2">{project}</h3>
 										<p>Coming soon...</p>
@@ -356,8 +363,8 @@ export default function Component() {
 										</Button>
 									</CardContent>
 								</Card>
-							),
-						)}
+							);
+						})}
 					</div>
 				</section>
 
