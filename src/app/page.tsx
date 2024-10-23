@@ -8,7 +8,7 @@ import { siGithub, siX } from "simple-icons";
 import "./styles/glitch.css";
 
 export default function Component() {
-  const fullText = "Welcome to my digital realm!";
+  const fullText = "Welcome to my digital realm ";
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -79,12 +79,12 @@ export default function Component() {
       />
       <main className="container mx-auto relative z-10">
         <header className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4 glitch" data-text="XXXX">
-            XXXX
+          <h1 className="text-4xl font-bold mb-4 glitch" data-text="5OR4dev">
+            5OR4dev
           </h1>
           <p className="text-xl">
             {useTypingEffect(fullText, 100)}
-            <span className="animate-blink">|</span>
+            <span className="animate-blink">❚</span>
           </p>
         </header>
 
@@ -101,8 +101,6 @@ export default function Component() {
               <h2 className="text-2xl font-bold mb-4">Skills</h2>
               <ul className="list-disc list-inside">
                 <li>HTML/CSS/JavaScript</li>
-                <li>React & Next.js</li>
-                <li>Node.js</li>
               </ul>
             </CardContent>
           </Card>
@@ -111,27 +109,32 @@ export default function Component() {
         <section className="text-center mb-12">
           <h2 className="text-2xl font-bold mb-4">Projects</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {["Coming soon", "Coming soon...", "Coming soon"].map((project) => {
-              const uniqueKey = `${project}-${Math.random().toString(36).substr(2, 9)}`;
-              return (
-                <Card key={uniqueKey} className="bg-gray-900 border-green-500">
-                  <CardContent className="p-6">
-                    <h3 className="text-xl font-bold mb-2">{project}</h3>
-                    <p>Coming soon...</p>
-                    <Button
-                      variant="outline"
-                      className="mt-4 border-green-500 text-green-500 hover:bg-green-500 hover:text-black"
-                    >
-                      View Project
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
-            })}
+            {["Coming soon...1", "Coming soon...2", "Coming soon...3"].map(
+              (project) => {
+                const uniqueKey = `${project}`;
+                return (
+                  <Card
+                    key={uniqueKey}
+                    className="bg-gray-900 border-green-500"
+                  >
+                    <CardContent className="p-6">
+                      <h3 className="text-xl font-bold mb-2">{project}</h3>
+                      <p>Coming soon...</p>
+                      <Button
+                        variant="outline"
+                        className="mt-4 border-green-500 text-green-500 hover:bg-green-500 hover:text-black"
+                      >
+                        View Project
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              },
+            )}
           </div>
         </section>
 
-        <footer className="text-center">
+        <footer className="text-center fixed w-full bottom-0 left-0">
           <div className="flex justify-center space-x-4 mb-4">
             <Button
               variant="outline"
@@ -150,7 +153,9 @@ export default function Component() {
               <span className="sr-only">Twitter</span>
             </Button>
           </div>
-          <p>&copy; 2024 Sora.E All rights reserved.</p>
+          <p className="text-sm text-gray-400">
+            (c) 2024 5OR4dev. All rights reserved.
+          </p>
         </footer>
       </main>
     </div>

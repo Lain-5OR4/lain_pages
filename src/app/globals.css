@@ -76,3 +76,26 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+#bg {
+  z-index: -999;
+  background-size: cover;
+  image-rendering: pixelated;
+  background-color: #000000;
+  width: 100%;
+  position: absolute;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.animate-blink {
+  animation: blink 1s step-start infinite;
+}
