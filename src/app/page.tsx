@@ -1,14 +1,12 @@
 "use client";
-import Icon from "@/components/icon_component/createIcon";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTypingEffect } from "@/hooks/useTypingEffect";
-import { useEffect, useRef } from "react";
-import { siGithub, siX } from "simple-icons";
 import "./styles/glitch.css";
 
 export default function Component() {
   const fullText = "Welcome to my digital realm ";
+  /*
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -21,8 +19,7 @@ export default function Component() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const raindrops: { x: number; y: number; length: number; speed: number }[] =
-      [];
+    const raindrops: { x: number; y: number; length: number; speed: number }[] = [];
 
     for (let i = 0; i < 100; i++) {
       raindrops.push({
@@ -68,15 +65,10 @@ export default function Component() {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+  */
 
   return (
     <div className="min-h-screen bg-black text-green-500 p-8 font-mono relative overflow-hidden">
-      <canvas
-        ref={canvasRef}
-        className="absolute top-0 left-0 w-full h-full pointer-events-none"
-        aria-hidden="true"
-        tabIndex={-1}
-      />
       <main className="container mx-auto relative z-10">
         <header className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 glitch" data-text="5OR4dev">
@@ -89,7 +81,7 @@ export default function Component() {
         </header>
 
         <section className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          <Card className="bg-gray-900 border-green-500">
+          <Card className="bg-gray-900 border-green-500 text-red-600">
             <CardContent className="p-6">
               <h2 className="text-2xl font-bold mb-4">About Me</h2>
               <p>Coming soon...</p>
@@ -109,54 +101,25 @@ export default function Component() {
         <section className="text-center mb-12">
           <h2 className="text-2xl font-bold mb-4">Projects</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {["Coming soon...1", "Coming soon...2", "Coming soon...3"].map(
-              (project) => {
-                const uniqueKey = `${project}`;
-                return (
-                  <Card
-                    key={uniqueKey}
-                    className="bg-gray-900 border-green-500"
-                  >
-                    <CardContent className="p-6">
-                      <h3 className="text-xl font-bold mb-2">{project}</h3>
-                      <p>Coming soon...</p>
-                      <Button
-                        variant="outline"
-                        className="mt-4 border-green-500 text-green-500 hover:bg-green-500 hover:text-black"
-                      >
-                        View Project
-                      </Button>
-                    </CardContent>
-                  </Card>
-                );
-              },
-            )}
+            {["Coming soon...1", "Coming soon...2", "Coming soon...3"].map((project) => {
+              const uniqueKey = `${project}`;
+              return (
+                <Card key={uniqueKey} className="bg-gray-900 border-green-500">
+                  <CardContent className="p-6">
+                    <h3 className="text-xl font-bold mb-2">{project}</h3>
+                    <p>Coming soon...</p>
+                    <Button
+                      variant="outline"
+                      className="mt-4 border-green-500 text-green-500 hover:bg-green-500 hover:text-black"
+                    >
+                      View Project
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </section>
-
-        <footer className="text-center fixed w-full bottom-0 left-0">
-          <div className="flex justify-center space-x-4 mb-4">
-            <Button
-              variant="outline"
-              size="icon"
-              className="border-green-500 text-green-500 hover:bg-green-500 hover:text-black"
-            >
-              <Icon icon={siGithub} />
-              <span className="sr-only">GitHub</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="border-green-500 text-green-500 hover:bg-green-500 hover:text-black"
-            >
-              <Icon icon={siX} />
-              <span className="sr-only">Twitter</span>
-            </Button>
-          </div>
-          <p className="text-sm text-gray-400">
-            (c) 2024 5OR4dev. All rights reserved.
-          </p>
-        </footer>
       </main>
     </div>
   );
