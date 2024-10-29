@@ -22,5 +22,14 @@ export function useTypingEffect(fullText: string, typingSpeed = 100) {
     };
   }, [fullText, typingSpeed]);
 
-  return typedText;
+  const renderTypingEffect = () => {
+    return (
+      <p className="text-xl">
+        {typedText}
+        <span className="animate-blink">❚</span>
+      </p>
+    );
+  };
+
+  return renderTypingEffect;
 }

@@ -28,7 +28,7 @@ const Background = () => {
     function drawRain() {
       if (!ctx || !canvas) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.strokeStyle = "rgba(0, 255, 0, 0.5)";
+      ctx.strokeStyle = "rgba(0, 180, 200, 0.6)";
       ctx.lineWidth = 1;
 
       for (const drop of raindrops) {
