@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 export function useTypingEffect(fullText: string, typingSpeed = 100) {
   const [typedText, setTypedText] = useState("");
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout>(null);
 
   useEffect(() => {
     let current_index = 0;
