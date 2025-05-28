@@ -1,4 +1,5 @@
 "use client";
+import { BackgroundMusicPlayer } from "@/components/audio/BackgroundMusicPlayer";
 import Footer from "@/components/footer/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,6 +13,7 @@ export default function Component() {
 
   return (
     <div className="bg-black text-green-500 font-mono relative overflow-hidden min-h-screen flex flex-col">
+      <BackgroundMusicPlayer />
       <main className="container mx-auto relative z-10 flex-1 p-8">
         <header className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 glitch" data-text="5OR4dev">
