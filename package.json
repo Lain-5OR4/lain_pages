@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build:github": "GITHUB_PAGES=true next build",
     "start": "next start",
     "lint": "npx @biomejs/biome lint ./src",
     "format": "npx @biomejs/biome check --write ./src"
