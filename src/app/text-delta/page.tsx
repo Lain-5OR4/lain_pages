@@ -22,9 +22,9 @@ export default function TextDiffPage() {
   const [diffMode, setDiffMode] = useState<DiffMode>("github");
   const [diffLevel, setDiffLevel] = useState<DiffLevel>("line");
   const [diffResult, setDiffResult] = useState<DiffLine[]>([]);
-  
-  // GitHub Pagesでのbasepath対応
-  const basePath = process.env.NODE_ENV === 'production' ? '/lain_pages' : '';
+
+  // ベストプラクティス: 環境変数から取得
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
   const logoPath = `${basePath}/assets/textdelta.png`;
 
   const calculateCharDiff = (str1: string, str2: string) => {
@@ -270,11 +270,7 @@ export default function TextDiffPage() {
       <div className="container mx-auto max-w-7xl">
         <header className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <img 
-              src={logoPath} 
-              alt="TextDelta" 
-              className="h-16 w-auto"
-            />
+            <img src={logoPath} alt="TextDelta" className="h-16 w-auto" />
           </div>
           <p className="text-gray-600 text-lg">
             Compare text differences with advanced highlighting

@@ -8,6 +8,9 @@ const nextConfig = {
     output: "export",
     trailingSlash: true,
     distDir: "out",
+    env: {
+        NEXT_PUBLIC_BASE_PATH: isGitHubPages ? '/lain_pages' : '',
+    },
     ...(isGitHubPages ? {
         basePath: "/lain_pages",
         assetPrefix: "/lain_pages",

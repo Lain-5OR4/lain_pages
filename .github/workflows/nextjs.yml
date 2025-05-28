@@ -67,6 +67,10 @@ jobs:
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
+      - name: Run lint
+        run: ${{ steps.detect-package-manager.outputs.runner }} npm run lint
+      - name: Run format check
+        run: ${{ steps.detect-package-manager.outputs.runner }} npx @biomejs/biome check ./src
       - name: Build with Next.js
         env:
           GITHUB_PAGES: true
