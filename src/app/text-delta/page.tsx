@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
+import Image from "next/image";
 
 type DiffMode = "unified" | "github";
 type DiffLevel = "line" | "character";
@@ -266,7 +267,13 @@ export default function TextDiffPage() {
       <div className="container mx-auto max-w-7xl">
         <header className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <img src="/assets/textdelta.png" alt="TextDelta" className="h-16" />
+            <Image 
+              src="/assets/textdelta.png" 
+              alt="TextDelta" 
+              width={64}
+              height={64}
+              className="h-16 w-auto"
+            />
           </div>
           <p className="text-gray-600 text-lg">
             Compare text differences with advanced highlighting

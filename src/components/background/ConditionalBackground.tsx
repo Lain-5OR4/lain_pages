@@ -6,7 +6,8 @@ export const ConditionalBackground = () => {
   const pathname = usePathname();
 
   // TextDeltaページでは雨のエフェクトを無効化
-  if (pathname === "/text-delta") {
+  // basePathを考慮して判定
+  if (pathname === "/text-delta" || pathname === "/text-delta/") {
     return null;
   }
 
