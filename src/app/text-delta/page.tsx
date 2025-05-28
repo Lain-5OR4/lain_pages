@@ -170,12 +170,13 @@ export default function TextDiffPage() {
     return charDiffs.map((char, index) => (
       <span
         key={`char-${index}-${char.type}-${char.text}`}
-        className={`${char.type === "added"
+        className={`${
+          char.type === "added"
             ? "bg-green-200 text-green-800"
             : char.type === "removed"
               ? "bg-red-200 text-red-800"
               : ""
-          }`}
+        }`}
       >
         {char.text}
       </span>
@@ -188,12 +189,13 @@ export default function TextDiffPage() {
         {diffResult.map((line, index) => (
           <div
             key={`unified-line-${index}-${line.type}-${line.content.slice(0, 10)}`}
-            className={`px-4 py-1 ${line.type === "added"
+            className={`px-4 py-1 ${
+              line.type === "added"
                 ? "bg-green-50 text-green-800 border-l-4 border-green-400"
                 : line.type === "removed"
                   ? "bg-red-50 text-red-800 border-l-4 border-red-400"
                   : "text-gray-700"
-              }`}
+            }`}
           >
             <span className="text-gray-400 mr-2 select-none">
               {line.type === "added" ? "+" : line.type === "removed" ? "-" : " "}
@@ -215,12 +217,13 @@ export default function TextDiffPage() {
             {diffResult.map((line, index) => (
               <tr
                 key={`github-line-${index}-${line.type}-${line.content.slice(0, 10)}`}
-                className={`${line.type === "added"
+                className={`${
+                  line.type === "added"
                     ? "bg-green-50"
                     : line.type === "removed"
                       ? "bg-red-50"
                       : "bg-white"
-                  }`}
+                }`}
               >
                 <td className="w-12 px-3 py-2 text-gray-500 text-right border-r border-gray-200 select-none bg-gray-50">
                   {line.lineNumber?.old || ""}
@@ -230,22 +233,24 @@ export default function TextDiffPage() {
                 </td>
                 <td className="px-3 py-2">
                   <span
-                    className={`inline-block w-4 mr-2 font-bold ${line.type === "added"
+                    className={`inline-block w-4 mr-2 font-bold ${
+                      line.type === "added"
                         ? "text-green-600"
                         : line.type === "removed"
                           ? "text-red-600"
                           : ""
-                      }`}
+                    }`}
                   >
                     {line.type === "added" ? "+" : line.type === "removed" ? "-" : ""}
                   </span>
                   <span
-                    className={`${line.type === "added"
+                    className={`${
+                      line.type === "added"
                         ? "text-green-800"
                         : line.type === "removed"
                           ? "text-red-800"
                           : "text-gray-800"
-                      }`}
+                    }`}
                   >
                     {line.charDiffs && diffLevel === "character"
                       ? renderCharDiffs(line.charDiffs)

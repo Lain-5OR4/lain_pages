@@ -1,9 +1,9 @@
 "use client";
+import Footer from "@/components/footer/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTypingEffect } from "@/hooks/useTypingEffect";
 import Link from "next/link";
-import Footer from "@/components/footer/Footer";
 import "./styles/glitch.css";
 
 export default function Component() {
