@@ -75,23 +75,39 @@ export default function Component() {
               </CardContent>
             </Card>
 
-            {["Coming soon...1", "Coming soon...2"].map((project) => {
-              const uniqueKey = `${project}`;
-              return (
-                <Card key={uniqueKey} className="bg-gray-900 border-green-500 text-slate-300">
-                  <CardContent className="p-6">
-                    <h3 className="text-xl font-bold mb-2">{project}</h3>
-                    <p>Coming soon...</p>
-                    <Button
-                      variant="outline"
-                      className="mt-4 border-green-500 text-green-500 hover:bg-green-500 hover:text-black bg-sky-100"
-                    >
-                      View Project
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
-            })}
+            <Card className="bg-gray-900 border-green-500 text-slate-300">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold mb-2">📚 Reading Records</h3>
+                <p className="mb-4">
+                  Personal book reading tracker and notes collection powered by Notion.
+                </p>
+                <a
+                  href="https://well-timimus-c9d.notion.site/3b762091a4d04987a6a93473678c7527?v=d7cea027c9b34e2bae2e88f7ac49ab0f"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button
+                    variant="outline"
+                    className="border-green-500 text-green-500 hover:bg-green-500 hover:text-black bg-sky-100"
+                  >
+                    View Reading Records
+                  </Button>
+                </a>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-900 border-green-500 text-slate-300">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold mb-2">Coming soon...2</h3>
+                <p>Coming soon...</p>
+                <Button
+                  variant="outline"
+                  className="mt-4 border-green-500 text-green-500 hover:bg-green-500 hover:text-black bg-sky-100"
+                >
+                  View Project
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </section>
       </main>
