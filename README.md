@@ -1,5 +1,7 @@
 # Lain Pages
 
+> **English** | [日本語](README.ja.md)
+
 A personal portfolio website featuring mini applications built with Next.js and deployed on GitHub Pages.
 
 ## 🌟 Features
@@ -7,10 +9,6 @@ A personal portfolio website featuring mini applications built with Next.js and 
 - **Personal Portfolio**: Modern dark-themed homepage with animated rain effects
 - **Mini Applications**: Collection of interactive web tools
   - **TextDelta**: Advanced text diff viewer with character-level and line-level comparison modes
-
-## 🚀 Live Demo
-
-Visit the site: [https://your-username.github.io/lain_pages/](https://your-username.github.io/lain_pages/)
 
 ## 🛠️ Tech Stack
 
@@ -35,37 +33,6 @@ A sophisticated text comparison tool inspired by WinMerge, featuring:
 - Node.js 20+
 - npm
 
-### Setup
-```bash
-# Clone the repository
-git clone https://github.com/your-username/lain_pages.git
-cd lain_pages
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
-### Available Scripts
-```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run build:github # Build for GitHub Pages deployment
-npm start            # Start production server
-npm run lint         # Run Biome linter
-npm run format       # Format code with Biome
-```
-
-### Development URLs
-- **Homepage**: http://localhost:3000
-- **TextDelta**: http://localhost:3000/text-delta
-
-## 🚀 Deployment
-
-The site automatically deploys to GitHub Pages via GitHub Actions when code is pushed to the `main` branch.
-
 ### CI/CD Pipeline
 1. **Lint Check**: Biome linter validation
 2. **Format Check**: Code formatting verification
@@ -73,14 +40,6 @@ The site automatically deploys to GitHub Pages via GitHub Actions when code is p
 4. **Deploy**: Automatic deployment to GitHub Pages
 
 The deployment fails if linting or formatting checks don't pass, ensuring code quality.
-
-### Manual Deployment
-```bash
-# Build for GitHub Pages
-npm run build:github
-
-# The 'out' directory contains the static files for deployment
-```
 
 ## 🎨 Design Features
 
@@ -112,29 +71,12 @@ npm run build:github
 
 ## 🔧 Configuration
 
-### Environment Variables
-- `GITHUB_PAGES`: Set to `true` for GitHub Pages builds
-- `NEXT_PUBLIC_BASE_PATH`: Base path for GitHub Pages deployment
-
 ### Biome Configuration
 Code quality is enforced using Biome with:
 - ESLint-style linting rules
 - Prettier-style formatting
 - TypeScript support
 - File type filtering (js, ts, jsx, tsx, json)
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run `npm run lint` and `npm run format`
-5. Commit your changes
-6. Create a pull request
-
-## 📄 License
-
-This project is open source and available under the MIT License.
 
 ## 🎯 Future Plans
 
