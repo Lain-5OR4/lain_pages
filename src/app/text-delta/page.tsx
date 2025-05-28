@@ -2,7 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
-import Image from "next/image";
 
 type DiffMode = "unified" | "github";
 type DiffLevel = "line" | "character";
@@ -23,6 +22,10 @@ export default function TextDiffPage() {
   const [diffMode, setDiffMode] = useState<DiffMode>("github");
   const [diffLevel, setDiffLevel] = useState<DiffLevel>("line");
   const [diffResult, setDiffResult] = useState<DiffLine[]>([]);
+  
+  // GitHub Pagesでのbasepath対応
+  const basePath = process.env.NODE_ENV === 'production' ? '/lain_pages' : '';
+  const logoPath = `${basePath}/assets/textdelta.png`;
 
   const calculateCharDiff = (str1: string, str2: string) => {
     const result: Array<{ type: "context" | "added" | "removed"; text: string }> = [];
@@ -267,11 +270,9 @@ export default function TextDiffPage() {
       <div className="container mx-auto max-w-7xl">
         <header className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <Image 
-              src="/assets/textdelta.png" 
+            <img 
+              src={logoPath} 
               alt="TextDelta" 
-              width={64}
-              height={64}
               className="h-16 w-auto"
             />
           </div>
