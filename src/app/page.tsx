@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTypingEffect } from "@/hooks/useTypingEffect";
+import Link from "next/link";
 import "./styles/glitch.css";
 
 export default function Component() {
@@ -44,12 +45,12 @@ export default function Component() {
                 <h3 className="text-xl font-bold mb-2">Mini Apps</h3>
                 <ul className="space-y-2 text-left text-sm">
                   <li>
-                    <a
+                    <Link
                       href="/text-delta"
                       className="text-green-400 hover:text-green-300 hover:underline transition-colors"
                     >
                       TextDelta
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <a
