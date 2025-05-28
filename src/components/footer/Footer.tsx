@@ -4,7 +4,7 @@ import { siGithub, siX } from "simple-icons";
 
 const Footer = () => {
   return (
-    <footer className="text-center w-full bottom-0 left-0 bg-black">
+    <footer className="text-center w-full py-6 bg-black">
       <div className="flex justify-center space-x-4 mb-4">
         <Button
           variant="outline"

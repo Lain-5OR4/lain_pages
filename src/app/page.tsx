@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTypingEffect } from "@/hooks/useTypingEffect";
 import Link from "next/link";
+import Footer from "@/components/footer/Footer";
 import "./styles/glitch.css";
 
 export default function Component() {
@@ -10,8 +11,8 @@ export default function Component() {
   const renderTypingEffect = useTypingEffect(fullText);
 
   return (
-    <div className="min-h-screen bg-black text-green-500 p-8 font-mono relative overflow-hidden">
-      <main className="container mx-auto relative z-10">
+    <div className="bg-black text-green-500 font-mono relative overflow-hidden min-h-screen flex flex-col">
+      <main className="container mx-auto relative z-10 flex-1 p-8">
         <header className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 glitch" data-text="5OR4dev">
             5OR4dev
@@ -94,6 +95,7 @@ export default function Component() {
           </div>
         </section>
       </main>
+      <Footer />
     </div>
   );
 }

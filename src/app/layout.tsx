@@ -1,4 +1,3 @@
-import Footer from "@/components/footer/Footer";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -35,11 +34,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${loveLetter.variable} ${geistMono.variable} ${geistSans.variable}  antialiased`}
+        className={`${loveLetter.variable} ${geistMono.variable} ${geistSans.variable} antialiased`}
       >
         <ConditionalBackground />
         {children}
-        <Footer />
       </body>
     </html>
   );
