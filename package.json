@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "npx @biomejs/biome lint ./src",
     "format": "npx @biomejs/biome check --write ./src"
   },
   "dependencies": {

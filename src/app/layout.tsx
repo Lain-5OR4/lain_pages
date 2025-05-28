@@ -1,8 +1,8 @@
-import Background from "@/components/background/Background";
 import Footer from "@/components/footer/Footer";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { ConditionalBackground } from "@/components/background/ConditionalBackground";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -37,7 +37,7 @@ export default function RootLayout({
       <body
         className={`${loveLetter.variable} ${geistMono.variable} ${geistSans.variable}  antialiased`}
       >
-        <Background />
+        <ConditionalBackground />
         {children}
         <Footer />
       </body>

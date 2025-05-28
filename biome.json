@@ -9,7 +9,8 @@
 		"ignoreUnknown": false,
 		"ignore": [
 			"**/node_modules/**"
-		]
+		],
+		"include": ["**/*.json", "**/*.ts", "**/*.js", "**/*.tsx", "**/*.jsx"]
 	},
 	"formatter": {
 		"enabled": true,

@@ -39,7 +39,41 @@ export default function Component() {
         <section className="text-center mb-12">
           <h2 className="text-2xl font-bold mb-4">Projects</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {["Coming soon...1", "Coming soon...2", "Coming soon...3"].map((project) => {
+            <Card className="bg-gray-900 border-green-500 text-slate-300">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold mb-2">Mini Apps</h3>
+                <ul className="space-y-2 text-left text-sm">
+                  <li>
+                    <a
+                      href="/text-delta"
+                      className="text-green-400 hover:text-green-300 hover:underline transition-colors"
+                    >
+                      TextDelta
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      // biome-ignore lint/a11y/useValidAnchor: <explanation>
+                      href="#"
+                      className="text-green-400 hover:text-green-300 hover:underline transition-colors"
+                    >
+                      Coming soon...
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      // biome-ignore lint/a11y/useValidAnchor: <explanation>
+                      href="#"
+                      className="text-green-400 hover:text-green-300 hover:underline transition-colors"
+                    >
+                      Coming soon...
+                    </a>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            {["Coming soon...1", "Coming soon...2"].map((project) => {
               const uniqueKey = `${project}`;
               return (
                 <Card key={uniqueKey} className="bg-gray-900 border-green-500 text-slate-300">
