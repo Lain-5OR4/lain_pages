@@ -1,5 +1,4 @@
 /** @type {import('next').NextConfig} */
-const isProd = process.env.NODE_ENV === 'production';
 const isGitHubPages = process.env.GITHUB_PAGES === 'true';
 
 const nextConfig = {
@@ -9,7 +8,7 @@ const nextConfig = {
     output: "export",
     trailingSlash: true,
     distDir: "out",
-    ...(isProd && isGitHubPages ? {
+    ...(isGitHubPages ? {
         basePath: "/lain_pages",
         assetPrefix: "/lain_pages",
     } : {}),
