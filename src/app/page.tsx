@@ -1,11 +1,11 @@
 "use client";
+import WalkingCharacter from "@/components/animation/WalkingCharacter";
 import { BackgroundMusicPlayer } from "@/components/audio/BackgroundMusicPlayer";
 import Footer from "@/components/footer/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTypingEffect } from "@/hooks/useTypingEffect";
 import Link from "next/link";
-import WalkingCharacter from "@/components/animation/WalkingCharacter";
 import "./styles/glitch.css";
 
 export default function Component() {
