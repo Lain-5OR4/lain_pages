@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface Position {
   x: number;
@@ -17,19 +17,19 @@ export default function WalkingCharacter() {
   const [direction, setDirection] = useState<'left' | 'right'>('right');
 
   // 新しいランダムな目標位置を生成
-  const getRandomTarget = (): Target => {
+  const getRandomTarget = useCallback((): Target => {
     return {
       x: Math.random() * (window.innerWidth - 100) + 50,
       y: Math.random() * (window.innerHeight - 100) + 50,
     };
-  };
+  }, []);
 
   // 初期化と目標位置の設定
   useEffect(() => {
     const initialTarget = getRandomTarget();
     setTarget(initialTarget);
     setPosition({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
-  }, []);
+  }, [getRandomTarget]);
 
   // アニメーションループ
   useEffect(() => {
@@ -66,7 +66,7 @@ export default function WalkingCharacter() {
     }, 16); // 約60FPS
 
     return () => clearInterval(interval);
-  }, [target]);
+  }, [target, getRandomTarget]);
 
   return (
     <div
@@ -86,6 +86,8 @@ export default function WalkingCharacter() {
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           className="drop-shadow-lg"
+          role="img"
+          aria-label="Walking character animation"
         >
           {/* 猫の体 */}
           <ellipse
