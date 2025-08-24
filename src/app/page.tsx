@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTypingEffect } from "@/hooks/useTypingEffect";
 import Link from "next/link";
+import WalkingCharacter from "@/components/animation/WalkingCharacter";
 import "./styles/glitch.css";
 
 export default function Component() {
@@ -14,6 +15,7 @@ export default function Component() {
   return (
     <div className="bg-black text-green-500 font-mono relative overflow-hidden min-h-screen flex flex-col">
       <BackgroundMusicPlayer />
+      <WalkingCharacter />
       <main className="container mx-auto relative z-10 flex-1 p-8">
         <header className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 glitch" data-text="5OR4dev">
@@ -26,7 +28,20 @@ export default function Component() {
           <Card className="bg-gray-900 border-green-500 text-slate-300">
             <CardContent className="p-6">
               <h2 className="text-2xl font-bold mb-4">About Me</h2>
-              <p>Coming soon...</p>
+              <div>
+                <h3 className="text-lg font-semibold text-green-400 mb-2">🎮📺 Anime & Games</h3>
+                <ul className="list-disc list-inside text-sm space-y-1">
+                  <li>Serial Experiments Lain</li>
+                  <li>攻殻機動隊</li>
+                  <li>イナズマイレブン シリーズ</li>
+                  <li>ダンガンロンパ シリーズ</li>
+                  <li>AI: ソムニウムファイル シリーズ</li>
+                  <li>HUNDRED LINE -最終防衛学園-</li>
+                  <li>超探偵事件簿 レインコード</li>
+                  <li>パラノマサイト FILE23 本所七不思議</li>
+                  <li>VA-11 Hall-A</li>
+                </ul>
+              </div>
             </CardContent>
           </Card>
 
