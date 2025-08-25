@@ -72,6 +72,11 @@
     font-family: var(--font-love-letter), Arial, Helvetica, sans-serif;
   }
 
+  /* Japanese font support for anime/games section */
+  .japanese-text {
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", "Meiryo", "MS Gothic", sans-serif;
+  }
+
   body::-webkit-scrollbar {
     display: none;
   }
