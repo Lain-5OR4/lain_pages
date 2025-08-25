@@ -30,7 +30,7 @@ export default function Component() {
               <h2 className="text-2xl font-bold mb-4">About Me</h2>
               <div>
                 <h3 className="text-lg font-semibold text-green-400 mb-2">🎮📺 Anime & Games</h3>
-                <ul className="list-disc list-inside text-sm space-y-1">
+                <ul className="list-disc list-inside text-sm space-y-1 japanese-text">
                   <li>Serial Experiments Lain</li>
                   <li>攻殻機動隊</li>
                   <li>イナズマイレブン シリーズ</li>
