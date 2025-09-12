@@ -5,6 +5,8 @@
 @theme {
   --font-*: initial;
   --font-Love-letter: var(--font-love-letter);
+  --font-Kaisei-decol: var(--font-kaisei-decol);
+  --font-Reggae-one: var(--font-reggae-one);
 
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -74,7 +76,7 @@
 
   /* Japanese font support for anime/games section */
   .japanese-text {
-    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", "Meiryo", "MS Gothic", sans-serif;
+    font-family: var(--font-kaisei-decol), var(--font-reggae-one), "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", "Meiryo", "MS Gothic", sans-serif;
   }
 
   body::-webkit-scrollbar {
