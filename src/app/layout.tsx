@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import { Kaisei_Decol, Reggae_One } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { ConditionalBackground } from "@/components/background/ConditionalBackground";
 
