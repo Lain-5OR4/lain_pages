@@ -72,7 +72,6 @@ export default function Component() {
                   </li>
                   <li>
                     <a
-                      // biome-ignore lint/a11y/useValidAnchor: <explanation>
                       href="#"
                       className="text-green-400 hover:text-green-300 hover:underline transition-colors"
                     >
@@ -81,7 +80,6 @@ export default function Component() {
                   </li>
                   <li>
                     <a
-                      // biome-ignore lint/a11y/useValidAnchor: <explanation>
                       href="#"
                       className="text-green-400 hover:text-green-300 hover:underline transition-colors"
                     >
