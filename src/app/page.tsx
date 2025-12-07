@@ -25,102 +25,118 @@ export default function Component() {
         </header>
 
         <section className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          <Card className="bg-gray-900 border-green-500 text-slate-300">
+          <Card className="bg-black border-green-500 border-2 text-green-500 shadow-[0_0_10px_rgba(0,255,0,0.3)] font-mono h-full">
             <CardContent className="p-6">
-              <h2 className="text-2xl font-bold mb-4">About Me</h2>
-              <div>
-                <h3 className="text-lg font-semibold text-green-400 mb-2">🎮📺 Anime & Games</h3>
-                <ul className="list-disc list-inside text-sm space-y-1 japanese-text">
-                  <li>Serial Experiments Lain</li>
-                  <li>攻殻機動隊</li>
-                  <li>イナズマイレブン シリーズ</li>
-                  <li>ダンガンロンパ シリーズ</li>
-                  <li>AI: ソムニウムファイル シリーズ</li>
-                  <li>HUNDRED LINE -最終防衛学園-</li>
-                  <li>超探偵事件簿 レインコード</li>
-                  <li>パラノマサイト FILE23 本所七不思議</li>
-                  <li>VA-11 Hall-A</li>
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
+              <h2 className="text-xl font-bold mb-4 border-b border-green-900 pb-2">
+                <span className="mr-2">{">"}</span>USER_PROFILE
+              </h2>
+              <div className="space-y-4 text-sm font-mono">
+                <div className="grid grid-cols-[80px_1fr] gap-2 items-baseline">
+                  <span className="text-green-700 font-bold opacity-70">ID:</span>
+                  <span className="tracking-wider">50R4.dev</span>
+                </div>
+                <div className="grid grid-cols-[80px_1fr] gap-2 items-baseline">
+                  <span className="text-green-700 font-bold opacity-70">ROLE:</span>
+                  <span className="animate-pulse tracking-widest">???</span>
+                </div>
 
-          <Card className="bg-gray-900 border-green-500 text-slate-300">
-            <CardContent className="p-6">
-              <h2 className="text-2xl font-bold mb-4">Skills</h2>
-              <ul className="list-disc list-inside">
-                <li>HTML/CSS/JavaScript</li>
-              </ul>
+                <div className="grid grid-cols-[80px_1fr] gap-2 items-baseline">
+                  <span className="text-green-700 font-bold opacity-70">LOC:</span>
+                  <span className="uppercase">Digital Realm</span>
+                </div>
+                <div className="grid grid-cols-[80px_1fr] gap-2 items-baseline">
+                  <span className="text-green-700 font-bold opacity-70">STATUS:</span>
+                  <span className="animate-pulse bg-green-900/50 px-2 py-0.5 rounded text-green-400">
+                    ONLINE
+                  </span>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-green-900/30 text-xs text-green-600">
+                  <p>{">"} Initialize handshake...</p>
+                  <p>{">"} Connection established.</p>
+                  <p>
+                    {">"} Waiting for input<span className="animate-blink">_</span>
+                  </p>
+                </div>
+              </div>
+              {/* <div className="hidden">
+                <h3 className="text-lg font-semibold text-green-400 mb-2">🎮📺 Anime & Games</h3>
+                ... (Content Hidden) ...
+              </div> */}
             </CardContent>
           </Card>
+          {/* <VimEditor /> */}
         </section>
 
         <section className="text-center mb-12">
-          <h2 className="text-2xl font-bold mb-4">Projects</h2>
+          <h2 className="text-2xl font-bold mb-8 text-green-500 font-mono tracking-widest text-shadow-[0_0_10px_rgba(0,255,0,0.5)]">
+            {">"} PROJECTS_
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="bg-gray-900 border-green-500 text-slate-300">
+            <Card className="bg-black border-green-500 border-2 text-green-500 shadow-[0_0_10px_rgba(0,255,0,0.3)] font-mono hover:scale-105 transition-transform duration-300">
               <CardContent className="p-6">
-                <h3 className="text-xl font-bold mb-2">Mini Apps</h3>
-                <ul className="space-y-2 text-left text-sm">
+                <h3 className="text-xl font-bold mb-2 border-b border-green-900 pb-2">
+                  <span className="mr-2">{">"}</span>MINI_APPS
+                </h3>
+                <ul className="space-y-2 text-left text-sm mt-4">
                   <li>
                     <Link
                       href="/text-delta"
-                      className="text-green-400 hover:text-green-300 hover:underline transition-colors"
+                      className="text-green-400 hover:text-green-300 hover:underline transition-colors flex items-center group"
                     >
-                      TextDelta
+                      <span className="w-2 h-2 bg-green-500 mr-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      TextDelta.exe
                     </Link>
                   </li>
                   <li>
-                    <a
-                      href="#"
-                      className="text-green-400 hover:text-green-300 hover:underline transition-colors"
-                    >
+                    <span className="text-green-700 cursor-not-allowed flex items-center">
+                      <span className="w-2 h-2 bg-green-900 mr-2" />
                       Coming soon...
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="text-green-400 hover:text-green-300 hover:underline transition-colors"
-                    >
-                      Coming soon...
-                    </a>
+                    </span>
                   </li>
                 </ul>
+                <div className="mt-8 pt-2 border-t border-green-900/50 text-xs text-green-400/70 text-right">
+                  <span className="animate-blink">_</span>
+                </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gray-900 border-green-500 text-slate-300">
+            <Card className="bg-black border-green-500 border-2 text-green-500 shadow-[0_0_10px_rgba(0,255,0,0.3)] font-mono hover:scale-105 transition-transform duration-300">
               <CardContent className="p-6">
-                <h3 className="text-xl font-bold mb-2">📚 Reading Records</h3>
-                <p className="mb-4">
-                  Personal book reading tracker and notes collection powered by Notion.
+                <h3 className="text-xl font-bold mb-2 border-b border-green-900 pb-2">
+                  <span className="mr-2">{">"}</span>READING_LOGS
+                </h3>
+                <p className="mb-4 text-sm text-left mt-4 text-green-400/80">
+                  Retrieving data from external database (Notion)...
                 </p>
                 <a
                   href="https://well-timimus-c9d.notion.site/3b762091a4d04987a6a93473678c7527?v=d7cea027c9b34e2bae2e88f7ac49ab0f"
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="block mt-6"
                 >
                   <Button
                     variant="outline"
-                    className="border-green-500 text-green-500 hover:bg-green-500 hover:text-black bg-sky-100"
+                    className="w-full border-green-500 text-green-500 hover:bg-green-500 hover:text-black font-bold uppercase tracking-wider"
                   >
-                    View Reading Records
+                    ACCESS_DB
                   </Button>
                 </a>
+                <div className="mt-4 pt-2 border-t border-green-900/50 text-xs text-green-400/70 text-right">
+                  <span className="animate-blink">_</span>
+                </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gray-900 border-green-500 text-slate-300">
-              <CardContent className="p-6">
-                <h3 className="text-xl font-bold mb-2">Coming soon...2</h3>
-                <p>Coming soon...</p>
-                <Button
-                  variant="outline"
-                  className="mt-4 border-green-500 text-green-500 hover:bg-green-500 hover:text-black bg-sky-100"
-                >
-                  View Project
-                </Button>
+            <Card className="bg-black border-green-500 border-2 text-green-500 shadow-[0_0_10px_rgba(0,255,0,0.3)] font-mono opacity-70">
+              <CardContent className="p-6 flex flex-col justify-center h-full min-h-[200px]">
+                <h3 className="text-xl font-bold mb-2 border-b border-green-900 pb-2 text-green-700">
+                  <span className="mr-2">{">"}</span>LOCKED
+                </h3>
+                <p className="mt-4 text-green-800 text-sm">Target area under construction.</p>
+                <div className="mt-auto pt-2 text-xs text-green-900 text-right">
+                  <span className="animate-pulse">Access Denied</span>
+                </div>
               </CardContent>
             </Card>
           </div>
