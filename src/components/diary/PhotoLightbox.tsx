@@ -1,6 +1,7 @@
 "use client";
 
 import type { DiaryEntry } from "@/data/diary";
+import { getPhotoSrc } from "@/data/diary";
 import { useCallback, useEffect, useState } from "react";
 
 interface PhotoLightboxProps {
@@ -11,7 +12,6 @@ interface PhotoLightboxProps {
 
 export default function PhotoLightbox({ entry, initialPhotoIndex, onClose }: PhotoLightboxProps) {
   const [photoIndex, setPhotoIndex] = useState(initialPhotoIndex);
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
   const photo = entry.photos[photoIndex];
   const hasMultiple = entry.photos.length > 1;
 
@@ -48,7 +48,7 @@ export default function PhotoLightbox({ entry, initialPhotoIndex, onClose }: Pho
         onKeyDown={(e) => e.stopPropagation()}
       >
         <img
-          src={`${basePath}/diary/${photo.src}`}
+          src={getPhotoSrc(photo.src)}
           alt={photo.alt}
           className="max-w-[90vw] max-h-[90vh] object-contain border-2 border-green-500 shadow-[0_0_20px_rgba(0,255,0,0.4)]"
         />

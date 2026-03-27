@@ -4,20 +4,49 @@ import DiaryCard from "@/components/diary/DiaryCard";
 import PhotoLightbox from "@/components/diary/PhotoLightbox";
 import Footer from "@/components/footer/Footer";
 import { Button } from "@/components/ui/button";
-import { diaryEntries } from "@/data/diary";
-import type { DiaryEntry } from "@/data/diary";
+import { DIARY_API_URL, fallbackEntries, parseDriveFiles } from "@/data/diary";
+import type { DiaryEntry, GasDriveFile } from "@/data/diary";
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "../styles/glitch.css";
 
 export default function DiaryPage() {
+  const [entries, setEntries] = useState<DiaryEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [lightbox, setLightbox] = useState<{
     entry: DiaryEntry;
     photoIndex: number;
   } | null>(null);
 
+  const fetchEntries = useCallback(async () => {
+    if (!DIARY_API_URL) {
+      setEntries(fallbackEntries);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(DIARY_API_URL);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data: GasDriveFile[] = await res.json();
+      setEntries(parseDriveFiles(data));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Unknown error");
+      setEntries(fallbackEntries);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchEntries();
+  }, [fetchEntries]);
+
   const handlePhotoClick = (entryId: string, photoIndex: number) => {
-    const entry = diaryEntries.find((e) => e.id === entryId);
+    const entry = entries.find((e) => e.id === entryId);
     if (entry) setLightbox({ entry, photoIndex });
   };
 
@@ -39,19 +68,45 @@ export default function DiaryPage() {
           <h1 className="text-3xl font-bold glitch" data-text="> PHOTO_DIARY">
             {">"} PHOTO_DIARY
           </h1>
-          <p className="text-green-400/60 text-sm mt-2">{"// "}Retrieving memory fragments...</p>
+          <p className="text-green-400/60 text-sm mt-2">
+            {"// "}
+            {loading ? "Fetching memory fragments..." : "Retrieval complete."}
+          </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {diaryEntries.map((entry) => (
-            <DiaryCard key={entry.id} entry={entry} onPhotoClick={handlePhotoClick} />
-          ))}
-        </div>
+        {loading && (
+          <div className="text-center text-green-600 mt-20">
+            <p className="animate-pulse">{">"} Loading data from remote storage...</p>
+          </div>
+        )}
 
-        {diaryEntries.length === 0 && (
+        {error && (
+          <div className="text-center text-green-600 mt-4 mb-6">
+            <p className="text-red-500/70 text-sm">
+              {"!"} Connection error: {error}
+            </p>
+            <button
+              type="button"
+              onClick={fetchEntries}
+              className="mt-2 text-green-500 hover:text-green-300 underline text-sm font-mono"
+            >
+              {">"} Retry connection
+            </button>
+          </div>
+        )}
+
+        {!loading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {entries.map((entry) => (
+              <DiaryCard key={entry.id} entry={entry} onPhotoClick={handlePhotoClick} />
+            ))}
+          </div>
+        )}
+
+        {!loading && entries.length === 0 && (
           <div className="text-center text-green-600 mt-20">
             <p>{">"} No entries found.</p>
-            <p className="text-sm mt-2 text-green-700">Add entries to src/data/diary.ts</p>
+            <p className="text-sm mt-2 text-green-700">Upload images to your Google Drive folder</p>
           </div>
         )}
       </main>

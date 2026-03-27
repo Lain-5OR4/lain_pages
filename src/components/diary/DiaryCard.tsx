@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import type { DiaryEntry } from "@/data/diary";
+import { getPhotoSrc } from "@/data/diary";
 
 interface DiaryCardProps {
   entry: DiaryEntry;
@@ -9,7 +10,6 @@ interface DiaryCardProps {
 }
 
 export default function DiaryCard({ entry, onPhotoClick }: DiaryCardProps) {
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
   const firstPhoto = entry.photos[0];
   const extraCount = entry.photos.length - 1;
   const dateFormatted = entry.date.replace(/-/g, ".");
@@ -22,7 +22,7 @@ export default function DiaryCard({ entry, onPhotoClick }: DiaryCardProps) {
         onClick={() => onPhotoClick(entry.id, 0)}
       >
         <img
-          src={`${basePath}/diary/${firstPhoto.src}`}
+          src={getPhotoSrc(firstPhoto.src)}
           alt={firstPhoto.alt}
           loading="lazy"
           className="w-full h-48 object-cover transition-all duration-300 group-hover:scale-105 group-hover:brightness-110"
