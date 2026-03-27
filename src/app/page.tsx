@@ -131,14 +131,24 @@ export default function Component() {
               </CardContent>
             </Card>
 
-            <Card className="bg-black border-green-500 border-2 text-green-500 shadow-[0_0_10px_rgba(0,255,0,0.3)] font-mono opacity-70">
-              <CardContent className="p-6 flex flex-col justify-center h-full min-h-[200px]">
-                <h3 className="text-xl font-bold mb-2 border-b border-green-900 pb-2 text-green-700">
-                  <span className="mr-2">{">"}</span>LOCKED
+            <Card className="bg-black border-green-500 border-2 text-green-500 shadow-[0_0_10px_rgba(0,255,0,0.3)] font-mono hover:scale-105 transition-transform duration-300">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold mb-2 border-b border-green-900 pb-2">
+                  <span className="mr-2">{">"}</span>PHOTO_DIARY
                 </h3>
-                <p className="mt-4 text-green-800 text-sm">Target area under construction.</p>
-                <div className="mt-auto pt-2 text-xs text-green-900 text-right">
-                  <span className="animate-pulse">Access Denied</span>
+                <p className="mb-4 text-sm text-left mt-4 text-green-400/80">
+                  Loading memory fragments from local storage...
+                </p>
+                <Link href="/diary">
+                  <Button
+                    variant="outline"
+                    className="w-full border-green-500 text-green-500 hover:bg-green-500 hover:text-black font-bold uppercase tracking-wider"
+                  >
+                    OPEN_DIARY
+                  </Button>
+                </Link>
+                <div className="mt-4 pt-2 border-t border-green-900/50 text-xs text-green-400/70 text-right">
+                  <span className="animate-blink">_</span>
                 </div>
               </CardContent>
             </Card>

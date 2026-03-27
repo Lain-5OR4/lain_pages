@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#0a0a0a"/>
+  <rect x="1" y="1" width="798" height="598" fill="none" stroke="#22c55e" stroke-width="2" opacity="0.3"/>
+  <text x="400" y="280" text-anchor="middle" font-family="monospace" font-size="20" fill="#22c55e" opacity="0.6">[ NO_IMAGE_DATA ]</text>
+  <text x="400" y="320" text-anchor="middle" font-family="monospace" font-size="14" fill="#22c55e" opacity="0.4">Place your photos in public/diary/</text>
+</svg>

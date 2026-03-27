@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#121212"/>
+  <!-- desk surface -->
+  <rect x="0" y="350" width="800" height="250" fill="#1a1410" rx="0"/>
+  <line x1="0" y1="350" x2="800" y2="350" stroke="#2a2018" stroke-width="2"/>
+  <!-- coffee cup -->
+  <ellipse cx="400" cy="340" rx="70" ry="15" fill="#1a1410"/>
+  <rect x="335" y="250" width="130" height="95" rx="5" fill="#222" stroke="#444" stroke-width="2"/>
+  <ellipse cx="400" cy="250" rx="65" ry="14" fill="#333" stroke="#444" stroke-width="2"/>
+  <ellipse cx="400" cy="252" rx="55" ry="11" fill="#1a0f0a"/>
+  <!-- steam -->
+  <g fill="none" stroke="#555" stroke-width="1.5" opacity="0.4">
+    <path d="M380,230 Q375,210 385,190 Q395,170 383,150"/>
+    <path d="M400,225 Q395,205 405,185 Q415,165 403,145"/>
+    <path d="M420,230 Q415,210 425,190 Q435,170 423,150"/>
+  </g>
+  <!-- cup handle -->
+  <path d="M465,275 Q500,275 500,300 Q500,325 465,325" fill="none" stroke="#444" stroke-width="3"/>
+  <!-- laptop in background -->
+  <rect x="100" y="200" width="180" height="120" rx="5" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
+  <rect x="108" y="208" width="164" height="100" fill="#0a0a0a"/>
+  <g font-family="monospace" font-size="7" fill="#22c55e" opacity="0.7">
+    <text x="115" y="225">const life = {</text>
+    <text x="115" y="237">  coffee: true,</text>
+    <text x="115" y="249">  code: true,</text>
+    <text x="115" y="261">  sleep: false</text>
+    <text x="115" y="273">};</text>
+    <text x="115" y="290">█</text>
+  </g>
+  <rect x="70" y="320" width="240" height="12" rx="2" fill="#1a1a1a" stroke="#333" stroke-width="1"/>
+  <!-- phone -->
+  <rect x="560" y="290" width="55" height="95" rx="6" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
+  <rect x="565" y="300" width="45" height="70" fill="#0a0a1a"/>
+  <text x="572" y="340" font-family="monospace" font-size="7" fill="#22c55e" opacity="0.6">03:47</text>
+  <text x="572" y="355" font-family="monospace" font-size="5" fill="#666">AM</text>
+  <!-- ambient light glow from screen -->
+  <circle cx="190" cy="260" r="100" fill="#22c55e" opacity="0.03"/>
+</svg>
