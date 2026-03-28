@@ -3,7 +3,7 @@ export interface DiaryEntry {
   date: string;
   title: string;
   description: string;
-  photos: { src: string; alt: string }[];
+  photos: { src: string; alt: string; stamp?: string }[];
 }
 
 // GAS Web App URL（デプロイ後にここを差し替え）
@@ -18,6 +18,22 @@ export interface GasDriveEntry {
   photos: { id: string; name: string; url: string }[];
 }
 
+/** Pixel ファイル名 "PXL_YYYYMMDD_HHMMSS*.jpg" から JST 日時スタンプを抽出 */
+function parsePixelTimestamp(filename: string): { date: string; time: string } | null {
+  const match = filename.match(/^PXL_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})/);
+  if (!match) return null;
+  const utc = new Date(
+    Date.UTC(+match[1], +match[2] - 1, +match[3], +match[4], +match[5], +match[6]),
+  );
+  const jst = new Date(utc.getTime() + 9 * 60 * 60 * 1000);
+  const y = String(jst.getUTCFullYear()).slice(2);
+  const mo = String(jst.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(jst.getUTCDate()).padStart(2, "0");
+  const h = String(jst.getUTCHours()).padStart(2, "0");
+  const m = String(jst.getUTCMinutes()).padStart(2, "0");
+  return { date: `'${y} ${mo} ${d}`, time: `${h}:${m}` };
+}
+
 /** GASレスポンス（サブフォルダ単位）を DiaryEntry[] に変換 */
 export function parseDriveEntries(entries: GasDriveEntry[]): DiaryEntry[] {
   return entries.map((entry) => ({
@@ -25,7 +41,14 @@ export function parseDriveEntries(entries: GasDriveEntry[]): DiaryEntry[] {
     date: entry.date,
     title: entry.title,
     description: entry.description,
-    photos: entry.photos.map((p) => ({ src: p.url, alt: p.name })),
+    photos: entry.photos.map((p) => {
+      const ts = parsePixelTimestamp(p.name);
+      return {
+        src: p.url,
+        alt: p.name,
+        stamp: ts ? `${ts.date} ${ts.time}` : "",
+      };
+    }),
   }));
 }
 

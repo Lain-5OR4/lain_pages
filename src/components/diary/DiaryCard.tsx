@@ -29,6 +29,11 @@ export default function DiaryCard({ entry, onPhotoClick }: DiaryCardProps) {
         />
         <div className="absolute inset-0 pointer-events-none bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,0,0,0.1)_2px,rgba(0,0,0,0.1)_4px)]" />
         <div className="absolute inset-0 pointer-events-none border-b-2 border-green-500/50" />
+        {firstPhoto.stamp && (
+          <span className="absolute bottom-2 right-2 pointer-events-none text-orange-400/90 text-xs font-mono tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+            {firstPhoto.stamp}
+          </span>
+        )}
         {extraCount > 0 && (
           <span className="absolute top-2 right-2 bg-black/80 border border-green-500 text-green-400 text-xs px-2 py-0.5 font-mono">
             +{extraCount}

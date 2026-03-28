@@ -47,11 +47,18 @@ export default function PhotoLightbox({ entry, initialPhotoIndex, onClose }: Pho
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => e.stopPropagation()}
       >
-        <img
-          src={getPhotoSrc(photo.src)}
-          alt={photo.alt}
-          className="max-w-[90vw] max-h-[90vh] object-contain border-2 border-green-500 shadow-[0_0_20px_rgba(0,255,0,0.4)]"
-        />
+        <div className="relative inline-block">
+          <img
+            src={getPhotoSrc(photo.src)}
+            alt={photo.alt}
+            className="max-w-[90vw] max-h-[90vh] object-contain border-2 border-green-500 shadow-[0_0_20px_rgba(0,255,0,0.4)]"
+          />
+          {photo.stamp && (
+            <span className="absolute bottom-3 right-3 text-orange-500/90 font-mono text-xl tracking-wider drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+              {photo.stamp}
+            </span>
+          )}
+        </div>
 
         <button
           type="button"
@@ -60,6 +67,12 @@ export default function PhotoLightbox({ entry, initialPhotoIndex, onClose }: Pho
         >
           [X] CLOSE
         </button>
+
+        {hasMultiple && (
+          <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-green-500 font-mono text-sm">
+            [{photoIndex + 1}/{entry.photos.length}]
+          </div>
+        )}
 
         {hasMultiple && (
           <>
@@ -77,9 +90,6 @@ export default function PhotoLightbox({ entry, initialPhotoIndex, onClose }: Pho
             >
               {">"}
             </button>
-            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-green-500 font-mono text-sm">
-              [{photoIndex + 1}/{entry.photos.length}]
-            </div>
           </>
         )}
       </div>
