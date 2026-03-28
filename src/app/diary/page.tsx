@@ -4,8 +4,8 @@ import DiaryCard from "@/components/diary/DiaryCard";
 import PhotoLightbox from "@/components/diary/PhotoLightbox";
 import Footer from "@/components/footer/Footer";
 import { Button } from "@/components/ui/button";
-import { DIARY_API_URL, fallbackEntries, parseDriveFiles } from "@/data/diary";
-import type { DiaryEntry, GasDriveFile } from "@/data/diary";
+import { DIARY_API_URL, fallbackEntries, parseDriveEntries } from "@/data/diary";
+import type { DiaryEntry, GasDriveEntry } from "@/data/diary";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import "../styles/glitch.css";
@@ -31,8 +31,8 @@ export default function DiaryPage() {
     try {
       const res = await fetch(DIARY_API_URL);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data: GasDriveFile[] = await res.json();
-      setEntries(parseDriveFiles(data));
+      const data: GasDriveEntry[] = await res.json();
+      setEntries(parseDriveEntries(data));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unknown error");
       setEntries(fallbackEntries);
