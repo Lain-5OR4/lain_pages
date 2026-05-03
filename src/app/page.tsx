@@ -97,6 +97,15 @@ export default function Component() {
                       Wired_Connection.exe
                     </Link>
                   </li>
+                  <li>
+                    <Link
+                      href="/fragments"
+                      className="text-green-400 hover:text-green-300 hover:underline transition-colors flex items-center group"
+                    >
+                      <span className="w-2 h-2 bg-green-500 mr-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      Fragments.exe
+                    </Link>
+                  </li>
                 </ul>
                 <div className="mt-8 pt-2 border-t border-green-900/50 text-xs text-green-400/70 text-right">
                   <span className="animate-blink">_</span>
