@@ -4,11 +4,12 @@ import DiaryCard from "@/components/diary/DiaryCard";
 import PhotoLightbox from "@/components/diary/PhotoLightbox";
 import Footer from "@/components/footer/Footer";
 import { Button } from "@/components/ui/button";
-import { DIARY_API_URL, fallbackEntries, parseDriveEntries } from "@/data/diary";
-import type { DiaryEntry, GasDriveEntry } from "@/data/diary";
+import type { DiaryEntry } from "@/data/diary";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import "../styles/glitch.css";
+
+const DIARY_API_BASE = process.env.NEXT_PUBLIC_DIARY_API ?? "https://api.mizora.dev";
 
 export default function DiaryPage() {
   const [entries, setEntries] = useState<DiaryEntry[]>([]);
@@ -20,22 +21,15 @@ export default function DiaryPage() {
   } | null>(null);
 
   const fetchEntries = useCallback(async () => {
-    if (!DIARY_API_URL) {
-      setEntries(fallbackEntries);
-      setLoading(false);
-      return;
-    }
-
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(DIARY_API_URL);
+      const res = await fetch(`${DIARY_API_BASE}/api/diary`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data: GasDriveEntry[] = await res.json();
-      setEntries(parseDriveEntries(data));
+      setEntries((await res.json()) as DiaryEntry[]);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unknown error");
-      setEntries(fallbackEntries);
+      setEntries([]);
     } finally {
       setLoading(false);
     }

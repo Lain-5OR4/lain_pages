@@ -1,7 +1,6 @@
 "use client";
 
 import type { DiaryEntry } from "@/data/diary";
-import { getPhotoSrc } from "@/data/diary";
 import { useCallback, useEffect, useState } from "react";
 
 interface PhotoLightboxProps {
@@ -49,7 +48,7 @@ export default function PhotoLightbox({ entry, initialPhotoIndex, onClose }: Pho
       >
         <div className="relative inline-block">
           <img
-            src={getPhotoSrc(photo.src)}
+            src={photo.src}
             alt={photo.alt}
             className="max-w-[90vw] max-h-[90vh] object-contain border-2 border-green-500 shadow-[0_0_20px_rgba(0,255,0,0.4)]"
           />

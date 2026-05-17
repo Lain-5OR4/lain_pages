@@ -2,7 +2,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import type { DiaryEntry } from "@/data/diary";
-import { getPhotoSrc } from "@/data/diary";
 
 interface DiaryCardProps {
   entry: DiaryEntry;
@@ -22,7 +21,7 @@ export default function DiaryCard({ entry, onPhotoClick }: DiaryCardProps) {
         onClick={() => onPhotoClick(entry.id, 0)}
       >
         <img
-          src={getPhotoSrc(firstPhoto.src)}
+          src={firstPhoto.src}
           alt={firstPhoto.alt}
           loading="lazy"
           className="w-full h-48 object-cover transition-all duration-300 group-hover:scale-105 group-hover:brightness-110"
