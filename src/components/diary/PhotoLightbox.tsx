@@ -34,7 +34,7 @@ export default function PhotoLightbox({ entry, initialPhotoIndex, onClose }: Pho
 
   return (
     <dialog
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 w-full h-full m-0 max-w-none max-h-none border-none open:flex"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/85 backdrop-blur-sm w-full h-full m-0 max-w-none max-h-none border-none open:flex"
       open
       onClick={onClose}
       onKeyDown={(e) => {
@@ -50,10 +50,10 @@ export default function PhotoLightbox({ entry, initialPhotoIndex, onClose }: Pho
           <img
             src={photo.src}
             alt={photo.alt}
-            className="max-w-[90vw] max-h-[90vh] object-contain border-2 border-green-500 shadow-[0_0_20px_rgba(0,255,0,0.4)]"
+            className="max-w-[90vw] max-h-[90vh] object-contain bg-stone-100 ring-1 ring-stone-50/20 shadow-[0_4px_24px_rgba(0,0,0,0.5)]"
           />
           {photo.stamp && (
-            <span className="absolute bottom-3 right-3 text-orange-500/90 font-mono text-xl tracking-wider drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+            <span className="absolute bottom-3 right-3 text-orange-50 text-xl tracking-wider font-mono drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
               {photo.stamp}
             </span>
           )}
@@ -62,14 +62,17 @@ export default function PhotoLightbox({ entry, initialPhotoIndex, onClose }: Pho
         <button
           type="button"
           onClick={onClose}
-          className="absolute -top-10 right-0 text-green-500 hover:text-green-300 font-mono text-xl transition-colors"
+          className="absolute -top-10 right-0 text-stone-200 hover:text-white tracking-widest text-sm transition-colors"
         >
-          [X] CLOSE
+          [×] CLOSE
         </button>
 
         {hasMultiple && (
-          <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-green-500 font-mono text-sm">
-            [{photoIndex + 1}/{entry.photos.length}]
+          <div
+            className="absolute -bottom-9 left-1/2 -translate-x-1/2 text-stone-200 text-xl"
+            style={{ fontFamily: "var(--font-caveat), cursive" }}
+          >
+            {photoIndex + 1} / {entry.photos.length}
           </div>
         )}
 
@@ -78,16 +81,18 @@ export default function PhotoLightbox({ entry, initialPhotoIndex, onClose }: Pho
             <button
               type="button"
               onClick={goPrev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 text-green-500 hover:text-green-300 font-mono text-3xl transition-colors bg-black/60 px-2 py-4"
+              className="absolute left-2 top-1/2 -translate-y-1/2 text-stone-200 hover:text-white text-3xl transition-colors bg-stone-900/60 px-3 py-4 rounded-sm"
+              aria-label="previous photo"
             >
-              {"<"}
+              ‹
             </button>
             <button
               type="button"
               onClick={goNext}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-green-500 hover:text-green-300 font-mono text-3xl transition-colors bg-black/60 px-2 py-4"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-stone-200 hover:text-white text-3xl transition-colors bg-stone-900/60 px-3 py-4 rounded-sm"
+              aria-label="next photo"
             >
-              {">"}
+              ›
             </button>
           </>
         )}

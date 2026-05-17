@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import type { DiaryEntry } from "@/data/diary";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import "../styles/glitch.css";
 
 const DIARY_API_BASE = process.env.NEXT_PUBLIC_DIARY_API ?? "https://api.mizora.dev";
 
@@ -44,64 +43,75 @@ export default function DiaryPage() {
     if (entry) setLightbox({ entry, photoIndex });
   };
 
+  const totalPhotos = entries.reduce((sum, e) => sum + e.photos.length, 0);
+  const year = entries[0]?.date
+    ? entries[0].date.slice(0, 4)
+    : new Date().getFullYear().toString();
+
   return (
-    <div className="relative min-h-screen bg-black text-green-500 font-mono flex flex-col">
-      <div className="absolute top-6 left-6 z-20">
+    <div className="min-h-screen bg-[#ede1c8] text-stone-800 flex flex-col selection:bg-stone-700/30">
+      <div className="fixed top-6 left-6 z-20">
         <Link href="/">
           <Button
             variant="outline"
-            className="border-green-500 text-green-500 hover:bg-green-500 hover:text-black font-mono tracking-widest bg-black/50 backdrop-blur-sm"
+            className="border-stone-700/60 text-stone-700 hover:bg-stone-700 hover:text-[#ede1c8] tracking-widest bg-[#ede1c8]/70 backdrop-blur-sm"
           >
-            {"<"} RETURN
+            ← RETURN
           </Button>
         </Link>
       </div>
 
-      <main className="relative z-10 flex-1 container mx-auto px-6 pt-24 pb-12">
-        <header className="mb-10">
-          <h1 className="text-3xl font-bold glitch" data-text="> PHOTO_DIARY">
-            {">"} PHOTO_DIARY
-          </h1>
-          <p className="text-green-400/60 text-sm mt-2">
-            {"// "}
-            {loading ? "Fetching memory fragments..." : "Retrieval complete."}
+      <main className="flex-1 max-w-3xl w-full mx-auto px-6 pt-24 pb-12">
+        <header className="mb-10 pb-6 border-b-2 border-stone-700/30">
+          <p className="text-[0.65rem] sm:text-xs tracking-[0.35em] text-stone-600 uppercase">
+            PHOTO · DIARY · BY DATE · {year}
+          </p>
+          <p className="text-sm text-stone-600 mt-3 font-[var(--font-caveat)] text-lg">
+            {loading ? "loading…" : `${entries.length} days · ${totalPhotos} photos`}
           </p>
         </header>
 
-        {loading && (
-          <div className="text-center text-green-600 mt-20">
-            <p className="animate-pulse">{">"} Loading data from remote storage...</p>
-          </div>
-        )}
-
         {error && (
-          <div className="text-center text-green-600 mt-4 mb-6">
-            <p className="text-red-500/70 text-sm">
-              {"!"} Connection error: {error}
-            </p>
+          <div className="text-center my-8">
+            <p className="text-red-800/80 text-sm">! connection error: {error}</p>
             <button
               type="button"
               onClick={fetchEntries}
-              className="mt-2 text-green-500 hover:text-green-300 underline text-sm font-mono"
+              className="mt-2 text-stone-700 underline underline-offset-2 text-sm"
             >
-              {">"} Retry connection
+              retry
             </button>
           </div>
         )}
 
-        {!loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {entries.map((entry) => (
-              <DiaryCard key={entry.id} entry={entry} onPhotoClick={handlePhotoClick} />
-            ))}
-          </div>
+        {!loading && entries.length === 0 && !error && (
+          <p
+            className="text-center text-stone-500 mt-20 text-3xl"
+            style={{ fontFamily: "var(--font-caveat), cursive" }}
+          >
+            no entries yet.
+          </p>
         )}
 
-        {!loading && entries.length === 0 && (
-          <div className="text-center text-green-600 mt-20">
-            <p>{">"} No entries found.</p>
-            <p className="text-sm mt-2 text-green-700">Upload images to your Google Drive folder</p>
-          </div>
+        <div>
+          {entries.map((entry, i) => (
+            <div key={entry.id}>
+              {i === 1 && entries.length > 2 && (
+                <div className="text-center text-[0.7rem] tracking-[0.5em] text-stone-500 my-10">
+                  ― EARLIER ―
+                </div>
+              )}
+              <DiaryCard entry={entry} onPhotoClick={handlePhotoClick} />
+            </div>
+          ))}
+        </div>
+
+        {entries.length > 0 && (
+          <footer className="mt-16 pt-6 border-t-2 border-stone-700/30 text-center">
+            <p className="text-[0.7rem] tracking-[0.5em] text-stone-600">
+              VOL · {String(entries.length).padStart(2, "0")}
+            </p>
+          </footer>
         )}
       </main>
 

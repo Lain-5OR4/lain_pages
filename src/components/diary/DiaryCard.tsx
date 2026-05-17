@@ -1,6 +1,5 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
 import type { DiaryEntry } from "@/data/diary";
 
 interface DiaryCardProps {
@@ -8,44 +7,82 @@ interface DiaryCardProps {
   onPhotoClick: (entryId: string, photoIndex: number) => void;
 }
 
+const MONTHS = [
+  "JAN",
+  "FEB",
+  "MAR",
+  "APR",
+  "MAY",
+  "JUN",
+  "JUL",
+  "AUG",
+  "SEP",
+  "OCT",
+  "NOV",
+  "DEC",
+];
+const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+
 export default function DiaryCard({ entry, onPhotoClick }: DiaryCardProps) {
-  const firstPhoto = entry.photos[0];
-  const extraCount = entry.photos.length - 1;
-  const dateFormatted = entry.date.replace(/-/g, ".");
+  const d = new Date(`${entry.date}T00:00:00`);
+  const month = MONTHS[d.getMonth()];
+  const day = String(d.getDate()).padStart(2, "0");
+  const weekday = WEEKDAYS[d.getDay()];
 
   return (
-    <Card className="bg-black border-green-500 border-2 text-green-500 shadow-[0_0_10px_rgba(0,255,0,0.3)] font-mono hover:shadow-[0_0_20px_rgba(0,255,0,0.5)] transition-all duration-300 overflow-hidden">
-      <button
-        type="button"
-        className="relative cursor-pointer group overflow-hidden w-full"
-        onClick={() => onPhotoClick(entry.id, 0)}
-      >
-        <img
-          src={firstPhoto.src}
-          alt={firstPhoto.alt}
-          loading="lazy"
-          className="w-full h-48 object-cover transition-all duration-300 group-hover:scale-105 group-hover:brightness-110"
-        />
-        <div className="absolute inset-0 pointer-events-none bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,0,0,0.1)_2px,rgba(0,0,0,0.1)_4px)]" />
-        <div className="absolute inset-0 pointer-events-none border-b-2 border-green-500/50" />
-        {firstPhoto.stamp && (
-          <span className="absolute bottom-2 right-2 pointer-events-none text-orange-400/90 text-xs font-mono tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-            {firstPhoto.stamp}
-          </span>
-        )}
-        {extraCount > 0 && (
-          <span className="absolute top-2 right-2 bg-black/80 border border-green-500 text-green-400 text-xs px-2 py-0.5 font-mono">
-            +{extraCount}
-          </span>
-        )}
-      </button>
-      <CardContent className="p-4">
-        <p className="text-xs text-green-600 mb-1">
-          {">"} {dateFormatted}
+    <article className="grid grid-cols-[4.5rem_1fr] gap-5 py-8 border-b border-stone-700/15 last:border-b-0">
+      <div className="text-stone-700 leading-tight pt-1 select-none">
+        <p className="text-[0.65rem] tracking-[0.3em] uppercase text-stone-600">{month}</p>
+        <p className="text-4xl font-light leading-none mt-1 text-stone-800">{day}</p>
+        <p className="text-[0.65rem] tracking-[0.3em] uppercase text-stone-500 mt-1">
+          {weekday}
         </p>
-        <h3 className="text-sm font-bold text-green-400 mb-2">{entry.title}</h3>
-        <p className="text-xs text-green-400/70 leading-relaxed">{entry.description}</p>
-      </CardContent>
-    </Card>
+      </div>
+
+      <div className="min-w-0">
+        {entry.title && (
+          <h2
+            className="text-2xl text-stone-800 leading-tight"
+            style={{ fontFamily: "var(--font-caveat), cursive" }}
+          >
+            {entry.title}
+          </h2>
+        )}
+        {entry.description && (
+          <p className="text-sm text-stone-700/85 mt-2 leading-relaxed whitespace-pre-wrap">
+            {entry.description}
+          </p>
+        )}
+        {entry.photos.length > 0 && (
+          <div className="mt-3">
+            <p className="text-[0.65rem] tracking-[0.3em] uppercase text-stone-500 mb-2">
+              {entry.photos.length} {entry.photos.length === 1 ? "PHOTO" : "PHOTOS"}
+            </p>
+            <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 snap-x snap-mandatory">
+              {entry.photos.map((photo, i) => (
+                <button
+                  key={photo.src}
+                  type="button"
+                  className="relative shrink-0 snap-start group focus:outline-none"
+                  onClick={() => onPhotoClick(entry.id, i)}
+                >
+                  <img
+                    src={photo.src}
+                    alt={photo.alt}
+                    loading="lazy"
+                    className="h-40 w-auto max-w-[16rem] object-cover bg-stone-700/10 rounded-sm shadow-[0_1px_3px_rgba(120,90,60,0.3)] group-hover:brightness-110 transition"
+                  />
+                  {photo.stamp && (
+                    <span className="absolute bottom-1 right-1.5 text-[0.6rem] text-orange-50/90 font-mono tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                      {photo.stamp}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </article>
   );
 }

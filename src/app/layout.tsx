@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Kaisei_Decol, Reggae_One } from "next/font/google";
+import { Caveat, Kaisei_Decol, Reggae_One } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ConditionalBackground } from "@/components/background/ConditionalBackground";
@@ -36,6 +36,13 @@ const reggaeOne = Reggae_One({
   display: "swap",
 });
 
+const caveat = Caveat({
+  subsets: ["latin"],
+  variable: "--font-caveat",
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Locus Solus in Wired",
   description: "portfolios of the future",
@@ -49,7 +56,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${loveLetter.variable} ${geistMono.variable} ${geistSans.variable} ${kaiseiDecol.variable} ${reggaeOne.variable} antialiased`}
+        className={`${loveLetter.variable} ${geistMono.variable} ${geistSans.variable} ${kaiseiDecol.variable} ${reggaeOne.variable} ${caveat.variable} antialiased`}
       >
         <ConditionalBackground />
         {children}
