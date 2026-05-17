@@ -160,6 +160,47 @@ describe("photo-diary /api/diary + CORS", () => {
 		expect(res.headers.get("access-control-allow-origin")).toBeNull();
 	});
 
+	it("GET /api/diary shifts taken_at with UTC marker to JST in the stamp", async () => {
+		await env.DB.prepare("DELETE FROM post_images").run();
+		await env.DB.prepare("DELETE FROM posts").run();
+		await env.DB.batch([
+			env.DB.prepare(
+				"INSERT INTO posts (id, title, caption, posted_on) VALUES (10, 't', 'c', '2026-05-12')",
+			),
+			env.DB.prepare(
+				"INSERT INTO post_images (post_id, r2_key, sort_order, taken_at) VALUES (10, 'posts/10/0.jpg', 0, '2026-05-12T03:00:00.000Z')",
+			),
+		]);
+		const entries = (await (
+			await SELF.fetch("http://example.com/api/diary")
+		).json()) as Array<{ id: string; photos: Array<{ stamp?: string }> }>;
+		const e = entries.find((x) => x.id === "10");
+		// UTC 03:00 + 9h = JST 12:00
+		expect(e?.photos[0].stamp).toBe("'26 05 12 12:00");
+		// restore baseline
+		await seedTwoPosts();
+	});
+
+	it("GET /api/diary renders naive (no-TZ) taken_at as-is", async () => {
+		await env.DB.prepare("DELETE FROM post_images").run();
+		await env.DB.prepare("DELETE FROM posts").run();
+		await env.DB.batch([
+			env.DB.prepare(
+				"INSERT INTO posts (id, title, caption, posted_on) VALUES (11, 't', 'c', '2026-05-12')",
+			),
+			env.DB.prepare(
+				"INSERT INTO post_images (post_id, r2_key, sort_order, taken_at) VALUES (11, 'posts/11/0.jpg', 0, '2026-05-12T07:15:30')",
+			),
+		]);
+		const entries = (await (
+			await SELF.fetch("http://example.com/api/diary")
+		).json()) as Array<{ id: string; photos: Array<{ stamp?: string }> }>;
+		const e = entries.find((x) => x.id === "11");
+		// naive → byte-for-byte (no JST shift)
+		expect(e?.photos[0].stamp).toBe("'26 05 12 07:15");
+		await seedTwoPosts();
+	});
+
 	it("OPTIONS /api/diary returns 204 (preflight)", async () => {
 		const res = await SELF.fetch("http://example.com/api/diary", {
 			method: "OPTIONS",

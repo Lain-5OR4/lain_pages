@@ -123,12 +123,23 @@ const safeExt = (name: string, fallback = "jpg"): string => {
 	return allowed.has(ext) ? ext : fallback;
 };
 
-const formatStamp = (iso: string | null | undefined): string => {
-	if (!iso) return "";
-	const d = new Date(iso);
+// Workers run in UTC. EXIF DateTimeOriginal is the camera's local time without a
+// timezone, so new uploads store a naive "YYYY-MM-DDTHH:MM:SS" we render byte-for-byte.
+// Timestamps that carry a UTC marker (Z / offset) — including SQLite CURRENT_TIMESTAMP
+// after we normalise it — get shifted to JST so the diary stays in the user's clock.
+const JST_OFFSET_MS = 9 * 60 * 60 * 1000;
+
+const formatStamp = (s: string | null | undefined): string => {
+	if (!s) return "";
+	const naive = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::\d{2}(?:\.\d+)?)?$/.exec(s);
+	if (naive) {
+		return `'${naive[1].slice(2)} ${naive[2]} ${naive[3]} ${naive[4]}:${naive[5]}`;
+	}
+	const d = new Date(s);
 	if (Number.isNaN(d.getTime())) return "";
+	const jst = new Date(d.getTime() + JST_OFFSET_MS);
 	const p = (n: number) => String(n).padStart(2, "0");
-	return `'${p(d.getFullYear() % 100)} ${p(d.getMonth() + 1)} ${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+	return `'${p(jst.getUTCFullYear() % 100)} ${p(jst.getUTCMonth() + 1)} ${p(jst.getUTCDate())} ${p(jst.getUTCHours())}:${p(jst.getUTCMinutes())}`;
 };
 
 const PAGE_STYLES = `
@@ -523,7 +534,12 @@ import exifr from "https://esm.sh/exifr@7";
 				const meta = await exifr.parse(incoming[i], ["DateTimeOriginal"]);
 				const d = meta && meta.DateTimeOriginal;
 				if (d instanceof Date && !isNaN(d.getTime()) && items[slot] && items[slot].file === incoming[i]) {
-					items[slot].takenAt = d.toISOString();
+					// EXIF DateTimeOriginal is camera-local with no TZ; store as naive
+					// "YYYY-MM-DDTHH:MM:SS" so the worker renders it byte-for-byte
+					// instead of converting through UTC.
+					items[slot].takenAt =
+						d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) +
+						"T" + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
 				}
 			} catch {}
 		}
@@ -657,17 +673,24 @@ app.get("/api/posts", async (c) => {
 app.get("/api/diary", async (c) => {
 	const posts = await getRecentPosts(c.env.DB);
 	const origin = new URL(c.req.url).origin;
-	const entries: DiaryEntry[] = posts.map((p) => ({
-		id: String(p.id),
-		date: p.posted_on,
-		title: p.title,
-		description: p.caption,
-		photos: p.images.map((img) => ({
-			src: `${origin}/images/${img.key}`,
-			alt: p.title || p.caption || `#${p.id}`,
-			stamp: formatStamp(img.taken_at ?? p.created_at),
-		})),
-	}));
+	const entries: DiaryEntry[] = posts.map((p) => {
+		// D1's CURRENT_TIMESTAMP is UTC but written as "YYYY-MM-DD HH:MM:SS" with no
+		// marker; tag it so formatStamp treats it as UTC and shifts to JST.
+		const createdUtc = /[Z]|[+-]\d{2}:?\d{2}$/.test(p.created_at)
+			? p.created_at
+			: `${p.created_at.replace(" ", "T")}Z`;
+		return {
+			id: String(p.id),
+			date: p.posted_on,
+			title: p.title,
+			description: p.caption,
+			photos: p.images.map((img) => ({
+				src: `${origin}/images/${img.key}`,
+				alt: p.title || p.caption || `#${p.id}`,
+				stamp: formatStamp(img.taken_at ?? createdUtc),
+			})),
+		};
+	});
 	c.header("Cache-Control", "public, max-age=60, s-maxage=300");
 	return c.json(entries);
 });
