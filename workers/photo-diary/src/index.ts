@@ -132,29 +132,230 @@ const formatStamp = (iso: string | null | undefined): string => {
 };
 
 const PAGE_STYLES = `
-:root { color-scheme: light dark; }
-body { font-family: system-ui, sans-serif; max-width: 38rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; }
-h1 { font-size: 1.4rem; margin: 0 0 2rem; }
-h1 a { color: inherit; text-decoration: none; }
-.post { margin: 0 0 3rem; }
-.post header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem; font-size: 0.85em; color: #888; }
+:root {
+	--ink: #1a1714;
+	--paper: #f7f3ec;
+	--paper-2: #ede6d6;
+	--rule: rgba(26, 23, 20, 0.18);
+	--muted: #6b6259;
+	--accent: #8b1f1a;
+	color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--paper); }
+body {
+	color: var(--ink);
+	font-family: "Inter", system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+	font-size: 15px;
+	line-height: 1.65;
+	margin: 0;
+	padding: 0;
+	-webkit-font-smoothing: antialiased;
+}
+.page { max-width: 48rem; margin: 0 auto; padding: 3rem 2rem 5rem; }
+
+/* masthead */
+.masthead {
+	display: grid; grid-template-columns: 1fr auto; align-items: end;
+	padding-bottom: 1.25rem; border-bottom: 2px solid var(--ink); margin-bottom: 0.6rem;
+}
+.masthead h1 {
+	font-family: "Playfair Display", "Cormorant Garamond", Georgia, serif;
+	font-weight: 500; font-size: 2.6rem; letter-spacing: -0.015em; margin: 0; line-height: 0.95;
+}
+.masthead h1 em { font-style: italic; font-weight: 400; color: var(--accent); }
+.masthead h1 a { color: inherit; text-decoration: none; }
+.masthead .meta {
+	font-size: 0.65rem; letter-spacing: 0.32em; text-transform: uppercase;
+	color: var(--muted); text-align: right; line-height: 1.4;
+}
+.masthead .meta b { color: var(--ink); font-weight: 500; }
+.tagline {
+	display: flex; justify-content: space-between; align-items: baseline;
+	font-size: 0.62rem; letter-spacing: 0.32em; text-transform: uppercase; color: var(--muted);
+	border-bottom: 1px solid var(--rule); padding-bottom: 0.75rem; margin-bottom: 2.5rem;
+	font-variant-numeric: tabular-nums;
+}
+
+/* back link */
+.back { font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); margin: 0 0 2rem; }
+.back a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
+.back a:hover { color: var(--ink); border-color: var(--ink); }
+
+/* numbered field */
+.field {
+	display: grid; grid-template-columns: 2.5rem 1fr; gap: 1.5rem; align-items: baseline;
+	padding: 1.5rem 0; border-bottom: 1px solid var(--rule);
+}
+.field-num {
+	font-family: "Playfair Display", Georgia, serif; font-size: 1.5rem; font-style: italic;
+	color: var(--accent); line-height: 1;
+}
+.field-body { min-width: 0; }
+.field-body label {
+	display: block; font-size: 0.62rem; letter-spacing: 0.32em;
+	text-transform: uppercase; color: var(--muted); margin-bottom: 0.6rem;
+}
+
+/* inputs */
+input[type=text], input[type=date] {
+	font-family: inherit; font-size: 1.05rem; color: var(--ink);
+	border: none; border-bottom: 1px solid var(--ink); background: transparent;
+	padding: 0.3rem 0; width: 100%; outline: none; border-radius: 0;
+}
+input[type=text]:focus, input[type=date]:focus { border-color: var(--accent); }
+textarea {
+	font-family: inherit; font-size: 1rem; color: var(--ink);
+	border: 1px solid var(--ink); background: transparent;
+	padding: 0.7rem 0.85rem; width: 100%; min-height: 5em; resize: vertical;
+	outline: none; line-height: 1.55;
+}
+textarea:focus { border-color: var(--accent); }
+
+/* dropzone + thumbs */
+.thumbs {
+	display: grid; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+	gap: 0.6rem; margin-bottom: 0.75rem;
+}
+.thumb {
+	position: relative; aspect-ratio: 1 / 1; background: var(--paper-2);
+	border: 1px solid var(--rule); overflow: hidden;
+}
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb .idx {
+	position: absolute; top: 0; left: 0; background: var(--ink); color: var(--paper);
+	font-size: 0.6rem; padding: 2px 5px; letter-spacing: 0.12em;
+	font-variant-numeric: tabular-nums; font-family: ui-monospace, monospace;
+}
+.thumb .rm {
+	position: absolute; top: 4px; right: 4px;
+	width: 1.3rem; height: 1.3rem; border-radius: 50%;
+	display: flex; align-items: center; justify-content: center;
+	background: var(--paper); border: 1px solid var(--ink); color: var(--ink);
+	font-size: 0.85rem; line-height: 1; cursor: pointer; padding: 0; user-select: none;
+}
+.thumb .rm:hover { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+.thumb .exif {
+	position: absolute; bottom: 4px; left: 4px;
+	font-size: 0.55rem; color: var(--paper); background: rgba(0,0,0,0.6);
+	padding: 2px 5px; font-family: ui-monospace, monospace; letter-spacing: 0.05em;
+}
+.dropzone {
+	display: block; border: 1px dashed var(--ink); padding: 1.5rem 1rem;
+	text-align: center; cursor: pointer; font-size: 0.7rem;
+	letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted);
+	transition: background 0.15s, color 0.15s; user-select: none;
+}
+.dropzone:hover, .dropzone.over { background: var(--ink); color: var(--paper); }
+
+/* date split */
+.date-display {
+	font-family: "Playfair Display", Georgia, serif; font-size: 1.3rem;
+	color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: 0.05em;
+	margin-top: 0.4rem;
+}
+.date-display em { font-style: italic; color: var(--muted); margin: 0 0.5em; }
+
+/* submit row */
+.submit-row {
+	display: flex; align-items: center; gap: 1.5rem; padding-top: 2rem;
+}
+.progress { flex: 1; height: 1px; background: var(--rule); position: relative; overflow: hidden; }
+.progress > span {
+	position: absolute; inset: 0 auto 0 0; width: 0%; background: var(--accent);
+	transition: width 0.25s ease;
+}
+button[type=submit] {
+	background: var(--ink); color: var(--paper); border: none;
+	padding: 0.75rem 2rem; font-size: 0.7rem; letter-spacing: 0.35em;
+	text-transform: uppercase; cursor: pointer; font-family: inherit;
+	transition: background 0.15s;
+}
+button[type=submit]:hover:not(:disabled) { background: var(--accent); }
+button[type=submit]:disabled { opacity: 0.4; cursor: not-allowed; }
+#upload-status {
+	font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase;
+	color: var(--muted); min-height: 1rem; margin-top: 0.6rem;
+	font-variant-numeric: tabular-nums;
+}
+
+/* admin entries list */
+.entries { list-style: none; margin: 0; padding: 0; }
+.entries li {
+	display: grid;
+	grid-template-columns: 2.5rem 6rem 1fr auto auto;
+	align-items: baseline; gap: 1rem;
+	padding: 1rem 0; border-bottom: 1px solid var(--rule);
+}
+.entries .num {
+	font-family: "Playfair Display", Georgia, serif; font-style: italic;
+	color: var(--muted); font-size: 1.1rem;
+}
+.entries .date {
+	font-size: 0.65rem; letter-spacing: 0.22em; color: var(--muted);
+	font-variant-numeric: tabular-nums; font-family: ui-monospace, monospace;
+}
+.entries .title { font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.entries .title a {
+	color: inherit; text-decoration: none;
+	border-bottom: 1px solid transparent; padding-bottom: 1px;
+}
+.entries .title a:hover { border-color: var(--ink); }
+.entries .count {
+	font-size: 0.62rem; letter-spacing: 0.22em; color: var(--muted);
+	text-transform: uppercase; font-variant-numeric: tabular-nums;
+}
+.entries .del form { margin: 0; }
+.entries .del button {
+	border: 1px solid var(--rule); background: transparent; color: var(--muted);
+	font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase;
+	padding: 0.35rem 0.7rem; cursor: pointer; font-family: inherit;
+}
+.entries .del button:hover { color: var(--accent); border-color: var(--accent); }
+
+.new-entry-cta {
+	display: inline-block; margin-bottom: 2rem;
+	padding: 0.6rem 1.4rem; border: 1px solid var(--ink); color: var(--ink);
+	text-decoration: none; font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
+	transition: background 0.15s, color 0.15s;
+}
+.new-entry-cta:hover { background: var(--ink); color: var(--paper); }
+
+/* public feed posts */
+.post { margin: 0 0 4rem; }
+.post header {
+	display: flex; justify-content: space-between; align-items: baseline;
+	margin-bottom: 0.5rem; font-size: 0.65rem; letter-spacing: 0.22em;
+	text-transform: uppercase; color: var(--muted);
+}
 .post header a { color: inherit; text-decoration: none; }
-.post h2 { font-size: 1.1rem; margin: 0.25rem 0 0.75rem; }
-.post .caption { margin: 0.75rem 0 0; white-space: pre-wrap; }
-.carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 4px; border-radius: 6px; background: #f4f4f4; -webkit-overflow-scrolling: touch; }
-.carousel img { flex: 0 0 100%; scroll-snap-align: start; width: 100%; max-height: 80vh; object-fit: contain; display: block; }
-.empty { color: #888; font-style: italic; }
-.admin-list { list-style: none; padding: 0; }
-.admin-list li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #eee; align-items: baseline; }
-.admin-list li a { color: inherit; text-decoration: none; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.admin-form { display: grid; gap: 0.75rem; margin: 1.5rem 0; }
-.admin-form label { display: grid; gap: 0.25rem; font-size: 0.85em; color: #666; }
-.admin-form input, .admin-form textarea { font-family: inherit; font-size: 1rem; padding: 0.4rem 0.5rem; border: 1px solid #ccc; border-radius: 4px; background: transparent; color: inherit; }
-.admin-form textarea { min-height: 5em; resize: vertical; }
-.admin-form button { padding: 0.5rem 1rem; cursor: pointer; }
-#upload-status { font-size: 0.85em; color: #666; min-height: 1.2em; }
-footer { margin: 4rem 0 2rem; font-size: 0.85em; color: #888; text-align: center; }
-footer a { color: inherit; margin: 0 0.5rem; }
+.post h2 {
+	font-family: "Playfair Display", Georgia, serif; font-weight: 500;
+	font-style: italic; font-size: 1.6rem; margin: 0.25rem 0 1rem; line-height: 1.15;
+}
+.post .caption { margin: 1rem 0 0; white-space: pre-wrap; font-size: 0.95rem; }
+.carousel {
+	display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+	gap: 2px; background: var(--paper-2); -webkit-overflow-scrolling: touch;
+}
+.carousel img {
+	flex: 0 0 100%; scroll-snap-align: start; width: 100%;
+	max-height: 80vh; object-fit: contain; display: block;
+}
+.empty {
+	color: var(--muted); font-style: italic; font-family: "Playfair Display", Georgia, serif;
+	font-size: 1.05rem; padding: 2rem 0;
+}
+
+/* footer */
+footer {
+	margin-top: 5rem; padding-top: 1.25rem; border-top: 1px solid var(--rule);
+	display: flex; justify-content: space-between; font-size: 0.6rem;
+	letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted);
+}
+footer a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; }
+footer a:hover { border-color: var(--muted); }
+footer .sep { margin: 0 0.75em; opacity: 0.4; }
 `;
 
 const layout = (opts: {
@@ -163,8 +364,14 @@ const layout = (opts: {
 	ogImage?: string;
 	ogUrl?: string;
 	noStore?: boolean;
+	section?: string;
+	issue?: string;
 	body: ReturnType<typeof html>;
-}) => html`<!doctype html>
+}) => {
+	const now = new Date();
+	const year = now.getFullYear();
+	const dateStamp = `${year}.${String(now.getMonth() + 1).padStart(2, "0")}.${String(now.getDate()).padStart(2, "0")}`;
+	return html`<!doctype html>
 <html lang="ja">
 	<head>
 		<meta charset="UTF-8" />
@@ -184,14 +391,33 @@ const layout = (opts: {
 		<meta property="og:type" content="${opts.ogImage ? "article" : "website"}" />
 		<meta name="twitter:card" content="summary_large_image" />
 		${opts.noStore ? html`<meta name="robots" content="noindex" />` : ""}
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
 		<style>${raw(PAGE_STYLES)}</style>
 	</head>
 	<body>
-		<h1><a href="/">photo-diary</a></h1>
-		${opts.body}
-		<footer><a href="/api/posts">JSON</a><a href="/admin">admin</a></footer>
+		<div class="page">
+			<header class="masthead">
+				<h1><a href="/">PHOTO <em>diary</em></a></h1>
+				<div class="meta">
+					<b>${opts.issue ?? `Vol. ${year}`}</b><br />
+					${opts.section ?? "Archive"}
+				</div>
+			</header>
+			<div class="tagline">
+				<span>個人写真日記 — by mizora</span>
+				<span>${dateStamp}</span>
+			</div>
+			${opts.body}
+			<footer>
+				<span><a href="/api/posts">JSON</a><span class="sep">·</span><a href="/admin">Admin</a></span>
+				<span>© ${year} mizora.dev</span>
+			</footer>
+		</div>
 	</body>
 </html>`;
+};
 
 const renderPost = (p: PostWithImages) => html`<article class="post">
 	<header>
@@ -214,9 +440,10 @@ const renderPost = (p: PostWithImages) => html`<article class="post">
 </article>`;
 
 // Inline ES module:
-// - resize images to long-edge ≤ 2048px JPEG in browser (canvas)
-// - extract EXIF DateTimeOriginal BEFORE re-encoding (resize strips it)
-// - send taken_at[i] alongside images[i] as multipart fields
+// - dropzone (click + drag) populates an internal items[] state
+// - thumbnail grid with index badge, EXIF stamp, and per-file remove button
+// - resize to long-edge ≤ 2048px JPEG (browser canvas) at submit time
+// - extract EXIF DateTimeOriginal BEFORE re-encoding (canvas resize strips it)
 const UPLOAD_SCRIPT = `
 import exifr from "https://esm.sh/exifr@7";
 
@@ -225,45 +452,132 @@ import exifr from "https://esm.sh/exifr@7";
 	const QUALITY = 0.85;
 	const form = document.getElementById("new-post-form");
 	if (!form) return;
+	const fileInput = document.getElementById("file-input");
+	const dropzone = document.getElementById("dropzone");
+	const thumbsEl = document.getElementById("thumbs");
+	const countEl = document.getElementById("count");
 	const status = document.getElementById("upload-status");
+	const progress = document.getElementById("progress-bar");
+	const btn = form.querySelector("button[type=submit]");
+
+	const items = [];
+
+	function setProgress(pct, msg) {
+		if (progress) progress.style.width = Math.max(0, Math.min(100, pct)) + "%";
+		if (msg != null) status.textContent = msg;
+	}
+
+	function pad(n) { return String(n).padStart(2, "0"); }
+	function formatStamp(iso) {
+		const d = new Date(iso);
+		if (isNaN(d.getTime())) return "";
+		return "'" + pad(d.getFullYear() % 100) + " " + pad(d.getMonth() + 1) + " " + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+	}
+
+	function render() {
+		thumbsEl.innerHTML = "";
+		for (let i = 0; i < items.length; i++) {
+			const it = items[i];
+			const card = document.createElement("div");
+			card.className = "thumb";
+			const idx = document.createElement("span");
+			idx.className = "idx";
+			idx.textContent = pad(i + 1);
+			const rm = document.createElement("button");
+			rm.type = "button";
+			rm.className = "rm";
+			rm.setAttribute("aria-label", "remove");
+			rm.textContent = "×";
+			rm.addEventListener("click", () => {
+				URL.revokeObjectURL(it.url);
+				items.splice(i, 1);
+				render();
+			});
+			const img = document.createElement("img");
+			img.src = it.url;
+			img.alt = "";
+			card.append(idx, rm, img);
+			if (it.takenAt) {
+				const exif = document.createElement("span");
+				exif.className = "exif";
+				exif.textContent = formatStamp(it.takenAt);
+				card.appendChild(exif);
+			}
+			thumbsEl.appendChild(card);
+		}
+		thumbsEl.style.display = items.length ? "" : "none";
+		countEl.textContent = String(items.length);
+	}
+
+	async function addFiles(fileList) {
+		const incoming = Array.from(fileList || []).filter((f) => f.type && f.type.startsWith("image/"));
+		if (!incoming.length) return;
+		const startCount = items.length;
+		for (let i = 0; i < incoming.length; i++) {
+			items.push({ file: incoming[i], url: URL.createObjectURL(incoming[i]), takenAt: "" });
+		}
+		render();
+		for (let i = 0; i < incoming.length; i++) {
+			const slot = startCount + i;
+			try {
+				const meta = await exifr.parse(incoming[i], ["DateTimeOriginal"]);
+				const d = meta && meta.DateTimeOriginal;
+				if (d instanceof Date && !isNaN(d.getTime()) && items[slot] && items[slot].file === incoming[i]) {
+					items[slot].takenAt = d.toISOString();
+				}
+			} catch {}
+		}
+		render();
+	}
+
+	fileInput.addEventListener("change", () => {
+		addFiles(fileInput.files);
+		fileInput.value = "";
+	});
+	dropzone.addEventListener("click", () => fileInput.click());
+	dropzone.addEventListener("keydown", (e) => {
+		if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInput.click(); }
+	});
+	["dragenter", "dragover"].forEach((ev) => {
+		dropzone.addEventListener(ev, (e) => { e.preventDefault(); dropzone.classList.add("over"); });
+	});
+	["dragleave", "dragend"].forEach((ev) => {
+		dropzone.addEventListener(ev, () => dropzone.classList.remove("over"));
+	});
+	dropzone.addEventListener("drop", (e) => {
+		e.preventDefault();
+		dropzone.classList.remove("over");
+		if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files);
+	});
 
 	form.addEventListener("submit", async (e) => {
 		e.preventDefault();
-		const fileInput = form.querySelector('input[type="file"]');
-		const files = Array.from(fileInput.files || []);
-		if (!files.length) { status.textContent = "select at least one image"; return; }
-		const btn = form.querySelector("button[type=submit]");
+		if (!items.length) { setProgress(0, "select at least one image"); return; }
 		btn.disabled = true;
 		try {
-			status.textContent = "reading EXIF...";
-			const takenAts = await Promise.all(files.map(async (f) => {
-				try {
-					const meta = await exifr.parse(f, ["DateTimeOriginal"]);
-					const d = meta && meta.DateTimeOriginal;
-					return (d instanceof Date && !isNaN(d.getTime())) ? d.toISOString() : "";
-				} catch { return ""; }
-			}));
-			status.textContent = "resizing 0/" + files.length;
+			const total = items.length;
+			setProgress(4, "resizing 0/" + total);
 			const resized = [];
-			for (let i = 0; i < files.length; i++) {
-				resized.push(await resize(files[i]));
-				status.textContent = "resizing " + (i + 1) + "/" + files.length;
+			for (let i = 0; i < total; i++) {
+				resized.push(await resize(items[i].file));
+				setProgress(4 + Math.round(((i + 1) / total) * 66), "resizing " + (i + 1) + "/" + total);
 			}
-			status.textContent = "uploading...";
+			setProgress(78, "uploading…");
 			const fd = new FormData();
 			fd.append("title", form.elements.title.value);
 			fd.append("caption", form.elements.caption.value);
 			fd.append("posted_on", form.elements.posted_on.value);
 			for (let i = 0; i < resized.length; i++) {
 				fd.append("images", resized[i], resized[i].name);
-				fd.append("taken_at", takenAts[i] || "");
+				fd.append("taken_at", items[i].takenAt || "");
 			}
 			const res = await fetch("/admin/posts", { method: "POST", body: fd });
-			if (!res.ok) { status.textContent = "upload failed: " + res.status; btn.disabled = false; return; }
+			if (!res.ok) { setProgress(0, "upload failed: " + res.status); btn.disabled = false; return; }
+			setProgress(100, "done");
 			const data = await res.json();
 			window.location = data.url || "/admin";
 		} catch (err) {
-			status.textContent = "error: " + (err && err.message || err);
+			setProgress(0, "error: " + ((err && err.message) || err));
 			btn.disabled = false;
 		}
 	});
@@ -373,21 +687,29 @@ app.get("/images/:key{.+}", async (c) => {
 app.get("/admin", async (c) => {
 	const posts = await getRecentPosts(c.env.DB);
 	c.header("Cache-Control", "no-store");
+	const total = posts.length;
 	return c.html(
 		layout({
 			title: "admin — photo-diary",
 			noStore: true,
+			section: "Editorial Desk",
+			issue: `${total} ${total === 1 ? "Entry" : "Entries"}`,
 			body: html`
-				<p><a href="/admin/new">+ 新規投稿</a></p>
+				<a class="new-entry-cta" href="/admin/new">+ New Entry</a>
 				${posts.length === 0
-					? html`<p class="empty">(まだ投稿なし)</p>`
-					: html`<ul class="admin-list">
+					? html`<p class="empty">No entries yet — start with a new one.</p>`
+					: html`<ul class="entries">
 						${posts.map(
-							(p) => html`<li>
-								<a href="/post/${p.id}">#${p.id} — ${p.posted_on} — ${p.title || p.caption || "(no title)"} (${p.images.length}枚)</a>
-								<form method="POST" action="/admin/posts/${p.id}/delete" onsubmit="return confirm('Delete #${p.id}?')">
-									<button type="submit">delete</button>
-								</form>
+							(p, i) => html`<li>
+								<span class="num">${String(total - i).padStart(2, "0")}</span>
+								<span class="date">${p.posted_on}</span>
+								<span class="title"><a href="/post/${p.id}">${p.title || p.caption || "(untitled)"}</a></span>
+								<span class="count">${p.images.length} ${p.images.length === 1 ? "photo" : "photos"}</span>
+								<span class="del">
+									<form method="POST" action="/admin/posts/${p.id}/delete" onsubmit="return confirm('Delete #${p.id}?')">
+										<button type="submit">Delete</button>
+									</form>
+								</span>
 							</li>`,
 						)}
 					</ul>`}
@@ -401,24 +723,51 @@ app.get("/admin/new", (c) => {
 	c.header("Cache-Control", "no-store");
 	return c.html(
 		layout({
-			title: "new post — photo-diary",
+			title: "new entry — photo-diary",
 			noStore: true,
+			section: "New Entry",
+			issue: "Draft",
 			body: html`
-				<p><a href="/admin">← admin</a></p>
-				<form id="new-post-form" class="admin-form" action="/admin/posts" method="POST" enctype="multipart/form-data">
-					<label>title
-						<input type="text" name="title" placeholder="title" />
-					</label>
-					<label>images
-						<input type="file" name="images" accept="image/*" multiple required />
-					</label>
-					<label>posted on
-						<input type="date" name="posted_on" value="${today}" required />
-					</label>
-					<label>caption
-						<textarea name="caption" placeholder="(optional)"></textarea>
-					</label>
-					<button type="submit">post</button>
+				<p class="back"><a href="/admin">← Editorial Desk</a></p>
+				<form id="new-post-form" action="/admin/posts" method="POST" enctype="multipart/form-data">
+					<div class="field">
+						<span class="field-num">01</span>
+						<div class="field-body">
+							<label>Title</label>
+							<input type="text" name="title" autocomplete="off" />
+						</div>
+					</div>
+
+					<div class="field">
+						<span class="field-num">02</span>
+						<div class="field-body">
+							<label>Images <span style="color:var(--ink); margin-left:0.5em">(<span id="count">0</span>)</span></label>
+							<div id="thumbs" class="thumbs" style="display:none"></div>
+							<div id="dropzone" class="dropzone" tabindex="0">drop files here / click to select</div>
+							<input id="file-input" type="file" name="images" accept="image/*" multiple style="display:none" />
+						</div>
+					</div>
+
+					<div class="field">
+						<span class="field-num">03</span>
+						<div class="field-body">
+							<label>Date Posted</label>
+							<input type="date" name="posted_on" value="${today}" required />
+						</div>
+					</div>
+
+					<div class="field">
+						<span class="field-num">04</span>
+						<div class="field-body">
+							<label>Caption</label>
+							<textarea name="caption" placeholder="(optional)"></textarea>
+						</div>
+					</div>
+
+					<div class="submit-row">
+						<div class="progress"><span id="progress-bar"></span></div>
+						<button type="submit">Publish</button>
+					</div>
 					<div id="upload-status"></div>
 				</form>
 				<script type="module">${raw(UPLOAD_SCRIPT)}</script>
