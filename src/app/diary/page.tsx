@@ -77,21 +77,126 @@ export default function DiaryPage() {
       </div>
 
       <div
-        className="relative min-h-[calc(100vh-1rem)] sm:min-h-[calc(100vh-1.5rem)] md:min-h-[calc(100vh-2rem)] text-stone-100"
+        className="relative min-h-[calc(100vh-1rem)] sm:min-h-[calc(100vh-1.5rem)] md:min-h-[calc(100vh-2rem)] text-stone-100 overflow-hidden"
         style={{
-          backgroundColor: "#7a5630",
-          backgroundImage: `
-            url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='c'><feTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' seed='2'/><feComponentTransfer><feFuncA type='discrete' tableValues='0 0 0.3 0.7 0.95 1'/></feComponentTransfer><feColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.09  0 0 0 0 0.03  0 0 0 1 0'/></filter><rect width='220' height='220' filter='url(%23c)'/></svg>"),
-            url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='2.3' numOctaves='2' seed='9'/><feColorMatrix values='0 0 0 0 0.30  0 0 0 0 0.18  0 0 0 0 0.07  0 0 0 0.5 0'/></filter><rect width='90' height='90' filter='url(%23f)'/></svg>"),
-            radial-gradient(ellipse at 50% 40%, rgba(150, 110, 65, 0.25), transparent 70%)
-          `,
-          backgroundSize: "220px 220px, 90px 90px, 100% 100%",
-          backgroundRepeat: "repeat, repeat, no-repeat",
+          backgroundColor: "#4a3320",
+          backgroundImage: `url("/diary/cork.jpg")`,
+          backgroundSize: "1024px 492px",
+          backgroundRepeat: "repeat",
           boxShadow:
-            "inset 0 0 0 1px rgba(0,0,0,0.55), inset 0 0 30px rgba(0,0,0,0.6), inset 0 10px 20px rgba(0,0,0,0.45), 0 4px 16px rgba(0,0,0,0.55)",
+            "inset 0 0 0 1px rgba(0,0,0,0.55), inset 0 0 30px rgba(0,0,0,0.55), inset 0 10px 20px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.55)",
         }}
       >
-        <main className="relative max-w-7xl mx-auto px-10 pt-20 pb-32">
+        {/* Fairy lights draped along the top of the corkboard.
+            Wire is an SVG that stretches with the container; bulbs are
+            HTML wrappers with fixed-size inner SVGs so they stay circular
+            regardless of viewport width. */}
+        <div
+          className="absolute left-0 right-0 top-6 w-full h-32 pointer-events-none z-[1]"
+          aria-hidden
+        >
+          <svg
+            className="absolute inset-0 w-full h-full"
+            viewBox="0 0 1000 128"
+            preserveAspectRatio="none"
+          >
+            {/* wire shadow */}
+            <path
+              d="M 0 20 Q 500 100 1000 26"
+              fill="none"
+              stroke="rgba(0,0,0,0.55)"
+              strokeWidth="2.4"
+              transform="translate(1.5, 2.5)"
+            />
+            {/* wire */}
+            <path
+              d="M 0 20 Q 500 100 1000 26"
+              fill="none"
+              stroke="#1a0e05"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+          </svg>
+          {[
+            { xPct: 5, y: 28, dim: false },
+            { xPct: 15, y: 41, dim: true },
+            { xPct: 25, y: 51, dim: false },
+            { xPct: 35, y: 57, dim: false },
+            { xPct: 45, y: 61, dim: false },
+            { xPct: 55, y: 61, dim: true },
+            { xPct: 65, y: 59, dim: false },
+            { xPct: 75, y: 53, dim: false },
+            { xPct: 85, y: 44, dim: true },
+            { xPct: 95, y: 32, dim: false },
+          ].map((b, i) => (
+            <div
+              key={i}
+              className="absolute"
+              style={{
+                left: `${b.xPct}%`,
+                top: `${b.y}px`,
+                transform: "translate(-50%, 0)",
+              }}
+            >
+              <svg width="36" height="40" viewBox="0 0 36 40" style={{ overflow: "visible" }}>
+                <line x1="18" y1="0" x2="18" y2="6" stroke="#1a0e05" strokeWidth="1.2" />
+                <circle
+                  cx="18"
+                  cy="20"
+                  r="15"
+                  fill="#ffd06b"
+                  opacity={b.dim ? 0.18 : 0.38}
+                  style={{ filter: "blur(5px)" }}
+                />
+                <circle
+                  cx="18"
+                  cy="20"
+                  r="7"
+                  fill="#ffe49b"
+                  opacity={b.dim ? 0.4 : 0.7}
+                  style={{ filter: "blur(1.8px)" }}
+                />
+                <ellipse
+                  cx="18"
+                  cy="20"
+                  rx="3.5"
+                  ry="4.8"
+                  fill={b.dim ? "#e8c280" : "#fff2b8"}
+                  stroke="#b8691f"
+                  strokeWidth="0.4"
+                  opacity={b.dim ? 0.75 : 1}
+                />
+                <ellipse
+                  cx="17"
+                  cy="18.4"
+                  rx="1.1"
+                  ry="1.8"
+                  fill="#fffce0"
+                  opacity={b.dim ? 0.75 : 1}
+                />
+              </svg>
+            </div>
+          ))}
+          {/* anchor nails at the wire ends */}
+          <div
+            className="absolute w-2 h-2 rounded-full bg-stone-950"
+            style={{
+              left: "0.4%",
+              top: "18px",
+              boxShadow: "inset 0.5px 0.5px 0 rgba(255,230,180,0.45)",
+            }}
+          />
+          <div
+            className="absolute w-2 h-2 rounded-full bg-stone-950"
+            style={{
+              right: "0.4%",
+              top: "24px",
+              boxShadow: "inset 0.5px 0.5px 0 rgba(255,230,180,0.45)",
+            }}
+          />
+        </div>
+
+        <main className="relative max-w-[110rem] mx-auto px-6 sm:px-10 md:px-14 pt-20 pb-32 z-[2]">
         <header className="flex items-baseline justify-between mb-12">
           <p className="text-[0.7rem] tracking-[0.35em] text-stone-100/85 uppercase">
             PHOTO DIARY · BY DATE · {year}
