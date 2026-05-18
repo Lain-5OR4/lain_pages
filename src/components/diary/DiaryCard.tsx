@@ -30,6 +30,8 @@ const PHOTO_ROTATIONS = [-4, 3, -2, 5, -3, 2, -5, 4];
 const STICKER_ROTATIONS = [-4, 3, -3, 5, -2, 4, -5, 2];
 const NOTE_ROTATIONS = [2, -3, 1, -2, 3, -1, 2, -2];
 const NOTE_COLORS = ["#d4c290", "#cebd8a", "#d8c694", "#ccbd92", "#d2c088"];
+const STICKY_ROTATIONS = [-5, 4, -3, 6, -4, 3, -6, 5];
+const STICKY_COLORS = ["#fef3c7", "#fee9a1", "#fdf2b8", "#fce7a1", "#fde9c4"];
 
 // CSS mask: two radial-gradient holes punched on the left/right edges → ticket notches.
 // `mask-composite: intersect` keeps only pixels covered by BOTH masks, so the two
@@ -87,9 +89,9 @@ export default function DiaryCard({ entry, index, onPhotoClick }: DiaryCardProps
 
         {/* Title ticket (with side notches) + photo-count tag */}
         <div className="min-w-0 flex-1 pt-1">
-          {(entry.title || entry.description) && (
+          {entry.title && (
             <div
-              className="relative inline-block max-w-full"
+              className="relative inline-block max-w-[20rem]"
               style={{
                 transform: `rotate(${NOTE_ROTATIONS[index % NOTE_ROTATIONS.length]}deg)`,
                 transformOrigin: "top left",
@@ -122,40 +124,31 @@ export default function DiaryCard({ entry, index, onPhotoClick }: DiaryCardProps
                   <span>No.</span>
                   <span className="text-base tracking-normal font-medium mt-0.5">{String(index + 1).padStart(2, "0")}</span>
                 </div>
-                <div className="min-w-0">
-                  {entry.title && (
-                    <h2
-                      className="text-3xl leading-tight text-stone-800"
-                      style={{ fontFamily: "var(--font-caveat), cursive" }}
-                    >
-                      {entry.title}
-                    </h2>
-                  )}
-                  {entry.description && (
-                    <p
-                      className="mt-0.5 text-xl leading-snug text-stone-700"
-                      style={{ fontFamily: "var(--font-caveat), cursive" }}
-                    >
-                      {entry.description}
-                    </p>
-                  )}
+                <div className="min-w-0 overflow-hidden">
+                  <h2
+                    className="text-3xl leading-tight text-stone-800 truncate"
+                    style={{ fontFamily: "var(--font-caveat), cursive" }}
+                    title={entry.title}
+                  >
+                    {entry.title}
+                  </h2>
                 </div>
               </div>
             </div>
           )}
-          <p className="mt-4 inline-flex items-center text-[0.55rem] tracking-[0.35em] uppercase text-[#e6b87a] font-mono">
-            <span className="border border-[#e6b87a]/50 px-2 py-1">
-              {String(entry.photos.length).padStart(2, "0")} {entry.photos.length === 1 ? "PHOTO" : "PHOTOS"}
-            </span>
-          </p>
         </div>
       </div>
 
-      {/* Polaroid stack (single row, photos overlap into a stack) */}
+      {/* Polaroid stack (single row, photos overlap into a stack).
+          Show at most 3 polaroids; if there are extras, label the 3rd
+          with a "+N photos" sticky note so the rest live behind the lightbox. */}
       <div className="relative flex flex-nowrap items-start pl-2 pr-4 min-h-[240px]">
-        {entry.photos.map((photo, i) => {
+        {entry.photos.slice(0, 3).map((photo, i) => {
           const rotation = PHOTO_ROTATIONS[(index * 3 + i) % PHOTO_ROTATIONS.length];
           const tapeColor = TAPE_COLORS[(index + i) % TAPE_COLORS.length];
+          const visibleCount = Math.min(3, entry.photos.length);
+          const extra = entry.photos.length - 3;
+          const showOverflowTag = i === 2 && extra > 0;
           return (
             <button
               key={photo.src}
@@ -166,7 +159,7 @@ export default function DiaryCard({ entry, index, onPhotoClick }: DiaryCardProps
                 transform: `rotate(${rotation}deg)`,
                 marginLeft: i === 0 ? 0 : "-1.75rem",
                 marginTop: i % 2 === 0 ? 0 : "0.75rem",
-                zIndex: 10 + (entry.photos.length - i),
+                zIndex: 10 + (visibleCount - i),
               }}
             >
               <div className="bg-[#faf3e0] p-2.5 pb-9 shadow-[4px_10px_24px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.06)]">
@@ -192,9 +185,85 @@ export default function DiaryCard({ entry, index, onPhotoClick }: DiaryCardProps
                   clipPath: ZIGZAG_TAPE_EDGES,
                 }}
               />
+              {/* overflow indicator sticky — pinned to the upper-right of the 3rd photo */}
+              {showOverflowTag && (
+                <div
+                  className="absolute z-40 pointer-events-none"
+                  style={{
+                    top: "32px",
+                    right: "14px",
+                    transform: "rotate(8deg)",
+                    transformOrigin: "top right",
+                    filter: "drop-shadow(2px 4px 6px rgba(0,0,0,0.5))",
+                  }}
+                >
+                  <span
+                    aria-hidden
+                    className="absolute -top-1.5 left-1/2 w-9 h-2.5 -translate-x-1/2 shadow-[0_1px_2px_rgba(0,0,0,0.25)]"
+                    style={{
+                      background: TAPE_COLORS[(index + 3) % TAPE_COLORS.length],
+                      clipPath: ZIGZAG_TAPE_EDGES,
+                    }}
+                  />
+                  <div
+                    className="px-3 py-1.5"
+                    style={{
+                      background: STICKY_COLORS[(index + 1) % STICKY_COLORS.length],
+                      backgroundImage:
+                        "linear-gradient(170deg, rgba(255,255,255,0.25), transparent 40%), linear-gradient(to bottom, transparent 80%, rgba(0,0,0,0.06))",
+                    }}
+                  >
+                    <p
+                      className="text-xl leading-tight text-stone-800 whitespace-nowrap"
+                      style={{ fontFamily: "var(--font-caveat), cursive" }}
+                    >
+                      +{extra} {extra === 1 ? "photo" : "photos"}
+                    </p>
+                  </div>
+                </div>
+              )}
             </button>
           );
         })}
+
+        {/* Description sticky note — stuck onto the photo area */}
+        {entry.description && (
+          <div
+            className="absolute z-40 pointer-events-none"
+            style={{
+              right: "0.5rem",
+              bottom: "0.25rem",
+              transform: `rotate(${STICKY_ROTATIONS[index % STICKY_ROTATIONS.length]}deg)`,
+              transformOrigin: "bottom right",
+              filter: "drop-shadow(2px 4px 7px rgba(0,0,0,0.45))",
+            }}
+          >
+            <span
+              aria-hidden
+              className="absolute -top-2 left-1/2 w-10 h-3 -translate-x-1/2 shadow-[0_1px_2px_rgba(0,0,0,0.25)]"
+              style={{
+                background: TAPE_COLORS[(index + 2) % TAPE_COLORS.length],
+                clipPath: ZIGZAG_TAPE_EDGES,
+                transform: `translateX(-50%) rotate(${index % 2 === 0 ? "-3" : "3"}deg)`,
+              }}
+            />
+            <div
+              className="px-3 py-2.5 max-w-[11rem]"
+              style={{
+                background: STICKY_COLORS[index % STICKY_COLORS.length],
+                backgroundImage:
+                  "linear-gradient(170deg, rgba(255,255,255,0.25), transparent 40%), linear-gradient(to bottom, transparent 80%, rgba(0,0,0,0.06))",
+              }}
+            >
+              <p
+                className="text-lg leading-snug text-stone-800 break-words"
+                style={{ fontFamily: "var(--font-caveat), cursive" }}
+              >
+                {entry.description}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </article>
   );

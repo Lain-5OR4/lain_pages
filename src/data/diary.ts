@@ -15,15 +15,18 @@ export const mockEntries: DiaryEntry[] = [
     title: "週末のカフェ巡り",
     description: "新しいお気に入りを見つけた",
     photos: [
-      { src: "https://picsum.photos/seed/cafe-a/600/600", alt: "cafe", stamp: "'26 04 27 11:32" },
-      { src: "https://picsum.photos/seed/cafe-b/600/600", alt: "cafe", stamp: "'26 04 27 13:18" },
-      { src: "https://picsum.photos/seed/cafe-c/600/600", alt: "cafe", stamp: "'26 04 27 16:04" },
+      { src: "https://picsum.photos/seed/cafe-a/600/600", alt: "cafe", stamp: "'26 04 27 10:48" },
+      { src: "https://picsum.photos/seed/cafe-b/600/600", alt: "cafe", stamp: "'26 04 27 11:32" },
+      { src: "https://picsum.photos/seed/cafe-c/600/600", alt: "cafe", stamp: "'26 04 27 13:18" },
+      { src: "https://picsum.photos/seed/cafe-d/600/600", alt: "cafe", stamp: "'26 04 27 14:05" },
+      { src: "https://picsum.photos/seed/cafe-e/600/600", alt: "cafe", stamp: "'26 04 27 16:04" },
+      { src: "https://picsum.photos/seed/cafe-f/600/600", alt: "cafe", stamp: "'26 04 27 17:22" },
     ],
   },
   {
     id: "mock-5",
     date: "2026-04-22",
-    title: "雨と本",
+    title: "雨と本と、ひとりぼっちの図書館",
     description: "雨の音と紙の匂い。",
     photos: [
       { src: "https://picsum.photos/seed/rain-a/600/600", alt: "rain", stamp: "'26 04 22 14:11" },
@@ -69,6 +72,7 @@ export const mockEntries: DiaryEntry[] = [
       { src: "https://picsum.photos/seed/spring-a/600/600", alt: "spring", stamp: "'26 03 22 14:05" },
       { src: "https://picsum.photos/seed/spring-b/600/600", alt: "spring", stamp: "'26 03 22 14:33" },
       { src: "https://picsum.photos/seed/spring-c/600/600", alt: "spring", stamp: "'26 03 22 15:01" },
+      { src: "https://picsum.photos/seed/spring-d/600/600", alt: "spring", stamp: "'26 03 22 15:48" },
     ],
   },
 ];
