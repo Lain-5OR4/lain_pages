@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import { Caveat, Kaisei_Decol, Reggae_One } from "next/font/google";
+import { Caveat, DotGothic16, Kaisei_Decol, Reggae_One } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
-import { ConditionalBackground } from "@/components/background/ConditionalBackground";
-
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -43,6 +41,13 @@ const caveat = Caveat({
   display: "swap",
 });
 
+const dotGothic16 = DotGothic16({
+  subsets: ["latin"],
+  variable: "--font-dot-gothic",
+  weight: "400",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Locus Solus in Wired",
   description: "portfolios of the future",
@@ -56,9 +61,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${loveLetter.variable} ${geistMono.variable} ${geistSans.variable} ${kaiseiDecol.variable} ${reggaeOne.variable} ${caveat.variable} antialiased`}
+        className={`${loveLetter.variable} ${geistMono.variable} ${geistSans.variable} ${kaiseiDecol.variable} ${reggaeOne.variable} ${caveat.variable} ${dotGothic16.variable} antialiased`}
       >
-        <ConditionalBackground />
         {children}
       </body>
     </html>

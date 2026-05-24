@@ -3,60 +3,131 @@
 import DiaryCard from "@/components/diary/DiaryCard";
 import PhotoLightbox from "@/components/diary/PhotoLightbox";
 import { Button } from "@/components/ui/button";
-import { mockEntries, type DiaryEntry } from "@/data/diary";
+import { type DiaryEntry, mockEntries } from "@/data/diary";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { Component, Suspense, use, useState } from "react";
 
 const DIARY_API_BASE = process.env.NEXT_PUBLIC_DIARY_API ?? "https://api.mizora.dev";
 
-export default function DiaryPage() {
-  const [entries, setEntries] = useState<DiaryEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [lightbox, setLightbox] = useState<{
-    entry: DiaryEntry;
-    photoIndex: number;
-  } | null>(null);
+async function fetchEntries(): Promise<DiaryEntry[]> {
+  // Dev: use mock data to preview the layout with multiple entries.
+  if (process.env.NODE_ENV === "development") return mockEntries;
+  const res = await fetch(`${DIARY_API_BASE}/api/diary`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json() as Promise<DiaryEntry[]>;
+}
 
-  const fetchEntries = useCallback(async () => {
-    // Dev: use mock data to preview the layout with multiple entries.
-    if (process.env.NODE_ENV === "development") {
-      setEntries(mockEntries);
-      setLoading(false);
-      return;
+// --- ErrorBoundary ---
+
+interface ErrorBoundaryProps {
+  onRetry: () => void;
+  children: React.ReactNode;
+}
+interface ErrorBoundaryState {
+  error: Error | null;
+}
+
+class DiaryErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  state: ErrorBoundaryState = { error: null };
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { error };
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="text-center my-8">
+          <p className="text-red-300/80 text-sm">! connection error: {this.state.error.message}</p>
+          <button
+            type="button"
+            onClick={() => {
+              this.setState({ error: null });
+              this.props.onRetry();
+            }}
+            className="mt-2 text-stone-200 underline text-sm"
+          >
+            retry
+          </button>
+        </div>
+      );
     }
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`${DIARY_API_BASE}/api/diary`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      setEntries((await res.json()) as DiaryEntry[]);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Unknown error");
-      setEntries([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    return this.props.children;
+  }
+}
 
-  useEffect(() => {
-    fetchEntries();
-  }, [fetchEntries]);
+// --- Loading fallback ---
 
-  const handlePhotoClick = (entryId: string, photoIndex: number) => {
-    const entry = entries.find((e) => e.id === entryId);
-    if (entry) setLightbox({ entry, photoIndex });
-  };
+function DiaryLoading() {
+  return (
+    <div className="flex items-center justify-center py-32">
+      <p className="text-stone-300/60 text-sm tracking-[0.5em] animate-pulse">loading...</p>
+    </div>
+  );
+}
 
+// --- Grid (unwraps the promise via use()) ---
+
+function DiaryGrid({
+  promise,
+  onPhotoClick,
+}: {
+  promise: Promise<DiaryEntry[]>;
+  onPhotoClick: (entry: DiaryEntry, photoIndex: number) => void;
+}) {
+  const entries = use(promise);
   const totalPhotos = entries.reduce((sum, e) => sum + e.photos.length, 0);
-  const year = entries[0]?.date
-    ? entries[0].date.slice(0, 4)
-    : new Date().getFullYear().toString();
+  const year = entries[0]?.date?.slice(0, 4) ?? new Date().getFullYear().toString();
+
+  return (
+    <>
+      <header className="flex items-baseline justify-between mb-12">
+        <p className="text-[0.7rem] tracking-[0.35em] text-stone-100/85 uppercase">
+          PHOTO DIARY · BY DATE · {year}
+        </p>
+        <p className="text-[0.75rem] tracking-[0.15em] text-stone-100/85">
+          {entries.length} days · {totalPhotos} photos
+        </p>
+      </header>
+
+      {entries.length === 0 ? (
+        <p className="text-center text-stone-300 mt-20 text-2xl tracking-widest">
+          no entries yet.
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-20">
+          {entries.map((entry, i) => (
+            <DiaryCard key={entry.id} entry={entry} index={i} onPhotoClick={onPhotoClick} />
+          ))}
+        </div>
+      )}
+
+      {entries.length > 0 && (
+        <div className="absolute bottom-10 right-10 text-stone-100/55 pointer-events-none select-none">
+          <span className="text-[0.7rem] tracking-[0.5em]">
+            VOL · {String(entries.length).padStart(2, "0")}
+          </span>
+        </div>
+      )}
+    </>
+  );
+}
+
+// --- Page ---
+
+export default function DiaryPage() {
+  const [promise, setPromise] = useState(fetchEntries);
+  const [lightbox, setLightbox] = useState<{ entry: DiaryEntry; photoIndex: number } | null>(null);
+
+  const handlePhotoClick = (entry: DiaryEntry, photoIndex: number) => {
+    setLightbox({ entry, photoIndex });
+  };
 
   return (
     <div
       className="relative min-h-screen p-2 sm:p-3 md:p-4 overflow-x-hidden"
       style={{
+        fontFamily: "var(--font-dot-gothic), sans-serif",
         backgroundColor: "#3a2418",
         backgroundImage: `
           url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='80'><filter id='w'><feTurbulence type='fractalNoise' baseFrequency='0.04 0.8' numOctaves='3' seed='5'/><feColorMatrix values='0 0 0 0 0.20  0 0 0 0 0.10  0 0 0 0 0.04  0 0 0 0.7 0'/></filter><rect width='320' height='80' filter='url(%23w)'/></svg>")
@@ -92,10 +163,11 @@ export default function DiaryPage() {
             HTML wrappers with fixed-size inner SVGs so they stay circular
             regardless of viewport width. */}
         <div
-          className="absolute left-0 right-0 top-6 w-full h-32 pointer-events-none z-[1]"
+          className="absolute left-0 right-0 top-6 w-full h-32 pointer-events-none z-1"
           aria-hidden
         >
           <svg
+            aria-hidden="true"
             className="absolute inset-0 w-full h-full"
             viewBox="0 0 1000 128"
             preserveAspectRatio="none"
@@ -128,9 +200,9 @@ export default function DiaryPage() {
             { xPct: 75, y: 53, dim: false },
             { xPct: 85, y: 44, dim: true },
             { xPct: 95, y: 32, dim: false },
-          ].map((b, i) => (
+          ].map((b) => (
             <div
-              key={i}
+              key={b.xPct}
               className="absolute"
               style={{
                 left: `${b.xPct}%`,
@@ -138,7 +210,13 @@ export default function DiaryPage() {
                 transform: "translate(-50%, 0)",
               }}
             >
-              <svg width="36" height="40" viewBox="0 0 36 40" style={{ overflow: "visible" }}>
+              <svg
+                aria-hidden="true"
+                width="36"
+                height="40"
+                viewBox="0 0 36 40"
+                style={{ overflow: "visible" }}
+              >
                 <line x1="18" y1="0" x2="18" y2="6" stroke="#1a0e05" strokeWidth="1.2" />
                 <circle
                   cx="18"
@@ -196,55 +274,12 @@ export default function DiaryPage() {
           />
         </div>
 
-        <main className="relative max-w-[110rem] mx-auto px-6 sm:px-10 md:px-14 pt-20 pb-32 z-[2]">
-        <header className="flex items-baseline justify-between mb-12">
-          <p className="text-[0.7rem] tracking-[0.35em] text-stone-100/85 uppercase">
-            PHOTO DIARY · BY DATE · {year}
-          </p>
-          <p className="text-[0.75rem] tracking-[0.15em] text-stone-100/85">
-            {loading ? "loading..." : `${entries.length} days · ${totalPhotos} photos`}
-          </p>
-        </header>
-
-        {error && (
-          <div className="text-center my-8">
-            <p className="text-red-300/80 text-sm">! connection error: {error}</p>
-            <button
-              type="button"
-              onClick={fetchEntries}
-              className="mt-2 text-stone-200 underline text-sm"
-            >
-              retry
-            </button>
-          </div>
-        )}
-
-        {!loading && entries.length === 0 && !error && (
-          <p className="text-center text-stone-300 mt-20 text-2xl tracking-widest">
-            no entries yet.
-          </p>
-        )}
-
-        {entries.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-20">
-            {entries.map((entry, i) => (
-              <DiaryCard
-                key={entry.id}
-                entry={entry}
-                index={i}
-                onPhotoClick={handlePhotoClick}
-              />
-            ))}
-          </div>
-        )}
-
-        {entries.length > 0 && (
-          <div className="absolute bottom-10 right-10 text-stone-100/55 pointer-events-none select-none">
-            <span className="text-[0.7rem] tracking-[0.5em]">
-              VOL · {String(entries.length).padStart(2, "0")}
-            </span>
-          </div>
-        )}
+        <main className="relative max-w-[110rem] mx-auto px-6 sm:px-10 md:px-14 pt-20 pb-32 z-2">
+          <DiaryErrorBoundary onRetry={() => setPromise(fetchEntries())}>
+            <Suspense fallback={<DiaryLoading />}>
+              <DiaryGrid promise={promise} onPhotoClick={handlePhotoClick} />
+            </Suspense>
+          </DiaryErrorBoundary>
         </main>
       </div>
 

@@ -44,15 +44,11 @@ export default function PhotoLightbox({ entry, initialPhotoIndex, onClose }: Pho
       }}
     >
       {(entry.title || entry.date) && (
-        <div
-          className="text-stone-200 text-center max-w-[80vw]"
-          onClick={stop}
-          onKeyDown={stop}
-        >
+        <div className="text-stone-200 text-center max-w-[80vw]" onClick={stop} onKeyDown={stop}>
           {entry.title && (
             <h2
               className="text-2xl md:text-3xl leading-tight"
-              style={{ fontFamily: "var(--font-caveat), cursive" }}
+              style={{ fontFamily: "var(--font-dot-gothic), sans-serif" }}
             >
               {entry.title}
             </h2>
@@ -100,10 +96,20 @@ export default function PhotoLightbox({ entry, initialPhotoIndex, onClose }: Pho
                 stop(e);
                 goPrev();
               }}
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-[60] text-stone-200 hover:text-white transition-colors bg-stone-900/60 p-3 rounded-sm"
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-60 text-stone-200 hover:text-white transition-colors bg-stone-900/60 p-3 rounded-sm"
               aria-label="previous photo"
             >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                aria-hidden="true"
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polyline points="13 4 6 10 13 16" />
               </svg>
             </button>
@@ -113,10 +119,20 @@ export default function PhotoLightbox({ entry, initialPhotoIndex, onClose }: Pho
                 stop(e);
                 goNext();
               }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-[60] text-stone-200 hover:text-white transition-colors bg-stone-900/60 p-3 rounded-sm"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-60 text-stone-200 hover:text-white transition-colors bg-stone-900/60 p-3 rounded-sm"
               aria-label="next photo"
             >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                aria-hidden="true"
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polyline points="7 4 14 10 7 16" />
               </svg>
             </button>
@@ -127,7 +143,7 @@ export default function PhotoLightbox({ entry, initialPhotoIndex, onClose }: Pho
       {entry.description && (
         <p
           className="max-w-[80vw] text-stone-200 text-lg md:text-xl leading-snug text-center"
-          style={{ fontFamily: "var(--font-caveat), cursive" }}
+          style={{ fontFamily: "var(--font-dot-gothic), sans-serif" }}
           onClick={stop}
           onKeyDown={stop}
         >
@@ -138,14 +154,13 @@ export default function PhotoLightbox({ entry, initialPhotoIndex, onClose }: Pho
       {hasMultiple && (
         <div
           className="text-stone-200 text-xl"
-          style={{ fontFamily: "var(--font-caveat), cursive" }}
+          style={{ fontFamily: "var(--font-dot-gothic), sans-serif" }}
           onClick={stop}
           onKeyDown={stop}
         >
           {photoIndex + 1} / {entry.photos.length}
         </div>
       )}
-
     </dialog>
   );
 }

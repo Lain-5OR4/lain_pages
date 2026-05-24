@@ -49,8 +49,16 @@ export const mockEntries: DiaryEntry[] = [
     title: "焙煎所",
     description: "ねむい朝",
     photos: [
-      { src: "https://picsum.photos/seed/roastery-a/600/600", alt: "roastery", stamp: "'26 04 09 07:51" },
-      { src: "https://picsum.photos/seed/roastery-b/600/600", alt: "roastery", stamp: "'26 04 09 08:23" },
+      {
+        src: "https://picsum.photos/seed/roastery-a/600/600",
+        alt: "roastery",
+        stamp: "'26 04 09 07:51",
+      },
+      {
+        src: "https://picsum.photos/seed/roastery-b/600/600",
+        alt: "roastery",
+        stamp: "'26 04 09 08:23",
+      },
     ],
   },
   {
@@ -69,10 +77,26 @@ export const mockEntries: DiaryEntry[] = [
     title: "春の終わり",
     description: "葉桜",
     photos: [
-      { src: "https://picsum.photos/seed/spring-a/600/600", alt: "spring", stamp: "'26 03 22 14:05" },
-      { src: "https://picsum.photos/seed/spring-b/600/600", alt: "spring", stamp: "'26 03 22 14:33" },
-      { src: "https://picsum.photos/seed/spring-c/600/600", alt: "spring", stamp: "'26 03 22 15:01" },
-      { src: "https://picsum.photos/seed/spring-d/600/600", alt: "spring", stamp: "'26 03 22 15:48" },
+      {
+        src: "https://picsum.photos/seed/spring-a/600/600",
+        alt: "spring",
+        stamp: "'26 03 22 14:05",
+      },
+      {
+        src: "https://picsum.photos/seed/spring-b/600/600",
+        alt: "spring",
+        stamp: "'26 03 22 14:33",
+      },
+      {
+        src: "https://picsum.photos/seed/spring-c/600/600",
+        alt: "spring",
+        stamp: "'26 03 22 15:01",
+      },
+      {
+        src: "https://picsum.photos/seed/spring-d/600/600",
+        alt: "spring",
+        stamp: "'26 03 22 15:48",
+      },
     ],
   },
 ];

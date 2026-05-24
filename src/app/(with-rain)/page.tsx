@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTypingEffect } from "@/hooks/useTypingEffect";
 import Link from "next/link";
-import "./styles/glitch.css";
+import "@/app/styles/glitch.css";
 
 export default function Component() {
   const fullText = "Welcome to my digital realm ";
