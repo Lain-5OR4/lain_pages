@@ -51,7 +51,7 @@ export default function DescriptionNote({
         }}
       />
       <div
-        className="px-3 py-2.5 max-w-44"
+        className="px-3 py-2.5 max-w-56"
         style={{
           background: stickyColor,
           backgroundImage:
