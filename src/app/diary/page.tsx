@@ -91,9 +91,7 @@ function DiaryGrid({
       </header>
 
       {entries.length === 0 ? (
-        <p className="text-center text-stone-300 mt-20 text-2xl tracking-widest">
-          no entries yet.
-        </p>
+        <p className="text-center text-stone-300 mt-20 text-2xl tracking-widest">no entries yet.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-20">
           {entries.map((entry, i) => (

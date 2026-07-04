@@ -17,20 +17,17 @@ export interface MicroCMSImage {
   height: number;
 }
 
-// Schema this code assumes (designed; not yet wired in the microCMS dashboard
-// as of the pause point — see docs/blog-microcms.md):
+// Schema (microCMS dashboard):
 //   title      テキストフィールド
-//   subtitle   テキストフィールド (optional)
-//   body       テキストエリア (Markdown text)
-//   tags       複数選択
-//   thumbnail  画像 (optional)
+//   content    リッチエディタ → returns HTML string
+//   eyecatch   画像 (optional)
+//   category   コンテンツ参照 (optional)
 export interface MicroCMSBlogPost {
   id: string; // contentId — used as our URL slug
   title: string;
-  subtitle?: string;
-  body: string; // markdown text — parsed client-side with `marked`
-  tags: string[];
-  thumbnail?: MicroCMSImage;
+  content: string; // HTML from rich editor
+  eyecatch?: MicroCMSImage;
+  category?: { id: string; name: string } | null;
   publishedAt: string;
   updatedAt: string;
   createdAt: string;

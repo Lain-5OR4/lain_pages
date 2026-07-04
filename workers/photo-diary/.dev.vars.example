@@ -1,0 +1,4 @@
+# Copy to .dev.vars for local development (wrangler dev / vitest).
+# Production values are set with `wrangler secret put <NAME>`.
+MICROCMS_SERVICE_DOMAIN=your-service-domain
+MICROCMS_API_KEY=your-read-only-api-key

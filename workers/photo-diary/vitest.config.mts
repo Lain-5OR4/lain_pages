@@ -5,6 +5,14 @@ export default defineWorkersConfig({
 		poolOptions: {
 			workers: {
 				wrangler: { configPath: './wrangler.jsonc' },
+				miniflare: {
+					// Deterministic microCMS credentials for blog proxy tests
+					// (overrides whatever is in .dev.vars).
+					bindings: {
+						MICROCMS_SERVICE_DOMAIN: 'test-service',
+						MICROCMS_API_KEY: 'test-key',
+					},
+				},
 			},
 		},
 	},

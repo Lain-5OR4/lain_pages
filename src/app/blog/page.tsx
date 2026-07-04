@@ -66,6 +66,14 @@ export default async function BlogIndexPage() {
         <hr className="my-12 border-stone-300" />
 
         {/* post list */}
+        {posts.length === 0 && (
+          <p
+            className="text-[0.78rem] text-stone-500"
+            style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" }}
+          >
+            ls: no entries yet. check back soon.
+          </p>
+        )}
         <ul className="divide-y divide-stone-300">
           {posts.map((post) => (
             <li key={post.slug} className="py-8">
@@ -81,17 +89,11 @@ export default async function BlogIndexPage() {
                 >
                   {post.title}
                 </h2>
-                {post.subtitle && (
-                  <p className="mt-3 text-stone-600 italic leading-snug">{post.subtitle}</p>
+                {post.category && (
+                  <div className="mt-4 text-[0.6rem] tracking-[0.32em] uppercase text-stone-700">
+                    {post.category}
+                  </div>
                 )}
-                <div className="mt-4 flex items-center gap-2 text-[0.6rem] tracking-[0.32em] uppercase text-stone-500">
-                  {post.tags.map((t, i) => (
-                    <span key={t} className="flex items-center gap-2">
-                      <span className="text-stone-700">{t}</span>
-                      {i < post.tags.length - 1 && <span className="text-stone-400">·</span>}
-                    </span>
-                  ))}
-                </div>
               </Link>
             </li>
           ))}

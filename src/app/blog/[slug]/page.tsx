@@ -1,4 +1,3 @@
-import { CopyButton } from "@/components/blog/CopyButton";
 import { getAllPosts, getPostBySlug } from "@/data/blog-posts";
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
@@ -35,7 +34,6 @@ export async function generateMetadata({
   if (!post) return {};
   return {
     title: `${post.title} | mizora journal`,
-    description: post.subtitle,
   };
 }
 
@@ -48,8 +46,6 @@ export default async function BlogPostPage({
   const post = await getPostBySlug(slug);
   if (!post) notFound();
 
-  const firstParagraphIndex = post.blocks.findIndex((b) => b.kind === "paragraph");
-
   return (
     <div
       className={`${playfair.variable} ${inter.variable} min-h-screen`}
@@ -60,7 +56,7 @@ export default async function BlogPostPage({
       }}
     >
       <article className="max-w-[64rem] mx-auto px-6 sm:px-10 py-16 md:py-24">
-        {/* prompt + front-matter (cat-ing a .md file) */}
+        {/* prompt + front-matter */}
         <header
           className="text-[0.78rem] leading-[1.7] mb-12"
           style={{
@@ -86,16 +82,18 @@ export default async function BlogPostPage({
             </div>
             <div>
               <span className="text-stone-500">author:&nbsp;&nbsp;</span>
-              <span className="text-stone-800">{BYLINE}@5OR4.dev</span>
+              <span className="text-stone-800">{BYLINE}@mizora.dev</span>
             </div>
             <div>
               <span className="text-stone-500">date:&nbsp;&nbsp;&nbsp;&nbsp;</span>
               <span className="text-stone-800">{post.date}</span>
             </div>
-            <div>
-              <span className="text-stone-500">tags:&nbsp;&nbsp;&nbsp;&nbsp;</span>
-              <span className="text-stone-800">[{post.tags.join(", ")}]</span>
-            </div>
+            {post.category && (
+              <div>
+                <span className="text-stone-500">category:&nbsp;</span>
+                <span className="text-stone-800">{post.category}</span>
+              </div>
+            )}
             <div>
               <span className="text-stone-500">read:&nbsp;&nbsp;&nbsp;&nbsp;</span>
               <span className="text-stone-800">{post.readingMinutes}m</span>
@@ -104,196 +102,40 @@ export default async function BlogPostPage({
           </div>
         </header>
 
-        {/* title block */}
+        {/* eyecatch */}
+        {post.eyecatch && (
+          <div className="mb-10 -mx-1 sm:-mx-3 overflow-hidden rounded-sm">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={post.eyecatch.url}
+              alt={post.title}
+              width={post.eyecatch.width}
+              height={post.eyecatch.height}
+              className="w-full object-cover"
+              style={{ maxHeight: "28rem" }}
+            />
+          </div>
+        )}
+
+        {/* title */}
         <h1
-          className="text-4xl md:text-5xl leading-[1.15] tracking-tight font-medium"
+          className="text-4xl md:text-5xl leading-[1.15] tracking-tight font-medium mb-10"
           style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
         >
           {post.title}
         </h1>
-        {post.subtitle && (
-          <p
-            className="mt-5 text-lg md:text-xl italic text-stone-600 leading-snug"
-            style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
-          >
-            {post.subtitle}
-          </p>
-        )}
 
         <hr className="my-10 border-stone-300" />
 
-        {/* body */}
-        <div className="space-y-6 text-[1.0625rem] leading-[1.75] text-stone-800">
-          {post.blocks.map((block, i) => {
-            if (block.kind === "paragraph") {
-              const isFirst = i === firstParagraphIndex;
-              return (
-                <p
-                  // biome-ignore lint/suspicious/noArrayIndexKey: blocks have no stable unique key; order is fixed at build time
-                  key={i}
-                  className={isFirst ? "editorial-dropcap" : ""}
-                  // biome-ignore lint/security/noDangerouslySetInnerHtml: inline markdown rendered at build time
-                  dangerouslySetInnerHTML={{ __html: block.html }}
-                />
-              );
-            }
-            if (block.kind === "heading") {
-              if (block.depth === 1) {
-                // h1 in body is unusual (page already has the title); render as h2.
-                return (
-                  <h2
-                    // biome-ignore lint/suspicious/noArrayIndexKey: blocks have no stable unique key; order is fixed at build time
-                    key={i}
-                    className="text-2xl md:text-3xl mt-12 mb-1 leading-tight font-medium"
-                    style={{
-                      fontFamily: "var(--font-playfair), Georgia, serif",
-                    }}
-                  >
-                    {block.text}
-                  </h2>
-                );
-              }
-              if (block.depth === 2) {
-                return (
-                  <h2
-                    // biome-ignore lint/suspicious/noArrayIndexKey: blocks have no stable unique key; order is fixed at build time
-                    key={i}
-                    className="text-2xl md:text-3xl mt-12 mb-1 leading-tight font-medium"
-                    style={{
-                      fontFamily: "var(--font-playfair), Georgia, serif",
-                    }}
-                  >
-                    {block.text}
-                  </h2>
-                );
-              }
-              return (
-                <h3
-                  // biome-ignore lint/suspicious/noArrayIndexKey: blocks have no stable unique key; order is fixed at build time
-                  key={i}
-                  className="text-xl md:text-2xl mt-10 mb-1 leading-tight font-medium"
-                  style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
-                >
-                  {block.text}
-                </h3>
-              );
-            }
-            if (block.kind === "list") {
-              const Tag = block.ordered ? "ol" : "ul";
-              return (
-                <Tag
-                  // biome-ignore lint/suspicious/noArrayIndexKey: blocks have no stable unique key; order is fixed at build time
-                  key={i}
-                  className={`space-y-2 pl-6 ${
-                    block.ordered ? "list-decimal" : "list-disc"
-                  } marker:text-stone-400`}
-                >
-                  {block.itemsHtml.map((h, j) => (
-                    <li
-                      // biome-ignore lint/suspicious/noArrayIndexKey: list items have no stable unique key; order is fixed at build time
-                      key={j}
-                      // biome-ignore lint/security/noDangerouslySetInnerHtml: inline markdown rendered at build time
-                      dangerouslySetInnerHTML={{ __html: h }}
-                    />
-                  ))}
-                </Tag>
-              );
-            }
-            if (block.kind === "blockquote") {
-              return (
-                <blockquote
-                  // biome-ignore lint/suspicious/noArrayIndexKey: blocks have no stable unique key; order is fixed at build time
-                  key={i}
-                  className="my-10 border-y border-stone-400 py-6 text-center"
-                >
-                  <p
-                    className="text-2xl md:text-3xl italic leading-snug text-stone-900"
-                    style={{
-                      fontFamily: "var(--font-playfair), Georgia, serif",
-                    }}
-                    // biome-ignore lint/security/noDangerouslySetInnerHtml: inline markdown rendered at build time
-                    dangerouslySetInnerHTML={{ __html: `“${block.html}”` }}
-                  />
-                </blockquote>
-              );
-            }
-            if (block.kind === "hr") {
-              // biome-ignore lint/suspicious/noArrayIndexKey: blocks have no stable unique key; order is fixed at build time
-              return <hr key={i} className="my-10 border-stone-300" />;
-            }
-            if (block.kind === "code") {
-              return (
-                <figure
-                  // biome-ignore lint/suspicious/noArrayIndexKey: blocks have no stable unique key; order is fixed at build time
-                  key={i}
-                  className="my-8 -mx-1 sm:-mx-3"
-                >
-                  {(block.filename || block.lang !== "text") && (
-                    <figcaption className="text-[0.6rem] tracking-[0.32em] uppercase text-stone-500 mb-2 px-1 flex items-center gap-2">
-                      {block.filename && <span>{block.filename}</span>}
-                      {block.filename && block.lang !== "text" && (
-                        <span className="text-stone-400">·</span>
-                      )}
-                      {block.lang !== "text" && (
-                        <span className="text-stone-400">{block.lang}</span>
-                      )}
-                    </figcaption>
-                  )}
-                  <div className="group relative">
-                    <CopyButton text={block.text} />
-                    {block.html ? (
-                      <div
-                        className="editorial-shiki overflow-x-auto rounded-sm"
-                        // biome-ignore lint/security/noDangerouslySetInnerHtml: shiki output is trusted (build time)
-                        dangerouslySetInnerHTML={{ __html: block.html }}
-                      />
-                    ) : (
-                      <pre
-                        className="overflow-x-auto text-[0.82rem] leading-[1.55] px-4 py-4 rounded-sm"
-                        style={{
-                          background: "#2a3038",
-                          color: "#e6edf3",
-                          borderLeft: "3px solid #8b1f1a",
-                          paddingRight: "4.5rem",
-                          fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
-                        }}
-                      >
-                        <code>{block.text}</code>
-                      </pre>
-                    )}
-                  </div>
-                </figure>
-              );
-            }
-            if (block.kind === "raw") {
-              return (
-                <div
-                  // biome-ignore lint/suspicious/noArrayIndexKey: blocks have no stable unique key; order is fixed at build time
-                  key={i}
-                  className="editorial-raw"
-                  // biome-ignore lint/security/noDangerouslySetInnerHtml: marked output, trusted markdown
-                  dangerouslySetInnerHTML={{ __html: block.html }}
-                />
-              );
-            }
-            return null;
-          })}
-        </div>
-
-        {/* tags */}
-        <div className="mt-16 pt-6 border-t border-stone-300 flex items-center gap-2 text-[0.6rem] tracking-[0.32em] uppercase text-stone-500">
-          <span>Tags</span>
-          <span className="text-stone-400">·</span>
-          {post.tags.map((t, i) => (
-            <span key={t} className="flex items-center gap-2">
-              <span className="text-stone-800">{t}</span>
-              {i < post.tags.length - 1 && <span className="text-stone-400">·</span>}
-            </span>
-          ))}
-        </div>
+        {/* body — rich editor HTML */}
+        <div
+          className="rich-content"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: trusted microCMS rich editor output
+          dangerouslySetInnerHTML={{ __html: post.contentHtml }}
+        />
 
         {/* footer */}
-        <footer className="mt-12 text-[0.6rem] tracking-[0.32em] uppercase text-stone-500 flex justify-between">
+        <footer className="mt-16 pt-6 border-t border-stone-300 text-[0.6rem] tracking-[0.32em] uppercase text-stone-500 flex justify-between">
           <Link href="/blog" className="hover:text-stone-900 transition-colors">
             ← back to index
           </Link>
@@ -302,7 +144,13 @@ export default async function BlogPostPage({
       </article>
 
       <style>{`
-        .editorial-dropcap::first-letter {
+        .rich-content {
+          font-size: 1.0625rem;
+          line-height: 1.75;
+          color: #3a3330;
+        }
+        .rich-content p { margin: 0 0 1.5rem; }
+        .rich-content p:first-of-type::first-letter {
           font-family: var(--font-playfair), Georgia, serif;
           font-style: italic;
           font-weight: 500;
@@ -312,24 +160,82 @@ export default async function BlogPostPage({
           padding: 0.25rem 0.5rem 0 0;
           color: #8b1f1a;
         }
-        .editorial-shiki {
-          border-radius: 4px;
-          overflow: hidden;
-          box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08), 0 8px 24px -12px rgba(0, 0, 0, 0.18);
+        .rich-content h1,
+        .rich-content h2 {
+          font-family: var(--font-playfair), Georgia, serif;
+          font-size: 1.75rem;
+          font-weight: 500;
+          line-height: 1.25;
+          margin: 3rem 0 0.5rem;
+          color: #1a1714;
         }
-        .editorial-shiki pre {
-          background-color: #2a3038 !important;
+        .rich-content h3 {
+          font-family: var(--font-playfair), Georgia, serif;
+          font-size: 1.35rem;
+          font-weight: 500;
+          margin: 2.5rem 0 0.5rem;
+          color: #1a1714;
+        }
+        .rich-content ul,
+        .rich-content ol {
+          padding-left: 1.5rem;
+          margin: 0 0 1.5rem;
+        }
+        .rich-content ul { list-style: disc; }
+        .rich-content ol { list-style: decimal; }
+        .rich-content li { margin-bottom: 0.4rem; }
+        .rich-content li::marker { color: #9d8878; }
+        .rich-content blockquote {
+          border-top: 1px solid #b8a898;
+          border-bottom: 1px solid #b8a898;
+          padding: 1.5rem 0;
+          margin: 2.5rem 0;
+          text-align: center;
+          font-family: var(--font-playfair), Georgia, serif;
+          font-size: 1.4rem;
+          font-style: italic;
+          line-height: 1.4;
+          color: #1a1714;
+        }
+        .rich-content pre,
+        .rich-content code {
+          font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+          font-size: 0.82rem;
+        }
+        .rich-content pre {
+          background: #2a3038;
+          color: #e6edf3;
           border-left: 3px solid #8b1f1a;
           padding: 1.1rem 1.2rem;
-          padding-right: 4.5rem;
-          font-size: 0.82rem;
-          line-height: 1.65;
-          font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-          margin: 0;
-          tab-size: 2;
+          border-radius: 4px;
+          overflow-x: auto;
+          margin: 0 0 1.5rem;
         }
-        .editorial-shiki code {
-          font-family: inherit;
+        .rich-content code {
+          background: #ede8e0;
+          padding: 0.1em 0.35em;
+          border-radius: 3px;
+          color: #8b1f1a;
+        }
+        .rich-content pre code {
+          background: none;
+          padding: 0;
+          color: inherit;
+        }
+        .rich-content a {
+          color: #8b1f1a;
+          text-decoration: underline;
+          text-underline-offset: 3px;
+        }
+        .rich-content img {
+          max-width: 100%;
+          border-radius: 4px;
+          margin: 1.5rem 0;
+        }
+        .rich-content hr {
+          border: none;
+          border-top: 1px solid #d6cfc6;
+          margin: 2.5rem 0;
         }
       `}</style>
     </div>
