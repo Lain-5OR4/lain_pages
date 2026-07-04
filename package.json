@@ -23,7 +23,7 @@
     "marked": "^18.0.4",
     "matter-js": "^0.20.0",
     "microcms-js-sdk": "^3.4.0",
-    "next": "^15.5.11",
+    "next": "^15.5.20",
     "react": "^19",
     "react-dom": "^19",
     "simple-icons": "^14.15.0",
