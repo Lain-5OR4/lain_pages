@@ -85,6 +85,21 @@ async function devSeedPosts(): Promise<BlogPost[]> {
   ];
 }
 
+// `output: "export"` refuses to build /blog/[slug] when generateStaticParams
+// returns [] — so a postless build (microCMS unset, or zero published posts)
+// statically generates exactly one placeholder page instead.
+export const PLACEHOLDER_SLUG = "coming-soon";
+
+export function placeholderPost(): BlogPost {
+  return {
+    slug: PLACEHOLDER_SLUG,
+    title: "no entries yet",
+    date: new Date().toISOString().slice(0, 10),
+    contentHtml: "<p>Nothing has been published here yet. Check back soon.</p>",
+    readingMinutes: 1,
+  };
+}
+
 // Seed posts are dev-only: a production build without microCMS env vars gets
 // an empty blog instead of publishing the placeholder article.
 function fallbackPosts(): Promise<BlogPost[]> {

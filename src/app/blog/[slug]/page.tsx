@@ -1,4 +1,4 @@
-import { getAllPosts, getPostBySlug } from "@/data/blog-posts";
+import { PLACEHOLDER_SLUG, getAllPosts, getPostBySlug, placeholderPost } from "@/data/blog-posts";
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import Link from "next/link";
@@ -21,7 +21,15 @@ const BYLINE = "mizora";
 
 export async function generateStaticParams() {
   const posts = await getAllPosts();
+  if (posts.length === 0) return [{ slug: PLACEHOLDER_SLUG }];
   return posts.map((p) => ({ slug: p.slug }));
+}
+
+async function resolvePost(slug: string) {
+  const post = await getPostBySlug(slug);
+  if (post) return post;
+  if (slug === PLACEHOLDER_SLUG) return placeholderPost();
+  return undefined;
 }
 
 export async function generateMetadata({
@@ -30,7 +38,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const post = await resolvePost(slug);
   if (!post) return {};
   return {
     title: `${post.title} | mizora journal`,
@@ -43,7 +51,7 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const post = await resolvePost(slug);
   if (!post) notFound();
 
   return (
