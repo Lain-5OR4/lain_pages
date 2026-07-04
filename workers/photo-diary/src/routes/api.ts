@@ -1,25 +1,13 @@
 import { Hono } from "hono";
+import { corsMiddleware, preflight } from "../cors";
 import { getRecentPosts } from "../db";
 import { formatStamp } from "../utils";
 import type { DiaryEntry } from "../types";
 
-const ALLOWED_ORIGINS = new Set([
-	"https://mizora.dev",
-	"http://localhost:3000",
-]);
-
 const api = new Hono<{ Bindings: Env }>();
 
-api.use("/*", async (c, next) => {
-	const origin = c.req.header("Origin") ?? "";
-	await next();
-	if (ALLOWED_ORIGINS.has(origin)) {
-		c.header("Access-Control-Allow-Origin", origin);
-		c.header("Vary", "Origin");
-	}
-});
-
-api.options("/*", () => new Response(null, { status: 204 }));
+api.use("/*", corsMiddleware);
+api.options("/*", preflight);
 
 api.get("/posts", async (c) => {
 	const posts = await getRecentPosts(c.env.DB);

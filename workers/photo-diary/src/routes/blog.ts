@@ -1,23 +1,10 @@
 import { Hono } from "hono";
-
-const ALLOWED_ORIGINS = new Set([
-	"https://mizora.dev",
-	"http://localhost:3000",
-	"http://localhost:3001",
-]);
+import { corsMiddleware, preflight } from "../cors";
 
 const blog = new Hono<{ Bindings: Env }>();
 
-blog.use("/*", async (c, next) => {
-	const origin = c.req.header("Origin") ?? "";
-	await next();
-	if (ALLOWED_ORIGINS.has(origin)) {
-		c.header("Access-Control-Allow-Origin", origin);
-		c.header("Vary", "Origin");
-	}
-});
-
-blog.options("/*", () => new Response(null, { status: 204 }));
+blog.use("/*", corsMiddleware);
+blog.options("/*", preflight);
 
 // microCMS endpoint name — must match the API name set in the dashboard
 const MICROCMS_ENDPOINT = "blogs";

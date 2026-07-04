@@ -53,7 +53,7 @@ This repo contains two independent deployable units:
 ### Diary Feature Architecture
 The diary page (`src/app/diary/page.tsx`) fetches from `NEXT_PUBLIC_DIARY_API/api/diary` (default `https://api.mizora.dev`).
 
-**Dev vs prod data**: In `NODE_ENV === "development"`, `mockEntries` from `src/data/diary.ts` is used instead of the API (mock photos are picsum URLs and have no real EXIF). The `DiaryEntry` type is defined in `src/data/diary.ts` and must match what `/api/diary` returns.
+**Dev vs prod data**: In `NODE_ENV === "development"`, `mockEntries` from `src/data/diary.ts` is used instead of the API (mock photos are picsum URLs and have no real EXIF). The `DiaryEntry` type lives in `shared/types/diary.ts`, shared with the worker.
 
 **Diary components** (`src/components/diary/`):
 - `DiaryCard` — Entry card with photos; uses `PolaroidPhoto`, `DescriptionNote`, `TitleTicket`, `DateSticker`
@@ -68,7 +68,7 @@ Content lives in microCMS (`blogs` endpoint, rich editor). Posts are written as 
 
 **Fallback behavior** (`src/data/blog-posts.ts`): when microCMS env vars are missing, dev builds use a local seed post; production builds render an empty blog (never the seed).
 
-**Pages**: `/blog` (index) and `/blog/[slug]` (detail, `generateStaticParams` from all posts). The detail body is rendered via `dangerouslySetInnerHTML` with scoped `.rich-content` styles.
+**Pages**: `/blog` (index) and `/blog/[slug]` (detail, `generateStaticParams` from all posts). Fonts, paper background, and metadata defaults live in `src/app/blog/layout.tsx`; the shell prompt header/footer are `JournalHeader`/`JournalFooter` in `src/components/blog/JournalChrome.tsx`, with the palette in `src/components/blog/theme.ts`. The detail body is rendered via `dangerouslySetInnerHTML` with scoped `.rich-content` styles.
 
 ---
 
@@ -102,12 +102,12 @@ Hono-based Cloudflare Worker deployed to `api.mizora.dev`. Uses **Drizzle ORM** 
 1. Admin uploads via browser form → client-side resize to 2048px JPEG via Canvas (EXIF is stripped here) → `exifr` extracts `DateTimeOriginal` before resize and sends as `taken_at` field
 2. Worker stores image in R2, inserts row in D1
 3. `/api/diary` transforms DB rows into `DiaryEntry[]`: maps `title/caption/posted_on` fields, builds absolute image URLs, formats `taken_at` into `stamp` via `formatStamp()`
-4. CORS is restricted to `https://mizora.dev` and `http://localhost:3000` only
+4. CORS allowlist lives in `workers/photo-diary/src/cors.ts` (`mizora.dev`, `localhost:3000/3001`) and is shared by `/api` and `/api/blog` routes
 
 ### Important Notes
 - Canvas `toBlob()` strips all EXIF including GPS — no GPS data survives in stored images
 - `taken_at` naive timestamps are rendered as-is (camera local time); UTC timestamps are shifted to JST
-- The `DiaryEntry` type is defined in both `workers/photo-diary/src/types.ts` and `src/data/diary.ts` — keep in sync
+- The `DiaryEntry` type is defined once in `shared/types/diary.ts` and re-exported by both `workers/photo-diary/src/types.ts` and `src/data/diary.ts`
 - Worker secrets `MICROCMS_SERVICE_DOMAIN` / `MICROCMS_API_KEY` are set via `wrangler secret put`; local dev reads `.dev.vars` (copy from `.dev.vars.example`). Vitest overrides them with dummy values in `vitest.config.mts`
 
 ---

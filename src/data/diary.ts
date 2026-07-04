@@ -1,10 +1,6 @@
-export interface DiaryEntry {
-  id: string;
-  date: string;
-  title: string;
-  description: string;
-  photos: { src: string; alt: string; stamp?: string }[];
-}
+import type { DiaryEntry } from "../../shared/types/diary";
+
+export type { DiaryEntry };
 
 // Dev-only mock data. Used in development when NODE_ENV === "development".
 // picsum.photos seed URLs are deterministic so the layout stays stable across reloads.
