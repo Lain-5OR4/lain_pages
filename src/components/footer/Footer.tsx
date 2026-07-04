@@ -23,7 +23,7 @@ const Footer = () => {
           <span className="sr-only">Twitter</span>
         </Button>
       </div>
-      <p className="text-sm text-gray-400">(c) 2024 5OR4dev. All rights reserved.</p>
+      <p className="text-sm text-gray-400">(c) 2026 Mizora. All rights reserved.</p>
     </footer>
   );
 };
