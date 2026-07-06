@@ -12,12 +12,9 @@ on:
 
 jobs:
   claude-review:
-    # Optional: Filter by PR author
-    # if: |
-    #   github.event.pull_request.user.login == 'external-contributor' ||
-    #   github.event.pull_request.user.login == 'new-developer' ||
-    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
-    
+    # Owner PRs only: fork/bot PRs don't receive the OAuth secret anyway,
+    # so running there just produces failed checks and wastes runner time.
+    if: github.event.pull_request.author_association == 'OWNER'
     runs-on: ubuntu-latest
     permissions:
       contents: read
