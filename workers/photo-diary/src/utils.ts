@@ -5,6 +5,19 @@ export const safeExt = (name: string, fallback = "jpg"): string => {
 	return allowed.has(ext) ? ext : fallback;
 };
 
+// Content type is derived from the whitelisted extension, never from the
+// client-supplied MIME (which could smuggle text/html into R2).
+const MIME_BY_EXT: Record<string, string> = {
+	jpg: "image/jpeg",
+	jpeg: "image/jpeg",
+	png: "image/png",
+	webp: "image/webp",
+	gif: "image/gif",
+	avif: "image/avif",
+};
+
+export const mimeForExt = (ext: string): string => MIME_BY_EXT[ext] ?? "image/jpeg";
+
 // Workers run in UTC. EXIF DateTimeOriginal is the camera's local time without a
 // timezone, so new uploads store a naive "YYYY-MM-DDTHH:MM:SS" we render byte-for-byte.
 // Timestamps that carry a UTC marker (Z / offset) — including SQLite CURRENT_TIMESTAMP

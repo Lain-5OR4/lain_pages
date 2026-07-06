@@ -15,6 +15,10 @@
 		"enabled": true
 	},
 	"upload_source_maps": true,
+	// api.mizora.dev is the only host: Cloudflare Access protects /admin* on it,
+	// so the unprotected workers.dev / preview hosts must stay disabled.
+	"workers_dev": false,
+	"preview_urls": false,
 	"routes": [
 		{ "pattern": "api.mizora.dev", "custom_domain": true }
 	],

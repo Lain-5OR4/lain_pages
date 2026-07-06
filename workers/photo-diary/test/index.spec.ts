@@ -95,6 +95,24 @@ describe("photo-diary read path", () => {
 		expect(res.status).toBe(404);
 	});
 
+	it("GET /images/:key refuses keys outside posts/ even if the object exists", async () => {
+		await env.BUCKET.put("secret/backup.jpg", JPEG_BYTES, {
+			httpMetadata: { contentType: "image/jpeg" },
+		});
+		const res = await SELF.fetch("http://example.com/images/secret/backup.jpg");
+		expect(res.status).toBe(404);
+		await env.BUCKET.delete("secret/backup.jpg");
+	});
+
+	it("GET /images/:key sends X-Content-Type-Options: nosniff", async () => {
+		const res = await SELF.fetch(
+			"http://example.com/images/posts/1/0-aaa.jpg",
+		);
+		expect(res.status).toBe(200);
+		expect(res.headers.get("x-content-type-options")).toBe("nosniff");
+		await res.arrayBuffer();
+	});
+
 	it("GET /api/posts merges images with key/taken_at into each post", async () => {
 		const res = await SELF.fetch("http://example.com/api/posts");
 		const posts = (await res.json()) as Array<{
@@ -281,6 +299,11 @@ describe("photo-diary write path", () => {
 		const keys = r2.objects.map((o) => o.key).sort();
 		expect(keys[0]).toMatch(new RegExp(`^posts/${data.id}/0-[a-f0-9]{8}\\.jpg$`));
 		expect(keys[1]).toMatch(new RegExp(`^posts/${data.id}/1-[a-f0-9]{8}\\.png$`));
+
+		// stored content type comes from the whitelisted extension, not the
+		// client-supplied blob MIME (both blobs were sent as image/jpeg)
+		const pngObj = await env.BUCKET.head(keys[1]);
+		expect(pngObj?.httpMetadata?.contentType).toBe("image/png");
 
 		// DB rows
 		const { results } = await env.DB.prepare(

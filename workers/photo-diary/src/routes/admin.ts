@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { html, raw } from "hono/html";
 import { createDb, deletePost, getRecentPosts } from "../db";
 import { posts, postImages } from "../schema";
-import { safeExt } from "../utils";
+import { mimeForExt, safeExt } from "../utils";
 import { UPLOAD_SCRIPT, layout } from "../views";
 
 const admin = new Hono<{ Bindings: Env }>();
@@ -158,7 +158,7 @@ admin.post("/posts", async (c) => {
 			const shortHash = crypto.randomUUID().slice(0, 8);
 			const key = `posts/${postId}/${i}-${shortHash}.${ext}`;
 			await c.env.BUCKET.put(key, await file.arrayBuffer(), {
-				httpMetadata: { contentType: file.type || "image/jpeg" },
+				httpMetadata: { contentType: mimeForExt(ext) },
 			});
 			return {
 				post_id: postId,

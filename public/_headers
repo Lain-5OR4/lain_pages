@@ -1,0 +1,7 @@
+# Cloudflare Pages response headers (copied into out/ by the static export).
+# GitHub Pages ignores this file — it only takes effect on the CF Pages deploy.
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()

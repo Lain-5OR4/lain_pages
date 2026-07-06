@@ -46,6 +46,8 @@ pub.get("/post/:id{[0-9]+}", async (c) => {
 
 pub.get("/images/:key{.+}", async (c) => {
 	const key = c.req.param("key");
+	// Only post images are public; never expose other bucket contents.
+	if (!key.startsWith("posts/")) return c.notFound();
 	const obj = await c.env.BUCKET.get(key);
 	if (!obj) return c.notFound();
 
@@ -53,6 +55,7 @@ pub.get("/images/:key{.+}", async (c) => {
 	obj.writeHttpMetadata(headers);
 	headers.set("etag", obj.httpEtag);
 	headers.set("cache-control", "public, max-age=31536000, immutable");
+	headers.set("x-content-type-options", "nosniff");
 	return new Response(obj.body, { headers });
 });
 
