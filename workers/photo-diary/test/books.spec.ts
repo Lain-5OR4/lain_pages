@@ -9,9 +9,13 @@ const setupSchema = async () => {
 			title TEXT NOT NULL,
 			author TEXT,
 			kind TEXT NOT NULL DEFAULT 'book',
+			category TEXT,
 			status TEXT NOT NULL DEFAULT 'to_read',
+			rating INTEGER,
 			isbn TEXT,
 			cover_url TEXT,
+			amazon_url TEXT,
+			publisher TEXT,
 			note TEXT,
 			started_on TEXT,
 			finished_on TEXT,
@@ -46,6 +50,24 @@ describe("books data model", () => {
 		expect(book.author).toBe("平澤章");
 		expect(book.isbn).toBe("9784822284688");
 		expect(book.cover_url).toContain("media-amazon.com");
+	});
+
+	it("createBook stores category/rating/publisher/amazon_url (from the Notion 種別/評価/出版社/リンク properties)", async () => {
+		const book = await createBook(env.DB, {
+			title: "例題で学ぶグラフ理論",
+			author: "安藤 清",
+			category: "数学",
+			status: "done",
+			rating: 4,
+			publisher: "森北出版",
+			amazon_url: "https://amzn.asia/d/fevd7z8",
+			note: "入門としては良いのではないか",
+		});
+		expect(book.category).toBe("数学");
+		expect(book.rating).toBe(4);
+		expect(book.publisher).toBe("森北出版");
+		expect(book.amazon_url).toBe("https://amzn.asia/d/fevd7z8");
+		expect(book.note).toBe("入門としては良いのではないか");
 	});
 
 	it("getBooks orders by most recently updated first", async () => {

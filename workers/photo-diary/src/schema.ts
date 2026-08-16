@@ -20,16 +20,24 @@ export const postImages = sqliteTable("post_images", {
 
 // kind: 'book' | 'article'
 // status: 'to_read' | 'reading' | 'done'
+// category is a free-text genre/subject label (e.g. 数学/統計学/情報技術),
+// carried over from the Notion "種別" property — distinct from `kind`.
+// rating is 1-5, set once status is 'done'.
 // cover_url is a plain URL string (Amazon product image, pasted manually) — no
-// scraping or upload pipeline.
+// scraping or upload pipeline. amazon_url is the separate product-page link
+// (Notion's "リンク" property).
 export const books = sqliteTable("books", {
 	id: integer("id").primaryKey({ autoIncrement: true }),
 	title: text("title").notNull(),
 	author: text("author"),
 	kind: text("kind").notNull().default("book"),
+	category: text("category"),
 	status: text("status").notNull().default("to_read"),
+	rating: integer("rating"),
 	isbn: text("isbn"),
 	cover_url: text("cover_url"),
+	amazon_url: text("amazon_url"),
+	publisher: text("publisher"),
 	note: text("note"),
 	started_on: text("started_on"),
 	finished_on: text("finished_on"),

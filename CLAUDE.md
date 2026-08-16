@@ -97,8 +97,10 @@ Hono-based Cloudflare Worker deployed to `api.mizora.dev`. Uses **Drizzle ORM** 
 - `posts`: `id, title, caption, posted_on, created_at`
 - `post_images`: `id, post_id, r2_key, sort_order, taken_at, width, height`
   - `taken_at` stores EXIF `DateTimeOriginal` as naive `YYYY-MM-DDTHH:MM:SS` (camera local time)
-- `books` (reading log, in progress — see milestone "Reading log (native)"): `id, title, author, kind, status, isbn, cover_url, note, started_on, finished_on, created_at, updated_at`
-  - `kind`: `book` | `article`; `status`: `to_read` | `reading` | `done`
+- `books` (reading log, in progress — see milestone "Reading log (native)"): `id, title, author, kind, category, status, rating, isbn, cover_url, amazon_url, publisher, note, started_on, finished_on, created_at, updated_at`
+  - `kind`: `book` | `article`; `status`: `to_read` | `reading` | `done`; `rating`: `1`-`5`
+  - `category` is a free-text genre carried over from Notion's `種別` property (e.g. 数学/統計学/情報技術) — distinct from `kind`
+  - `amazon_url` is the Amazon product-page link (Notion's `リンク` property), separate from `cover_url`
   - `cover_url` is a plain pasted URL (Amazon product image) — no scraping/upload pipeline
   - Schema changes to this table must ship as additive-only files under `migrations/` (`CREATE TABLE IF NOT EXISTS`) and applied to prod with `wrangler d1 execute --remote`. Never re-run `schema.sql` against prod — it starts with `DROP TABLE IF EXISTS` for every table
 
@@ -125,7 +127,7 @@ Hono-based Cloudflare Worker deployed to `api.mizora.dev`. Uses **Drizzle ORM** 
 - Must pass both lint and format checks for CI/CD deployment
 
 ### Deployment
-- Push-driven deployment is handled by Cloudflare Pages; the GitHub Pages workflow (`nextjs.yml`) is manual-only (`workflow_dispatch`)
+- **Pushing to main deploys to production.** Both the frontend (Cloudflare Pages) and the worker (Workers Builds) are GitHub-connected and auto-deploy on push; `npm run deploy` in `workers/photo-diary/` is only for manual/emergency deploys. The GitHub Pages workflow (`nextjs.yml`) is manual-only (`workflow_dispatch`)
 - Environment variable `GITHUB_PAGES=true` triggers basePath/assetPrefix configuration
 - Static export builds to `out/` directory
 - Deployment fails if lint/format checks don't pass
