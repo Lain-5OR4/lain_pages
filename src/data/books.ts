@@ -1,0 +1,56 @@
+import type { Book } from "../../shared/types/book";
+
+export type { Book, BookKind, BookStatus } from "../../shared/types/book";
+
+// Dev-only mock data. Used in development when NODE_ENV === "development",
+// so the frontend dev server doesn't need the worker running locally.
+export const mockBooks: Book[] = [
+  {
+    id: 1,
+    title: "例題で学ぶグラフ理論",
+    author: "安藤 清",
+    kind: "book",
+    category: "数学",
+    status: "done",
+    rating: 4,
+    isbn: null,
+    coverUrl: null,
+    amazonUrl: "https://amzn.asia/d/fevd7z8",
+    publisher: "森北出版",
+    note: "入門としては良いのではないか",
+    startedOn: null,
+    finishedOn: null,
+  },
+  {
+    id: 2,
+    title: "競技プログラミングの鉄則",
+    author: "米田 優峻",
+    kind: "book",
+    category: "情報技術",
+    status: "reading",
+    rating: null,
+    isbn: null,
+    coverUrl: null,
+    amazonUrl: "https://amzn.asia/d/6Z3tThq",
+    publisher: "マイナビ",
+    note: null,
+    startedOn: null,
+    finishedOn: null,
+  },
+  {
+    id: 3,
+    title: "チャート式シリーズ 大学教養 線形代数",
+    author: "加藤 文元",
+    kind: "book",
+    category: "数学",
+    status: "to_read",
+    rating: null,
+    isbn: null,
+    coverUrl: null,
+    amazonUrl: "https://amzn.asia/d/dkPpSVE",
+    publisher: "数研出版",
+    note: null,
+    startedOn: null,
+    finishedOn: null,
+  },
+];

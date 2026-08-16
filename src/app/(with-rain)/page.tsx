@@ -1,10 +1,10 @@
 "use client";
+import { TypingEffect } from "@/components/animation/TypingEffect";
 import WalkingCharacter from "@/components/animation/WalkingCharacter";
 import { BackgroundMusicPlayer } from "@/components/audio/BackgroundMusicPlayer";
 import Footer from "@/components/footer/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useTypingEffect } from "@/hooks/useTypingEffect";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import "@/app/styles/glitch.css";
@@ -33,10 +33,10 @@ const MINI_APPS = [
 const GATEWAYS = [
   {
     title: "READING_LOGS",
-    blurb: "Retrieving data from external database (Notion)...",
-    cta: "ACCESS_DB",
-    href: "https://well-timimus-c9d.notion.site/3b762091a4d04987a6a93473678c7527?v=d7cea027c9b34e2bae2e88f7ac49ab0f",
-    external: true,
+    blurb: "Querying reading_log.db...",
+    cta: "OPEN_LOG",
+    href: "/reading",
+    external: false,
   },
   {
     title: "PHOTO_DIARY",
@@ -101,9 +101,6 @@ function GatewayCard({ title, blurb, cta, href, external }: (typeof GATEWAYS)[nu
 }
 
 export default function Component() {
-  const fullText = "Welcome to my digital realm ";
-  const renderTypingEffect = useTypingEffect(fullText);
-
   return (
     <div className="bg-black text-green-500 font-mono relative overflow-hidden min-h-screen flex flex-col">
       <BackgroundMusicPlayer />
@@ -113,7 +110,7 @@ export default function Component() {
           <h1 className="text-4xl font-bold mb-4 glitch" data-text="Mizora">
             Mizora
           </h1>
-          {renderTypingEffect()}
+          <TypingEffect text="Welcome to my digital realm " />
         </header>
 
         <section className="mb-12">
