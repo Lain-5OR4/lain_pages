@@ -87,6 +87,7 @@ Hono-based Cloudflare Worker deployed to `api.mizora.dev`. Uses **Drizzle ORM** 
 |---|---|
 | `GET /api/diary` | Returns `DiaryEntry[]` formatted for the frontend |
 | `GET /api/posts` | Returns raw post data |
+| `GET /api/books` | Returns `Book[]` (reading log) — camelCase API contract, `shared/types/book.ts` |
 | `GET /api/blog` | Proxies the microCMS post list (no `content` field, 60s/300s cache) |
 | `GET /api/blog/:id` | Proxies a single microCMS post; `?draftKey=` for previews (no-store) |
 | `GET /images/:key` | Serves images from R2 (1-year immutable cache) |

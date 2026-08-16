@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { corsMiddleware, preflight } from "../cors";
-import { getRecentPosts } from "../db";
+import { getBooks, getRecentPosts } from "../db";
 import { formatStamp } from "../utils";
-import type { DiaryEntry } from "../types";
+import type { Book, DiaryEntry } from "../types";
 
 const api = new Hono<{ Bindings: Env }>();
 
@@ -37,6 +37,28 @@ api.get("/diary", async (c) => {
 	});
 	c.header("Cache-Control", "public, max-age=60, s-maxage=300");
 	return c.json(entries);
+});
+
+api.get("/books", async (c) => {
+	const rows = await getBooks(c.env.DB);
+	const books: Book[] = rows.map((b) => ({
+		id: b.id,
+		title: b.title,
+		author: b.author,
+		kind: b.kind as Book["kind"],
+		category: b.category,
+		status: b.status as Book["status"],
+		rating: b.rating,
+		isbn: b.isbn,
+		coverUrl: b.cover_url,
+		amazonUrl: b.amazon_url,
+		publisher: b.publisher,
+		note: b.note,
+		startedOn: b.started_on,
+		finishedOn: b.finished_on,
+	}));
+	c.header("Cache-Control", "public, max-age=60, s-maxage=300");
+	return c.json(books);
 });
 
 export default api;
