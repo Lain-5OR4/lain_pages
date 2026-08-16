@@ -1,9 +1,13 @@
 "use client";
 
+import { BookDrawer } from "@/components/reading/BookDrawer";
+import { BookList } from "@/components/reading/BookList";
+import { Shelf } from "@/components/reading/Shelf";
+import { SANS, SERIF, chipStyle, viewBtnStyle } from "@/components/reading/theme";
 import type { Book, BookStatus } from "@/data/books";
 import { mockBooks } from "@/data/books";
 import Link from "next/link";
-import { Component, Suspense, use, useState } from "react";
+import { Component, Suspense, use, useMemo, useState } from "react";
 
 const READING_API_BASE = process.env.NEXT_PUBLIC_DIARY_API ?? "https://api.mizora.dev";
 
@@ -23,15 +27,6 @@ async function fetchBooks(): Promise<Book[]> {
     throw err;
   }
 }
-
-type ViewMode = "compact" | "card";
-
-const STATUS_ORDER: BookStatus[] = ["reading", "to_read", "done"];
-const STATUS_LABEL: Record<BookStatus, string> = {
-  to_read: "未着手",
-  reading: "読書中",
-  done: "読了",
-};
 
 // --- ErrorBoundary ---
 
@@ -54,14 +49,17 @@ class ReadingErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     if (this.state.error) {
       return (
         <div className="text-center my-8">
-          <p className="text-red-400/80 text-sm">! connection error: {this.state.error.message}</p>
+          <p style={{ color: "#a05a44", font: `400 13px/1 ${SANS}` }}>
+            接続エラー: {this.state.error.message}
+          </p>
           <button
             type="button"
             onClick={() => {
               this.setState({ error: null });
               this.props.onRetry();
             }}
-            className="mt-2 text-green-400 underline text-sm"
+            className="mt-2 underline"
+            style={{ color: "#8a5a3b", font: `400 13px/1 ${SANS}` }}
           >
             retry
           </button>
@@ -75,181 +73,174 @@ class ReadingErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 function ReadingLoading() {
   return (
     <div className="flex items-center justify-center py-32">
-      <p className="text-green-700 text-sm tracking-[0.5em] animate-pulse">loading...</p>
+      <p
+        className="animate-pulse"
+        style={{ color: "#9a7d63", font: `400 13px/1 ${SANS}`, letterSpacing: ".5em" }}
+      >
+        loading...
+      </p>
     </div>
   );
 }
 
-// --- Shared bits ---
+// --- Body (unwraps the promise via use()) ---
 
-function Stars({ rating }: { rating: number | null }) {
-  if (!rating) return null;
-  return (
-    <span
-      className="text-amber-400 text-xs tracking-tighter shrink-0"
-      aria-label={`rating: ${rating}/5`}
-    >
-      {"★".repeat(rating)}
-      <span className="text-green-900">{"★".repeat(5 - rating)}</span>
-    </span>
-  );
-}
+function ReadingBody({ promise }: { promise: Promise<Book[]> }) {
+  const books = use(promise);
+  const [view, setView] = useState<"shelf" | "list">("shelf");
+  const [filter, setFilter] = useState<"all" | BookStatus>("all");
+  const [query, setQuery] = useState("");
+  const [selId, setSelId] = useState<number | null>(null);
 
-function CategoryTag({ category }: { category: string | null }) {
-  if (!category) return null;
-  return (
-    <span className="text-[0.65rem] uppercase tracking-widest text-green-600 border border-green-900 rounded px-1.5 py-0.5 shrink-0">
-      {category}
-    </span>
-  );
-}
-
-function Cover({
-  src,
-  title,
-  className,
-}: {
-  src: string | null;
-  title: string;
-  className: string;
-}) {
-  if (!src) {
-    return (
-      <div
-        className={`${className} shrink-0 border border-green-900/70 rounded-sm bg-green-950/40 flex items-center justify-center text-green-900 text-[0.6rem] text-center`}
-      >
-        no cover
-      </div>
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return books.filter(
+      (b) =>
+        (filter === "all" || b.status === filter) &&
+        (!q || `${b.title}${b.author ?? ""}`.toLowerCase().includes(q)),
     );
-  }
+  }, [books, filter, query]);
+
+  const readCount = books.filter((b) => b.status === "done");
+  const rated = readCount.filter((b) => (b.rating ?? 0) > 0);
+  const thisYear = new Date().getFullYear().toString();
+  const statTotal = books.length;
+  const statYear = readCount.filter((b) => (b.finishedOn ?? "").startsWith(thisYear)).length;
+  const statAvg = rated.length
+    ? (rated.reduce((a, b) => a + (b.rating ?? 0), 0) / rated.length).toFixed(1)
+    : "–";
+
+  const selected = books.find((b) => b.id === selId) ?? null;
+  const filters: Array<["all" | BookStatus, string]> = [
+    ["all", "すべて"],
+    ["done", "読了"],
+    ["reading", "読書中"],
+    ["to_read", "積読"],
+  ];
+
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={src}
-      alt={`${title} cover`}
-      className={`${className} shrink-0 object-cover border border-green-900/70 rounded-sm bg-green-950/40`}
-    />
-  );
-}
+    <>
+      <header
+        className="flex items-end justify-between gap-6 flex-wrap"
+        style={{ borderBottom: "1px solid rgba(61,38,24,.18)", paddingBottom: 18 }}
+      >
+        <div className="flex flex-col gap-1.5">
+          <div
+            className="uppercase"
+            style={{ font: `500 11px/1 ${SANS}`, letterSpacing: ".34em", color: "#9a7d63" }}
+          >
+            my reading shelf
+          </div>
+          <h1
+            style={{
+              margin: 0,
+              font: `900 40px/1.05 ${SERIF}`,
+              color: "#2f2118",
+              letterSpacing: ".06em",
+            }}
+          >
+            読書記録
+          </h1>
+        </div>
+        <div
+          className="flex gap-4.5"
+          style={{
+            padding: "8px 20px",
+            background: "rgba(255,255,255,.5)",
+            border: "1px solid rgba(61,38,24,.14)",
+            borderRadius: 2,
+          }}
+        >
+          {[
+            ["TOTAL", statTotal],
+            [thisYear, statYear],
+            ["AVG", statAvg],
+          ].map(([label, value], i) => (
+            <div key={label} className="flex items-center gap-4.5">
+              {i > 0 && (
+                <div style={{ width: 1, alignSelf: "stretch", background: "rgba(61,38,24,.14)" }} />
+              )}
+              <div className="flex flex-col gap-0.5 items-center">
+                <span style={{ font: `700 20px/1 ${SERIF}`, color: "#2f2118" }}>{value}</span>
+                <span
+                  style={{ font: `500 9.5px/1 ${SANS}`, letterSpacing: ".16em", color: "#9a7d63" }}
+                >
+                  {label}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </header>
 
-// --- Compact view: one line per book ---
-
-function CompactRow({ book }: { book: Book }) {
-  return (
-    <li
-      className="flex items-center gap-2 border-b border-green-900/30 px-1 py-1.5 text-sm"
-      title={book.note ?? undefined}
-    >
-      <span className="text-green-200 truncate">{book.title}</span>
-      {book.author && (
-        <span className="text-green-700 shrink-0 whitespace-nowrap">— {book.author}</span>
-      )}
-      <span className="flex-1" />
-      <CategoryTag category={book.category} />
-      <Stars rating={book.rating} />
-    </li>
-  );
-}
-
-function CompactList({ books }: { books: Book[] }) {
-  return (
-    <ul>
-      {books.map((book) => (
-        <CompactRow key={book.id} book={book} />
-      ))}
-    </ul>
-  );
-}
-
-// --- Card view: cover-forward grid ---
-
-function BookCard({ book }: { book: Book }) {
-  return (
-    <li
-      className="border border-green-900/50 rounded p-2 flex flex-col gap-2"
-      title={book.note ?? undefined}
-    >
-      <Cover src={book.coverUrl} title={book.title} className="w-full aspect-[2/3] rounded-sm" />
-      <div className="min-w-0">
-        <p className="text-green-200 text-sm leading-tight line-clamp-2">{book.title}</p>
-        {book.author && <p className="text-green-700 text-xs mt-1 truncate">{book.author}</p>}
-        <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-          <CategoryTag category={book.category} />
-          <Stars rating={book.rating} />
+      <div className="flex items-center justify-between gap-4 flex-wrap mt-6.5">
+        <div className="flex gap-2 flex-wrap">
+          {filters.map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setFilter(id)}
+              style={chipStyle(filter === id)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2.5 items-center">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="タイトル・著者で検索"
+            className="outline-none"
+            style={{
+              width: 220,
+              padding: "10px 12px",
+              background: "rgba(255,255,255,.6)",
+              border: "1px solid rgba(61,38,24,.2)",
+              borderRadius: 2,
+              font: `400 13px/1 ${SANS}`,
+              color: "#2f2118",
+            }}
+          />
+          <div
+            className="flex overflow-hidden"
+            style={{ border: "1px solid rgba(61,38,24,.2)", borderRadius: 2 }}
+          >
+            <button
+              type="button"
+              onClick={() => setView("shelf")}
+              style={viewBtnStyle(view === "shelf")}
+            >
+              棚
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("list")}
+              style={viewBtnStyle(view === "list")}
+            >
+              一覧
+            </button>
+          </div>
         </div>
       </div>
-    </li>
-  );
-}
 
-function CardGrid({ books }: { books: Book[] }) {
-  return (
-    <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-      {books.map((book) => (
-        <BookCard key={book.id} book={book} />
-      ))}
-    </ul>
-  );
-}
+      <div className="mt-6.5">
+        {visible.length === 0 ? (
+          <p
+            className="text-center"
+            style={{ margin: 0, padding: "48px 0", font: `400 13px/1.8 ${SANS}`, color: "#9a7d63" }}
+          >
+            該当する本がありません。
+          </p>
+        ) : view === "shelf" ? (
+          <Shelf books={visible} onOpen={setSelId} />
+        ) : (
+          <BookList books={visible} onOpen={setSelId} />
+        )}
+      </div>
 
-// --- View toggle ---
-
-function ViewToggle({ view, onChange }: { view: ViewMode; onChange: (v: ViewMode) => void }) {
-  const base = "px-3 py-1 text-[0.7rem] tracking-widest uppercase transition-colors";
-  const active = "bg-green-500 text-black";
-  const inactive = "text-green-500 hover:bg-green-950";
-  return (
-    <div className="inline-flex border border-green-900 rounded overflow-hidden">
-      <button
-        type="button"
-        onClick={() => onChange("compact")}
-        className={`${base} ${view === "compact" ? active : inactive}`}
-      >
-        compact
-      </button>
-      <button
-        type="button"
-        onClick={() => onChange("card")}
-        className={`${base} ${view === "card" ? active : inactive} border-l border-green-900`}
-      >
-        cards
-      </button>
-    </div>
-  );
-}
-
-// --- Grouped list (unwraps the promise via use()) ---
-
-function BookGroups({ promise, view }: { promise: Promise<Book[]>; view: ViewMode }) {
-  const books = use(promise);
-  const byStatus = new Map<BookStatus, Book[]>();
-  for (const status of STATUS_ORDER) byStatus.set(status, []);
-  for (const book of books) byStatus.get(book.status)?.push(book);
-
-  if (books.length === 0) {
-    return (
-      <p className="text-center text-green-700 mt-20 text-lg tracking-widest">no entries yet.</p>
-    );
-  }
-
-  return (
-    <div className="space-y-10">
-      <p className="text-[0.75rem] tracking-[0.15em] text-green-600 -mt-6">{books.length} books</p>
-      {STATUS_ORDER.map((status) => {
-        const group = byStatus.get(status) ?? [];
-        if (group.length === 0) return null;
-        return (
-          <section key={status}>
-            <h2 className="text-lg font-bold text-green-400 mb-3 border-b border-green-900 pb-2">
-              <span className="mr-2">{">"}</span>
-              {STATUS_LABEL[status]}
-              <span className="ml-2 text-green-700 text-sm font-normal">{group.length}</span>
-            </h2>
-            {view === "compact" ? <CompactList books={group} /> : <CardGrid books={group} />}
-          </section>
-        );
-      })}
-    </div>
+      {selected && <BookDrawer key={selected.id} book={selected} onClose={() => setSelId(null)} />}
+    </>
   );
 }
 
@@ -257,31 +248,34 @@ function BookGroups({ promise, view }: { promise: Promise<Book[]>; view: ViewMod
 
 export default function ReadingPage() {
   const [promise, setPromise] = useState(fetchBooks);
-  const [view, setView] = useState<ViewMode>("compact");
 
   return (
-    <div className="min-h-screen bg-black text-green-500 font-mono p-6 md:p-10">
+    <div
+      className="min-h-screen"
+      style={{
+        background: [
+          "radial-gradient(120% 80% at 50% 0%, rgba(255,255,255,.5), rgba(255,255,255,0) 60%)",
+          "repeating-linear-gradient(90deg, rgba(0,0,0,.012) 0 2px, rgba(0,0,0,0) 2px 6px)",
+          "#e8ded0",
+        ].join(","),
+        paddingBottom: 80,
+      }}
+    >
       <div
-        className={`mx-auto transition-[max-width] ${view === "compact" ? "max-w-3xl" : "max-w-6xl"}`}
+        className="max-w-[1240px] mx-auto flex flex-col gap-6"
+        style={{ padding: "34px 32px 0" }}
       >
-        <header className="mb-10">
-          <Link href="/" className="text-xs text-green-700 hover:text-green-400 transition-colors">
-            ← RETURN
-          </Link>
-          <h1 className="text-3xl font-bold mt-4 text-green-400">{">"} READING_LOG_</h1>
-          <p className="text-green-600 text-sm mt-2">{"// 読書記録という名の積読状況整理"}</p>
-        </header>
-
-        <div className="flex flex-wrap items-baseline justify-between gap-2 mb-10">
-          <p className="text-[0.7rem] tracking-[0.35em] text-green-600 uppercase">
-            READING_LOG · BY STATUS
-          </p>
-          <ViewToggle view={view} onChange={setView} />
-        </div>
+        <Link
+          href="/"
+          className="self-start"
+          style={{ font: `500 11px/1 ${SANS}`, letterSpacing: ".2em", color: "#9a7d63" }}
+        >
+          ← RETURN
+        </Link>
 
         <ReadingErrorBoundary onRetry={() => setPromise(fetchBooks())}>
           <Suspense fallback={<ReadingLoading />}>
-            <BookGroups promise={promise} view={view} />
+            <ReadingBody promise={promise} />
           </Suspense>
         </ReadingErrorBoundary>
       </div>
