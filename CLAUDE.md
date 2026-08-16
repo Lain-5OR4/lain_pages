@@ -97,6 +97,10 @@ Hono-based Cloudflare Worker deployed to `api.mizora.dev`. Uses **Drizzle ORM** 
 - `posts`: `id, title, caption, posted_on, created_at`
 - `post_images`: `id, post_id, r2_key, sort_order, taken_at, width, height`
   - `taken_at` stores EXIF `DateTimeOriginal` as naive `YYYY-MM-DDTHH:MM:SS` (camera local time)
+- `books` (reading log, in progress — see milestone "Reading log (native)"): `id, title, author, kind, status, isbn, cover_url, note, started_on, finished_on, created_at, updated_at`
+  - `kind`: `book` | `article`; `status`: `to_read` | `reading` | `done`
+  - `cover_url` is a plain pasted URL (Amazon product image) — no scraping/upload pipeline
+  - Schema changes to this table must ship as additive-only files under `migrations/` (`CREATE TABLE IF NOT EXISTS`) and applied to prod with `wrangler d1 execute --remote`. Never re-run `schema.sql` against prod — it starts with `DROP TABLE IF EXISTS` for every table
 
 ### Data Flow
 1. Admin uploads via browser form → client-side resize to 2048px JPEG via Canvas (EXIF is stripped here) → `exifr` extracts `DateTimeOriginal` before resize and sends as `taken_at` field

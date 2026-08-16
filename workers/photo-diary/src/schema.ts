@@ -17,3 +17,22 @@ export const postImages = sqliteTable("post_images", {
 	width: integer("width"),
 	height: integer("height"),
 });
+
+// kind: 'book' | 'article'
+// status: 'to_read' | 'reading' | 'done'
+// cover_url is a plain URL string (Amazon product image, pasted manually) — no
+// scraping or upload pipeline.
+export const books = sqliteTable("books", {
+	id: integer("id").primaryKey({ autoIncrement: true }),
+	title: text("title").notNull(),
+	author: text("author"),
+	kind: text("kind").notNull().default("book"),
+	status: text("status").notNull().default("to_read"),
+	isbn: text("isbn"),
+	cover_url: text("cover_url"),
+	note: text("note"),
+	started_on: text("started_on"),
+	finished_on: text("finished_on"),
+	created_at: text("created_at").notNull().default("CURRENT_TIMESTAMP"),
+	updated_at: text("updated_at").notNull().default("CURRENT_TIMESTAMP"),
+});
