@@ -90,20 +90,41 @@ function Stars({ rating }: { rating: number | null }) {
   );
 }
 
+function Cover({ src, title }: { src: string | null; title: string }) {
+  if (!src) {
+    return (
+      <div className="w-12 h-16 shrink-0 border border-green-900/70 rounded-sm bg-green-950/40 flex items-center justify-center text-green-900 text-[0.6rem]">
+        no cover
+      </div>
+    );
+  }
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt={`${title} cover`}
+      className="w-12 h-16 shrink-0 object-cover border border-green-900/70 rounded-sm bg-green-950/40"
+    />
+  );
+}
+
 function BookRow({ book }: { book: Book }) {
   return (
-    <li className="border border-green-900/50 rounded px-4 py-3">
-      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span className="text-green-200">{book.title}</span>
-        {book.author && <span className="text-green-700 text-sm">— {book.author}</span>}
-        {book.category && (
-          <span className="text-[0.65rem] uppercase tracking-widest text-green-600 border border-green-900 rounded px-1.5 py-0.5">
-            {book.category}
-          </span>
-        )}
-        <Stars rating={book.rating} />
+    <li className="border border-green-900/50 rounded px-4 py-3 flex gap-3">
+      <Cover src={book.coverUrl} title={book.title} />
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <span className="text-green-200">{book.title}</span>
+          {book.author && <span className="text-green-700 text-sm">— {book.author}</span>}
+          {book.category && (
+            <span className="text-[0.65rem] uppercase tracking-widest text-green-600 border border-green-900 rounded px-1.5 py-0.5">
+              {book.category}
+            </span>
+          )}
+          <Stars rating={book.rating} />
+        </div>
+        {book.note && <p className="mt-1 text-sm text-green-500/80 italic">{book.note}</p>}
       </div>
-      {book.note && <p className="mt-1 text-sm text-green-500/80 italic">{book.note}</p>}
     </li>
   );
 }
