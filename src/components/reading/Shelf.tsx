@@ -5,7 +5,7 @@ import { type DecoratedBook, SANS, SERIF, decorate } from "./theme";
 
 // Pack decorated books into shelf rows, wrapping once a row's total slot
 // width would exceed BUDGET (matches the reference design's row-packing).
-const BUDGET = 470;
+const BUDGET = 820;
 
 function packRows(books: DecoratedBook[]): DecoratedBook[][] {
   const rows: DecoratedBook[][] = [];
@@ -126,7 +126,7 @@ export function Shelf({ books, onOpen }: { books: Book[]; onOpen: (id: number) =
   const rows = packRows(decorated);
   const sizerW = Math.max(
     600,
-    Math.min(1180, Math.max(0, ...rows.map((r) => r.reduce((a, b) => a + b.slotW, 0))) + 130),
+    Math.min(1560, Math.max(0, ...rows.map((r) => r.reduce((a, b) => a + b.slotW, 0))) + 130),
   );
 
   return (
