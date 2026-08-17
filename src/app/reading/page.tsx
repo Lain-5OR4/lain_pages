@@ -5,14 +5,15 @@ import { BookList } from "@/components/reading/BookList";
 import { Shelf } from "@/components/reading/Shelf";
 import { SANS, SERIF, chipStyle, viewBtnStyle } from "@/components/reading/theme";
 import type { Book, BookStatus } from "@/data/books";
-import { mockBooks } from "@/data/books";
 import Link from "next/link";
 import { Component, Suspense, use, useMemo, useState } from "react";
 
 const READING_API_BASE = process.env.NEXT_PUBLIC_DIARY_API ?? "https://api.mizora.dev";
 
+// Always hits the live worker, even in dev — unlike diary's mock-data
+// pattern, the reading log is actively curated and the point of running
+// this locally is to see the real shelf, not a 3-book placeholder.
 async function fetchBooks(): Promise<Book[]> {
-  if (process.env.NODE_ENV === "development") return mockBooks;
   try {
     const res = await fetch(`${READING_API_BASE}/api/books`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
