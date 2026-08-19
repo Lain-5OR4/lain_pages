@@ -4,7 +4,7 @@ import type { Book } from "@/data/books";
 import { SANS, SERIF, STATUS_LABEL, decorate, stars } from "./theme";
 
 export function BookList({ books, onOpen }: { books: Book[]; onOpen: (id: number) => void }) {
-  const decorated = books.map(decorate);
+  const decorated = books.map((b, i) => decorate(b, i));
   return (
     <div
       className="grid gap-3.5"

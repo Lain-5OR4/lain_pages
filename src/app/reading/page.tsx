@@ -263,7 +263,7 @@ export default function ReadingPage() {
       }}
     >
       <div
-        className="max-w-[1600px] mx-auto flex flex-col gap-6"
+        className="max-w-[2040px] mx-auto flex flex-col gap-6"
         style={{ padding: "34px 32px 0" }}
       >
         <Link

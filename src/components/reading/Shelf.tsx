@@ -1,11 +1,13 @@
 "use client";
 
 import type { Book } from "@/data/books";
+import { useCallback, useEffect, useRef, useState } from "react";
+
 import { type DecoratedBook, SANS, SERIF, decorate } from "./theme";
 
 // Pack decorated books into shelf rows, wrapping once a row's total slot
 // width would exceed BUDGET (matches the reference design's row-packing).
-const BUDGET = 820;
+const BUDGET = 1280;
 
 function packRows(books: DecoratedBook[]): DecoratedBook[][] {
   const rows: DecoratedBook[][] = [];
@@ -40,8 +42,6 @@ function SpineButton({ b, onOpen }: { b: DecoratedBook; onOpen: (id: number) => 
         color: b.dim.fg,
         textShadow: "0 1px 0 rgba(0,0,0,.35)",
         opacity: faded ? 0.72 : 1,
-        transform: `rotate(${b.dim.lean}deg)`,
-        transformOrigin: `bottom ${b.dim.lean < 0 ? "right" : "left"}`,
         boxShadow:
           "3px 0 8px -1px rgba(0,0,0,.5), 0 6px 10px -6px rgba(0,0,0,.9), inset 0 0 0 1px rgba(0,0,0,.22)",
         background: [
@@ -84,16 +84,33 @@ function SpineButton({ b, onOpen }: { b: DecoratedBook; onOpen: (id: number) => 
   );
 }
 
-function FaceButton({ b, onOpen }: { b: DecoratedBook; onOpen: (id: number) => void }) {
+function FaceButton({
+  b,
+  onOpen,
+  onMeasure,
+}: {
+  b: DecoratedBook;
+  onOpen: (id: number) => void;
+  onMeasure: (id: number, aspect: number) => void;
+}) {
   const faded = b.status !== "done";
-  const w = Math.round(b.dim.h * 0.66);
+  const imgRef = useRef<HTMLImageElement>(null);
+  // Cached images are already `complete` by the time this effect's onLoad
+  // listener attaches, so the "load" event never fires for them — check
+  // completeness on mount as a fallback for that case.
+  useEffect(() => {
+    const img = imgRef.current;
+    if (img?.complete && img.naturalWidth && img.naturalHeight) {
+      onMeasure(b.id, img.naturalWidth / img.naturalHeight);
+    }
+  }, [b.id, onMeasure]);
   return (
     <button
       type="button"
       onClick={() => onOpen(b.id)}
       className="shrink-0 relative p-0 border-none cursor-pointer overflow-hidden flex items-center justify-center transition-transform duration-[180ms] ease-[cubic-bezier(.2,.8,.2,1)] hover:-translate-y-2.5 hover:-rotate-1"
       style={{
-        width: w,
+        width: b.faceW,
         height: b.dim.h,
         borderRadius: "1px 4px 4px 1px",
         opacity: faded ? 0.72 : 1,
@@ -104,10 +121,15 @@ function FaceButton({ b, onOpen }: { b: DecoratedBook; onOpen: (id: number) => v
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
+        ref={imgRef}
         src={b.coverUrl ?? undefined}
         alt=""
         className="block w-full h-full object-cover"
         style={{ position: "absolute", inset: 0 }}
+        onLoad={(e) => {
+          const { naturalWidth, naturalHeight } = e.currentTarget;
+          if (naturalWidth && naturalHeight) onMeasure(b.id, naturalWidth / naturalHeight);
+        }}
       />
       <span
         className="absolute inset-0 pointer-events-none"
@@ -122,11 +144,19 @@ function FaceButton({ b, onOpen }: { b: DecoratedBook; onOpen: (id: number) => v
 }
 
 export function Shelf({ books, onOpen }: { books: Book[]; onOpen: (id: number) => void }) {
-  const decorated = books.map(decorate);
+  // Real cover aspect ratios, measured on image load and keyed by book id.
+  // Until an image loads, decorate() falls back to DEFAULT_COVER_ASPECT so
+  // face-out boxes still render at a reasonable width immediately.
+  const [aspects, setAspects] = useState<Record<number, number>>({});
+  const handleMeasure = useCallback((id: number, aspect: number) => {
+    setAspects((prev) => (prev[id] === aspect ? prev : { ...prev, [id]: aspect }));
+  }, []);
+
+  const decorated = books.map((b, i) => decorate(b, i, aspects));
   const rows = packRows(decorated);
   const sizerW = Math.max(
     600,
-    Math.min(1560, Math.max(0, ...rows.map((r) => r.reduce((a, b) => a + b.slotW, 0))) + 130),
+    Math.min(2000, Math.max(0, ...rows.map((r) => r.reduce((a, b) => a + b.slotW, 0))) + 130),
   );
 
   return (
@@ -176,31 +206,11 @@ export function Shelf({ books, onOpen }: { books: Book[]; onOpen: (id: number) =
             >
               {row.map((b) =>
                 b.faceOut ? (
-                  <FaceButton key={b.id} b={b} onOpen={onOpen} />
+                  <FaceButton key={b.id} b={b} onOpen={onOpen} onMeasure={handleMeasure} />
                 ) : (
                   <SpineButton key={b.id} b={b} onOpen={onOpen} />
                 ),
               )}
-              <span
-                className="shrink-0 rounded-[1px]"
-                style={{
-                  width: 9,
-                  height: 118,
-                  marginLeft: 2,
-                  background: "linear-gradient(90deg,#3a3128,#8a7a63 30%,#5a4c3b 70%,#241d16)",
-                  boxShadow: "2px 0 6px -1px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.28)",
-                }}
-              />
-              <span
-                className="shrink-0 rounded-[1px]"
-                style={{
-                  width: 52,
-                  height: 5,
-                  marginLeft: -2,
-                  background: "linear-gradient(180deg,#7a6a55,#332a20)",
-                  boxShadow: "0 4px 8px -4px rgba(0,0,0,.7)",
-                }}
-              />
               <span
                 className="absolute pointer-events-none"
                 style={{

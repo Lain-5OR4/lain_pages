@@ -81,32 +81,35 @@ export interface BookDeco {
   fg: string;
   w: number;
   h: number;
-  lean: number;
 }
 
 export function deco(title: string, i: number): BookDeco {
   const [bg, fg] = CLOTHS[(title.length + i * 3) % CLOTHS.length];
   const w = Math.max(26, Math.min(52, 28 + ((title.length * 2 + i * 5) % 26)));
   const h = 196 + ((title.length * 7 + i * 13) % 46);
-  const leanSeed = (title.length * 5 + i * 7) % 17;
-  const lean = leanSeed === 3 ? -2.2 : leanSeed === 11 ? 1.6 : 0;
-  return { bg, fg, w, h, lean };
+  return { bg, fg, w, h };
 }
 
 export interface DecoratedBook extends Book {
   dim: BookDeco;
   faceOut: boolean;
+  faceW: number;
   slotW: number;
   titleText: string;
   authorText: string;
 }
 
-export function decorate(b: Book, i: number): DecoratedBook {
+// Fallback cover aspect ratio (width/height) used until the real image has
+// loaded and its natural size is known — see FaceButton in Shelf.tsx.
+const DEFAULT_COVER_ASPECT = 0.66;
+
+export function decorate(b: Book, i: number, aspects: Record<number, number> = {}): DecoratedBook {
   const d = deco(b.title, i);
   // No curated "featured" flag in the schema, so face a deterministic ~1-in-5
   // covered books outward — same spirit as occasionally turning a book face-out
   // on a real shelf, without needing real curation data.
   const faceOut = !!(b.coverUrl && i % 5 === 0);
+  const faceW = Math.round(d.h * (aspects[b.id] ?? DEFAULT_COVER_ASPECT));
   const shortTitle = b.title.length > 13 ? `${b.title.slice(0, 12)}…` : b.title;
   const author = b.author ?? "";
   const shortAuthor = author.length > 8 ? `${author.slice(0, 7)}…` : author;
@@ -114,7 +117,8 @@ export function decorate(b: Book, i: number): DecoratedBook {
     ...b,
     dim: d,
     faceOut,
-    slotW: (faceOut ? Math.round(d.h * 0.66) : d.w) + 4,
+    faceW,
+    slotW: (faceOut ? faceW : d.w) + 4,
     titleText: shortTitle,
     authorText: shortAuthor,
   };
