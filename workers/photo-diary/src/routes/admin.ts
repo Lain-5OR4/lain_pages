@@ -1,9 +1,49 @@
 import { Hono } from "hono";
 import { html, raw } from "hono/html";
-import { createDb, deletePost, getRecentPosts } from "../db";
+import {
+	createBook,
+	createDb,
+	deleteBook,
+	deletePost,
+	getBook,
+	getBooks,
+	getRecentPosts,
+	type NewBook,
+	updateBook,
+} from "../db";
 import { posts, postImages } from "../schema";
 import { mimeForExt, safeExt } from "../utils";
-import { UPLOAD_SCRIPT, layout } from "../views";
+import { UPLOAD_SCRIPT, layout, renderBookForm } from "../views";
+
+const KINDS = new Set(["book", "article"]);
+const STATUSES = new Set(["to_read", "reading", "done"]);
+
+// Every editable field lives on this one form (see renderBookForm) so status,
+// rating, dates, and cover/amazon links can all be set without Notion.
+const parseBookForm = (formData: FormData): Partial<NewBook> => {
+	const str = (key: string) => {
+		const v = String(formData.get(key) ?? "").trim();
+		return v || null;
+	};
+	const kind = String(formData.get("kind") ?? "");
+	const status = String(formData.get("status") ?? "");
+	const ratingRaw = Number(formData.get("rating"));
+	return {
+		title: String(formData.get("title") ?? "").trim(),
+		author: str("author"),
+		kind: KINDS.has(kind) ? (kind as NewBook["kind"]) : "book",
+		status: STATUSES.has(status) ? (status as NewBook["status"]) : "to_read",
+		rating: ratingRaw >= 1 && ratingRaw <= 5 ? ratingRaw : null,
+		category: str("category"),
+		isbn: str("isbn"),
+		cover_url: str("cover_url"),
+		amazon_url: str("amazon_url"),
+		publisher: str("publisher"),
+		note: str("note"),
+		started_on: str("started_on"),
+		finished_on: str("finished_on"),
+	};
+};
 
 const admin = new Hono<{ Bindings: Env }>();
 
@@ -186,6 +226,117 @@ admin.post("/posts/:id{[0-9]+}/delete", async (c) => {
 	const ok = await deletePost(c.env, id);
 	if (!ok) return c.notFound();
 	return c.redirect("/admin");
+});
+
+// --- books (reading log) ---
+
+const STATUS_LABEL: Record<string, string> = {
+	to_read: "積読",
+	reading: "読書中",
+	done: "読了",
+};
+
+admin.get("/books", async (c) => {
+	const books = await getBooks(c.env.DB);
+	c.header("Cache-Control", "no-store");
+	return c.html(
+		layout({
+			title: "books admin — photo-diary",
+			noStore: true,
+			section: "Reading Log",
+			issue: `${books.length} Books`,
+			body: html`
+				<p class="back"><a href="/admin">← Photo Admin</a></p>
+				<a class="new-entry-cta" href="/admin/books/new">+ New Book</a>
+				${books.length === 0
+					? html`<p class="empty">No books yet — start with a new one.</p>`
+					: html`<ul class="books">
+							${books.map(
+								(b) =>
+									html`<li>
+										<span class="status">${STATUS_LABEL[b.status] ?? b.status}</span>
+										<span class="title"
+											>${b.title}${b.author
+												? html`<span class="author">${b.author}</span>`
+												: ""}</span
+										>
+										<span class="rating">${b.rating ? "★".repeat(b.rating) : ""}</span>
+										<span class="edit"><a href="/admin/books/${b.id}/edit">Edit</a></span>
+										<span class="del">
+											<form
+												method="POST"
+												action="/admin/books/${b.id}/delete"
+												onsubmit="return confirm('Delete “${b.title}”?')"
+											>
+												<button type="submit">Delete</button>
+											</form>
+										</span>
+									</li>`,
+							)}
+						</ul>`}
+			`,
+		}),
+	);
+});
+
+admin.get("/books/new", (c) => {
+	c.header("Cache-Control", "no-store");
+	return c.html(
+		layout({
+			title: "new book — photo-diary",
+			noStore: true,
+			section: "New Book",
+			issue: "Draft",
+			body: html`
+				<p class="back"><a href="/admin/books">← Reading Log</a></p>
+				${renderBookForm({ action: "/admin/books", submitLabel: "Add Book" })}
+			`,
+		}),
+	);
+});
+
+admin.post("/books", async (c) => {
+	const formData = await c.req.formData();
+	const input = parseBookForm(formData);
+	if (!input.title) return c.json({ error: "title is required" }, 400);
+	const book = await createBook(c.env.DB, input as NewBook);
+	return c.redirect(`/admin/books/${book.id}/edit`);
+});
+
+admin.get("/books/:id{[0-9]+}/edit", async (c) => {
+	const id = Number(c.req.param("id"));
+	const book = await getBook(c.env.DB, id);
+	if (!book) return c.notFound();
+	c.header("Cache-Control", "no-store");
+	return c.html(
+		layout({
+			title: `edit — ${book.title}`,
+			noStore: true,
+			section: "Edit Book",
+			issue: `#${book.id}`,
+			body: html`
+				<p class="back"><a href="/admin/books">← Reading Log</a></p>
+				${renderBookForm({ action: `/admin/books/${id}`, submitLabel: "Save", book })}
+			`,
+		}),
+	);
+});
+
+admin.post("/books/:id{[0-9]+}", async (c) => {
+	const id = Number(c.req.param("id"));
+	const formData = await c.req.formData();
+	const input = parseBookForm(formData);
+	if (!input.title) return c.json({ error: "title is required" }, 400);
+	const book = await updateBook(c.env.DB, id, input);
+	if (!book) return c.notFound();
+	return c.redirect("/admin/books");
+});
+
+admin.post("/books/:id{[0-9]+}/delete", async (c) => {
+	const id = Number(c.req.param("id"));
+	const ok = await deleteBook(c.env.DB, id);
+	if (!ok) return c.notFound();
+	return c.redirect("/admin/books");
 });
 
 export default admin;

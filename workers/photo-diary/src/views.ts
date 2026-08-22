@@ -1,5 +1,5 @@
 import { html, raw } from "hono/html";
-import type { PostWithImages } from "./db";
+import type { Book, PostWithImages } from "./db";
 
 export const PAGE_STYLES = `
 :root {
@@ -190,6 +190,46 @@ button[type=submit]:disabled { opacity: 0.4; cursor: not-allowed; }
 	transition: background 0.15s, color 0.15s;
 }
 .new-entry-cta:hover { background: var(--ink); color: var(--paper); }
+
+/* select inputs (books admin) */
+select {
+	font-family: inherit; font-size: 1.05rem; color: var(--ink);
+	border: none; border-bottom: 1px solid var(--ink); background: transparent;
+	padding: 0.3rem 0; width: 100%; outline: none; border-radius: 0;
+}
+select:focus { border-color: var(--accent); }
+
+/* admin books list */
+.books { list-style: none; margin: 0; padding: 0; }
+.books li {
+	display: grid;
+	grid-template-columns: 6rem 1fr auto auto auto;
+	align-items: baseline; gap: 1rem;
+	padding: 1rem 0; border-bottom: 1px solid var(--rule);
+}
+.books .status {
+	font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase;
+	color: var(--muted); border: 1px solid var(--rule); padding: 0.2rem 0.5rem;
+	text-align: center; white-space: nowrap;
+}
+.books .title { font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.books .title .author { color: var(--muted); font-size: 0.85em; margin-left: 0.6em; }
+.books .rating {
+	font-size: 0.75rem; color: var(--accent); letter-spacing: 0.1em;
+	font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.books .edit a {
+	font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase;
+	color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--rule);
+}
+.books .edit a:hover { color: var(--ink); border-color: var(--ink); }
+.books .del form { margin: 0; }
+.books .del button {
+	border: 1px solid var(--rule); background: transparent; color: var(--muted);
+	font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase;
+	padding: 0.35rem 0.7rem; cursor: pointer; font-family: inherit;
+}
+.books .del button:hover { color: var(--accent); border-color: var(--accent); }
 
 /* public feed posts */
 .post { margin: 0 0 4rem; }
@@ -469,7 +509,8 @@ export const layout = (opts: {
 					<footer>
 						<span
 							><a href="/api/posts">JSON</a><span class="sep">·</span
-							><a href="/admin">Admin</a></span
+							><a href="/admin">Admin</a><span class="sep">·</span
+							><a href="/admin/books">Books</a></span
 						>
 						<span>© ${year} mizora.dev</span>
 					</footer>
@@ -499,3 +540,144 @@ export const renderPost = (p: PostWithImages) =>
 			: ""}
 		${p.caption ? html`<p class="caption">${p.caption}</p>` : ""}
 	</article>`;
+
+const KIND_OPTIONS: Array<[Book["kind"], string]> = [
+	["book", "書籍"],
+	["article", "記事"],
+];
+const STATUS_OPTIONS: Array<[Book["status"], string]> = [
+	["to_read", "積読"],
+	["reading", "読書中"],
+	["done", "読了"],
+];
+
+// Shared form for both /admin/books/new (empty book) and /admin/books/:id/edit
+// (prefilled) — every editable field lives here so status changes, ratings,
+// dates, and cover/amazon links can all be set without touching Notion.
+export const renderBookForm = (opts: {
+	action: string;
+	submitLabel: string;
+	book?: Partial<Book>;
+}) => {
+	const b = opts.book ?? {};
+	return html`
+		<form method="POST" action="${opts.action}">
+			<div class="field">
+				<span class="field-num">01</span>
+				<div class="field-body">
+					<label>Title</label>
+					<input type="text" name="title" autocomplete="off" value="${b.title ?? ""}" required />
+				</div>
+			</div>
+			<div class="field">
+				<span class="field-num">02</span>
+				<div class="field-body">
+					<label>Author</label>
+					<input type="text" name="author" autocomplete="off" value="${b.author ?? ""}" />
+				</div>
+			</div>
+			<div class="field">
+				<span class="field-num">03</span>
+				<div class="field-body">
+					<label>Kind</label>
+					<select name="kind">
+						${KIND_OPTIONS.map(
+							([v, label]) =>
+								html`<option value="${v}" ${b.kind === v ? "selected" : ""}>
+									${label}
+								</option>`,
+						)}
+					</select>
+				</div>
+			</div>
+			<div class="field">
+				<span class="field-num">04</span>
+				<div class="field-body">
+					<label>Status</label>
+					<select name="status">
+						${STATUS_OPTIONS.map(
+							([v, label]) =>
+								html`<option value="${v}" ${b.status === v ? "selected" : ""}>
+									${label}
+								</option>`,
+						)}
+					</select>
+				</div>
+			</div>
+			<div class="field">
+				<span class="field-num">05</span>
+				<div class="field-body">
+					<label>Rating</label>
+					<select name="rating">
+						<option value="">—</option>
+						${[1, 2, 3, 4, 5].map(
+							(n) =>
+								html`<option value="${n}" ${b.rating === n ? "selected" : ""}>
+									${"★".repeat(n)}
+								</option>`,
+						)}
+					</select>
+				</div>
+			</div>
+			<div class="field">
+				<span class="field-num">06</span>
+				<div class="field-body">
+					<label>Category</label>
+					<input type="text" name="category" autocomplete="off" value="${b.category ?? ""}" />
+				</div>
+			</div>
+			<div class="field">
+				<span class="field-num">07</span>
+				<div class="field-body">
+					<label>ISBN</label>
+					<input type="text" name="isbn" autocomplete="off" value="${b.isbn ?? ""}" />
+				</div>
+			</div>
+			<div class="field">
+				<span class="field-num">08</span>
+				<div class="field-body">
+					<label>Cover URL</label>
+					<input type="text" name="cover_url" autocomplete="off" value="${b.cover_url ?? ""}" />
+				</div>
+			</div>
+			<div class="field">
+				<span class="field-num">09</span>
+				<div class="field-body">
+					<label>Amazon URL</label>
+					<input type="text" name="amazon_url" autocomplete="off" value="${b.amazon_url ?? ""}" />
+				</div>
+			</div>
+			<div class="field">
+				<span class="field-num">10</span>
+				<div class="field-body">
+					<label>Publisher</label>
+					<input type="text" name="publisher" autocomplete="off" value="${b.publisher ?? ""}" />
+				</div>
+			</div>
+			<div class="field">
+				<span class="field-num">11</span>
+				<div class="field-body">
+					<label>Started On</label>
+					<input type="date" name="started_on" value="${b.started_on ?? ""}" />
+				</div>
+			</div>
+			<div class="field">
+				<span class="field-num">12</span>
+				<div class="field-body">
+					<label>Finished On</label>
+					<input type="date" name="finished_on" value="${b.finished_on ?? ""}" />
+				</div>
+			</div>
+			<div class="field">
+				<span class="field-num">13</span>
+				<div class="field-body">
+					<label>Note</label>
+					<textarea name="note" placeholder="(optional)">${b.note ?? ""}</textarea>
+				</div>
+			</div>
+			<div class="submit-row">
+				<button type="submit">${opts.submitLabel}</button>
+			</div>
+		</form>
+	`;
+};

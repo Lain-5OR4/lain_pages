@@ -93,6 +93,9 @@ Hono-based Cloudflare Worker deployed to `api.mizora.dev`. Uses **Drizzle ORM** 
 | `GET /images/:key` | Serves images from R2 (1-year immutable cache) |
 | `GET /admin/new` | Upload form (protected by Cloudflare Access) |
 | `POST /admin/posts` | Create post with images |
+| `GET /admin/books` | Reading log list — status/rating/edit/delete (protected by Cloudflare Access) |
+| `GET /admin/books/new`, `GET /admin/books/:id/edit` | Create/edit form — every `books` column is editable here (no separate `/api` write route) |
+| `POST /admin/books`, `POST /admin/books/:id`, `POST /admin/books/:id/delete` | Create/update/delete (plain HTML forms, no PATCH/DELETE from browsers) |
 
 ### Schema (`src/schema.ts`)
 - `posts`: `id, title, caption, posted_on, created_at`
