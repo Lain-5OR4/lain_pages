@@ -5,16 +5,21 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { type DecoratedBook, SANS, SERIF, decorate } from "./theme";
 
-// Pack decorated books into shelf rows, wrapping once a row's total slot
-// width would exceed BUDGET (matches the reference design's row-packing).
-const BUDGET = 1280;
+// Fallback row-packing budget used only for the first render, before the
+// container has been measured (see Shelf's ResizeObserver below).
+const DEFAULT_BUDGET = 1280;
 
-function packRows(books: DecoratedBook[]): DecoratedBook[][] {
+// Pack decorated books into shelf rows, wrapping once a row's total slot
+// width would exceed budget (matches the reference design's row-packing).
+// Books have fixed pixel widths (shrink-0), so budget must track the real
+// available width or narrow viewports would overflow the cabinet instead
+// of wrapping into more rows.
+function packRows(books: DecoratedBook[], budget: number): DecoratedBook[][] {
   const rows: DecoratedBook[][] = [];
   let cur: DecoratedBook[] = [];
   let curW = 0;
   for (const b of books) {
-    if (curW + b.slotW > BUDGET && cur.length) {
+    if (curW + b.slotW > budget && cur.length) {
       rows.push(cur);
       cur = [];
       curW = 0;
@@ -152,15 +157,28 @@ export function Shelf({ books, onOpen }: { books: Book[]; onOpen: (id: number) =
     setAspects((prev) => (prev[id] === aspect ? prev : { ...prev, [id]: aspect }));
   }, []);
 
+  // Books render at fixed pixel widths, so row-packing has to track the
+  // container's real width — otherwise a row packed for a wide viewport
+  // just overflows a narrower one instead of wrapping.
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [budget, setBudget] = useState(DEFAULT_BUDGET);
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    // Cabinet padding (0 20px = 40) + row padding (0 12px = 24) below.
+    const chrome = 64;
+    const update = () => setBudget(Math.max(240, el.clientWidth - chrome));
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   const decorated = books.map((b, i) => decorate(b, i, aspects));
-  const rows = packRows(decorated);
-  const sizerW = Math.max(
-    600,
-    Math.min(2000, Math.max(0, ...rows.map((r) => r.reduce((a, b) => a + b.slotW, 0))) + 130),
-  );
+  const rows = packRows(decorated, budget);
 
   return (
-    <div style={{ width: sizerW, margin: "0 auto", maxWidth: "100%" }}>
+    <div ref={containerRef} style={{ width: "100%", maxWidth: 2000, margin: "0 auto" }}>
       <div
         className="rounded-[5px] flex flex-col"
         style={{
