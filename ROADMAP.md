@@ -77,6 +77,7 @@
 - [ ] **CI にworkerテストを組み込む** — 現在ローカルのみ。push時に `npm test` を回す workflow
 - [ ] **microCMS webhook → CF Pages deploy hook** — 記事公開で自動再ビルド(手動デプロイ卒業)
 - [ ] **Cloudflare Web Analytics** — cookieless なのでバナー不要で計測できる
+- [ ] **worker/D1 の命名見直し**(優先度低) — `workers/photo-diary` は今や写真日記・読書記録・blogプロキシを兼ねる汎用APIになっており実態と乖離。ただしWorker名変更は事実上「新規Worker作成」相当(カスタムドメインルート付け替え・Access設定見直し・secret再設定が必要)で、D1の`database_name`(`photo-diary-db`)もwranglerにrenameコマンドがなく変えるには作り直しが必要。当面はコード側(フォルダ名やCLAUDE.mdの説明)だけ実態に合わせる程度に留め、本番リソースの改名は後回し(2026-08-23 検討・保留)
 
 ---
 
