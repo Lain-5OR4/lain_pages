@@ -196,12 +196,12 @@ export function Shelf({ books, onOpen }: { books: Book[]; onOpen: (id: number) =
                 gap: 4,
                 padding: "0 12px",
                 background: [
-                  "linear-gradient(180deg, rgba(0,0,0,.55) 0 14px, rgba(0,0,0,.16) 46px, rgba(0,0,0,0) 120px)",
-                  "repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 2px, rgba(0,0,0,.22) 2px 4px, rgba(0,0,0,0) 4px 26px)",
-                  "linear-gradient(100deg,#31211a,#3d2a20 40%,#241811)",
+                  "linear-gradient(180deg, rgba(0,0,0,.32) 0 14px, rgba(0,0,0,.1) 46px, rgba(0,0,0,0) 120px)",
+                  "repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 2px, rgba(0,0,0,.16) 2px 4px, rgba(0,0,0,0) 4px 26px)",
+                  "linear-gradient(100deg,#3a2820,#453026 40%,#2c1e16)",
                 ].join(","),
                 boxShadow:
-                  "inset 22px 0 40px -26px rgba(0,0,0,.85), inset -22px 0 40px -26px rgba(0,0,0,.85)",
+                  "inset 22px 0 32px -26px rgba(0,0,0,.55), inset -22px 0 32px -26px rgba(0,0,0,.55)",
               }}
             >
               {row.map((b) =>
@@ -218,7 +218,7 @@ export function Shelf({ books, onOpen }: { books: Book[]; onOpen: (id: number) =
                   right: 12,
                   bottom: 0,
                   height: 34,
-                  background: "linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.4))",
+                  background: "linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.24))",
                 }}
               />
             </div>
