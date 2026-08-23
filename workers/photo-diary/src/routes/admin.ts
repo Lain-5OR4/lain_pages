@@ -13,7 +13,7 @@ import {
 } from "../db";
 import { posts, postImages } from "../schema";
 import { mimeForExt, safeExt } from "../utils";
-import { UPLOAD_SCRIPT, layout, renderBookForm } from "../views";
+import { STATUS_OPTIONS, UPLOAD_SCRIPT, layout, renderBookForm } from "../views";
 
 const KINDS = new Set(["book", "article"]);
 const STATUSES = new Set(["to_read", "reading", "done"]);
@@ -230,12 +230,6 @@ admin.post("/posts/:id{[0-9]+}/delete", async (c) => {
 
 // --- books (reading log) ---
 
-const STATUS_LABEL: Record<string, string> = {
-	to_read: "積読",
-	reading: "読書中",
-	done: "読了",
-};
-
 admin.get("/books", async (c) => {
 	const books = await getBooks(c.env.DB);
 	c.header("Cache-Control", "no-store");
@@ -254,7 +248,21 @@ admin.get("/books", async (c) => {
 							${books.map(
 								(b) =>
 									html`<li>
-										<span class="status">${STATUS_LABEL[b.status] ?? b.status}</span>
+										<span class="cover">
+											${b.cover_url
+												? html`<img src="${b.cover_url}" alt="" loading="lazy" />`
+												: ""}
+										</span>
+										<form class="status-form" method="POST" action="/admin/books/${b.id}/status">
+											<select name="status" onchange="this.form.requestSubmit()">
+												${STATUS_OPTIONS.map(
+													([v, label]) =>
+														html`<option value="${v}" ${b.status === v ? "selected" : ""}>
+															${label}
+														</option>`,
+												)}
+											</select>
+										</form>
 										<span class="title"
 											>${b.title}${b.author
 												? html`<span class="author">${b.author}</span>`
@@ -328,6 +336,19 @@ admin.post("/books/:id{[0-9]+}", async (c) => {
 	const input = parseBookForm(formData);
 	if (!input.title) return c.json({ error: "title is required" }, 400);
 	const book = await updateBook(c.env.DB, id, input);
+	if (!book) return c.notFound();
+	return c.redirect("/admin/books");
+});
+
+// Quick status change from the list row — deliberately narrow (only touches
+// `status`) instead of routing through parseBookForm/the full edit POST,
+// which would null out every other field not present in a status-only form.
+admin.post("/books/:id{[0-9]+}/status", async (c) => {
+	const id = Number(c.req.param("id"));
+	const formData = await c.req.formData();
+	const status = String(formData.get("status") ?? "");
+	if (!STATUSES.has(status)) return c.json({ error: "invalid status" }, 400);
+	const book = await updateBook(c.env.DB, id, { status: status as NewBook["status"] });
 	if (!book) return c.notFound();
 	return c.redirect("/admin/books");
 });

@@ -203,14 +203,20 @@ select:focus { border-color: var(--accent); }
 .books { list-style: none; margin: 0; padding: 0; }
 .books li {
 	display: grid;
-	grid-template-columns: 6rem 1fr auto auto auto;
-	align-items: baseline; gap: 1rem;
-	padding: 1rem 0; border-bottom: 1px solid var(--rule);
+	grid-template-columns: 2.75rem 7rem 1fr auto auto auto;
+	align-items: center; gap: 1rem;
+	padding: 0.75rem 0; border-bottom: 1px solid var(--rule);
 }
-.books .status {
-	font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase;
-	color: var(--muted); border: 1px solid var(--rule); padding: 0.2rem 0.5rem;
-	text-align: center; white-space: nowrap;
+.books .cover {
+	width: 2.75rem; height: 3.9rem; background: var(--paper-2);
+	border: 1px solid var(--rule); overflow: hidden; flex-shrink: 0;
+}
+.books .cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.books .status-form { margin: 0; }
+.books .status-form select {
+	font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
+	color: var(--muted); border: 1px solid var(--rule); padding: 0.3rem 0.4rem;
+	background: transparent; width: 100%;
 }
 .books .title { font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .books .title .author { color: var(--muted); font-size: 0.85em; margin-left: 0.6em; }
@@ -545,7 +551,7 @@ const KIND_OPTIONS: Array<[Book["kind"], string]> = [
 	["book", "書籍"],
 	["article", "記事"],
 ];
-const STATUS_OPTIONS: Array<[Book["status"], string]> = [
+export const STATUS_OPTIONS: Array<[Book["status"], string]> = [
 	["to_read", "積読"],
 	["reading", "読書中"],
 	["done", "読了"],

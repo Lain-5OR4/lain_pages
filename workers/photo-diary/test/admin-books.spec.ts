@@ -30,9 +30,9 @@ beforeEach(async () => {
 });
 
 describe("admin books pages", () => {
-	it("GET /admin/books lists books with status/edit/delete and no-store", async () => {
+	it("GET /admin/books lists books with cover/status/edit/delete and no-store", async () => {
 		await env.DB.prepare(
-			"INSERT INTO books (id, title, author, status, rating) VALUES (1, 'UNIXという考え方', '田中', 'done', 4)",
+			"INSERT INTO books (id, title, author, status, rating, cover_url) VALUES (1, 'UNIXという考え方', '田中', 'done', 4, 'https://example.com/cover.jpg')",
 		).run();
 		const res = await SELF.fetch("http://example.com/admin/books");
 		expect(res.status).toBe(200);
@@ -42,6 +42,8 @@ describe("admin books pages", () => {
 		expect(body).toContain("/admin/books/new");
 		expect(body).toContain('href="/admin/books/1/edit"');
 		expect(body).toContain('action="/admin/books/1/delete"');
+		expect(body).toContain('src="https://example.com/cover.jpg"');
+		expect(body).toContain('action="/admin/books/1/status"');
 	});
 
 	it("GET /admin/books/new returns the create form", async () => {
@@ -127,6 +129,51 @@ describe("admin books pages", () => {
 		const fd = new FormData();
 		fd.append("title", "x");
 		const res = await SELF.fetch("http://example.com/admin/books/9999", {
+			method: "POST",
+			body: fd,
+		});
+		expect(res.status).toBe(404);
+	});
+
+	it("POST /admin/books/:id/status updates only the status, leaving other fields intact", async () => {
+		await env.DB.prepare(
+			`INSERT INTO books (id, title, author, rating, note, status)
+			 VALUES (5, 'ステータスのみ更新', '著者C', 5, 'メモは残るはず', 'to_read')`,
+		).run();
+		const fd = new FormData();
+		fd.append("status", "reading");
+		const res = await SELF.fetch("http://example.com/admin/books/5/status", {
+			method: "POST",
+			body: fd,
+			redirect: "manual",
+		});
+		expect(res.status).toBe(302);
+		expect(res.headers.get("location")).toBe("/admin/books");
+
+		const edit = await (await SELF.fetch("http://example.com/admin/books/5/edit")).text();
+		expect(edit).toContain('value="著者C"');
+		expect(edit).toContain("メモは残るはず");
+		const list = await (await SELF.fetch("http://example.com/admin/books")).text();
+		expect(list).toContain("ステータスのみ更新");
+	});
+
+	it("POST /admin/books/:id/status rejects an invalid status", async () => {
+		await env.DB.prepare(
+			"INSERT INTO books (id, title, status) VALUES (6, '不正ステータス対象', 'to_read')",
+		).run();
+		const fd = new FormData();
+		fd.append("status", "not-a-real-status");
+		const res = await SELF.fetch("http://example.com/admin/books/6/status", {
+			method: "POST",
+			body: fd,
+		});
+		expect(res.status).toBe(400);
+	});
+
+	it("POST /admin/books/:id/status returns 404 for an unknown id", async () => {
+		const fd = new FormData();
+		fd.append("status", "done");
+		const res = await SELF.fetch("http://example.com/admin/books/9999/status", {
 			method: "POST",
 			body: fd,
 		});
