@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export function useBackgroundMusic(audioSrc: string) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [wasPlayingBeforeHidden, setWasPlayingBeforeHidden] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const wasPlayingBeforeHiddenRef = useRef(false);
 
   useEffect(() => {
     audioRef.current = new Audio(audioSrc);
@@ -18,43 +18,45 @@ export function useBackgroundMusic(audioSrc: string) {
     };
   }, [audioSrc]);
 
-  // Page Visibility API でタブの表示/非表示を監視
+  // play() returns a promise that rejects when autoplay policy blocks it
+  // (likely for the non-user-gesture resume below) — only report "playing"
+  // once it actually succeeded.
+  const startPlayback = useCallback((audio: HTMLAudioElement) => {
+    audio.play().then(
+      () => setIsPlaying(true),
+      () => setIsPlaying(false),
+    );
+  }, []);
+
+  // タブの表示/非表示で BGM を一時停止/再開する
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (audioRef.current) {
-        if (document.hidden) {
-          // タブが非表示になった時
-          if (isPlaying) {
-            setWasPlayingBeforeHidden(true);
-            audioRef.current.pause();
-            setIsPlaying(false);
-          }
-        } else {
-          // タブが表示された時
-          if (wasPlayingBeforeHidden) {
-            audioRef.current.play();
-            setIsPlaying(true);
-            setWasPlayingBeforeHidden(false);
-          }
+      const audio = audioRef.current;
+      if (!audio) return;
+      if (document.hidden) {
+        if (!audio.paused) {
+          wasPlayingBeforeHiddenRef.current = true;
+          audio.pause();
+          setIsPlaying(false);
         }
+      } else if (wasPlayingBeforeHiddenRef.current) {
+        wasPlayingBeforeHiddenRef.current = false;
+        startPlayback(audio);
       }
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [isPlaying, wasPlayingBeforeHidden]);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [startPlayback]);
 
   const togglePlay = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (audio.paused) {
+      startPlayback(audio);
+    } else {
+      audio.pause();
+      setIsPlaying(false);
     }
   };
 

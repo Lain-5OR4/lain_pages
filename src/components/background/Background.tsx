@@ -25,6 +25,8 @@ const Background = () => {
       });
     }
 
+    let frameId = 0;
+
     function drawRain() {
       if (!ctx || !canvas) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -44,7 +46,7 @@ const Background = () => {
         }
       }
 
-      requestAnimationFrame(drawRain);
+      frameId = requestAnimationFrame(drawRain);
     }
 
     drawRain();
@@ -57,6 +59,7 @@ const Background = () => {
     window.addEventListener("resize", handleResize);
 
     return () => {
+      cancelAnimationFrame(frameId);
       window.removeEventListener("resize", handleResize);
     };
   }, []);

@@ -283,6 +283,7 @@ export default function DiaryPage() {
 
       {lightbox && (
         <PhotoLightbox
+          key={lightbox.entry.id}
           entry={lightbox.entry}
           initialPhotoIndex={lightbox.photoIndex}
           onClose={() => setLightbox(null)}
