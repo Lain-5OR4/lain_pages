@@ -33,30 +33,6 @@ export function stars(n: number | null): string {
   return "★★★★★".slice(0, r) + "☆☆☆☆☆".slice(0, 5 - r);
 }
 
-export function chipStyle(active: boolean): CSSProperties {
-  return {
-    padding: "8px 16px",
-    borderRadius: 2,
-    cursor: "pointer",
-    font: `500 12px/1 ${SANS}`,
-    letterSpacing: ".06em",
-    border: `1px solid ${active ? "#2f2118" : "rgba(61,38,24,.2)"}`,
-    background: active ? "#2f2118" : "rgba(255,255,255,.45)",
-    color: active ? "#f4ece0" : "#6b5442",
-  };
-}
-
-export function viewBtnStyle(active: boolean): CSSProperties {
-  return {
-    padding: "10px 18px",
-    border: "none",
-    cursor: "pointer",
-    font: `500 12px/1 ${SANS}`,
-    background: active ? "#2f2118" : "rgba(255,255,255,.55)",
-    color: active ? "#f4ece0" : "#6b5442",
-  };
-}
-
 export function starBtnStyle(active: boolean, size: number): CSSProperties {
   return {
     width: size,
@@ -73,7 +49,7 @@ export function starBtnStyle(active: boolean, size: number): CSSProperties {
 }
 
 // Deterministic pseudo-random dimensions/color for a book's spine, derived
-// from title length + row index so the same book always looks the same
+// from title length + book id so the same book always looks the same
 // (no `pages` field in our schema, unlike the original design reference —
 // title length stands in for it).
 export interface BookDeco {
@@ -85,7 +61,7 @@ export interface BookDeco {
 
 export function deco(title: string, i: number): BookDeco {
   const [bg, fg] = CLOTHS[(title.length + i * 3) % CLOTHS.length];
-  const w = Math.max(26, Math.min(52, 28 + ((title.length * 2 + i * 5) % 26)));
+  const w = 40 + ((title.length * 2 + i * 5) % 18);
   const h = 196 + ((title.length * 7 + i * 13) % 46);
   return { bg, fg, w, h };
 }
@@ -95,31 +71,24 @@ export interface DecoratedBook extends Book {
   faceOut: boolean;
   faceW: number;
   slotW: number;
-  titleText: string;
-  authorText: string;
 }
 
 // Fallback cover aspect ratio (width/height) used until the real image has
 // loaded and its natural size is known — see FaceButton in Shelf.tsx.
 const DEFAULT_COVER_ASPECT = 0.66;
 
-export function decorate(b: Book, i: number, aspects: Record<number, number> = {}): DecoratedBook {
-  const d = deco(b.title, i);
+export function decorate(b: Book, aspects: Record<number, number> = {}): DecoratedBook {
+  const d = deco(b.title, b.id);
   // No curated "featured" flag in the schema, so face a deterministic ~1-in-5
   // covered books outward — same spirit as occasionally turning a book face-out
   // on a real shelf, without needing real curation data.
-  const faceOut = !!(b.coverUrl && i % 5 === 0);
-  const faceW = Math.round(d.h * (aspects[b.id] ?? DEFAULT_COVER_ASPECT));
-  const shortTitle = b.title.length > 13 ? `${b.title.slice(0, 12)}…` : b.title;
-  const author = b.author ?? "";
-  const shortAuthor = author.length > 8 ? `${author.slice(0, 7)}…` : author;
+  const faceOut = !!(b.coverUrl && b.id % 5 === 0);
+  const faceW = Math.min(200, Math.round(d.h * (aspects[b.id] ?? DEFAULT_COVER_ASPECT)));
   return {
     ...b,
     dim: d,
     faceOut,
     faceW,
     slotW: (faceOut ? faceW : d.w) + 4,
-    titleText: shortTitle,
-    authorText: shortAuthor,
   };
 }

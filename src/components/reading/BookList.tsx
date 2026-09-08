@@ -4,24 +4,11 @@ import type { Book } from "@/data/books";
 import { SANS, SERIF, STATUS_LABEL, decorate, stars } from "./theme";
 
 export function BookList({ books, onOpen }: { books: Book[]; onOpen: (id: number) => void }) {
-  const decorated = books.map((b, i) => decorate(b, i));
+  const decorated = books.map((book) => decorate(book));
   return (
-    <div
-      className="grid gap-3.5"
-      style={{ gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}
-    >
+    <div className="reading-book-list">
       {decorated.map((b) => (
-        <button
-          key={b.id}
-          type="button"
-          onClick={() => onOpen(b.id)}
-          className="flex gap-3.5 text-left p-3.5 border cursor-pointer hover:bg-white transition-colors"
-          style={{
-            background: "rgba(255,255,255,.62)",
-            borderColor: "rgba(61,38,24,.14)",
-            borderRadius: 2,
-          }}
-        >
+        <button key={b.id} type="button" onClick={() => onOpen(b.id)} className="reading-book-card">
           <div
             className="shrink-0 overflow-hidden"
             style={{

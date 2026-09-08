@@ -3,7 +3,8 @@
 import type { Book } from "@/data/books";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { type DecoratedBook, SANS, SERIF, decorate } from "./theme";
+import { SpineButton } from "./SpineButton";
+import { type DecoratedBook, decorate } from "./theme";
 
 // Fallback row-packing budget used only for the first render, before the
 // container has been measured (see Shelf's ResizeObserver below).
@@ -31,64 +32,6 @@ function packRows(books: DecoratedBook[], budget: number): DecoratedBook[][] {
   return rows;
 }
 
-function SpineButton({ b, onOpen }: { b: DecoratedBook; onOpen: (id: number) => void }) {
-  const faded = b.status !== "done";
-  const tSize = b.dim.w >= 42 ? 15 : b.dim.w >= 34 ? 13 : 11;
-  return (
-    <button
-      type="button"
-      onClick={() => onOpen(b.id)}
-      className="shrink-0 border-none cursor-pointer overflow-hidden flex flex-col items-center justify-between transition-transform duration-[180ms] ease-[cubic-bezier(.2,.8,.2,1)] hover:-translate-y-3.5"
-      style={{
-        width: b.dim.w,
-        height: b.dim.h,
-        padding: "12px 2px",
-        borderRadius: "1px 3px 3px 1px",
-        color: b.dim.fg,
-        textShadow: "0 1px 0 rgba(0,0,0,.35)",
-        opacity: faded ? 0.72 : 1,
-        boxShadow:
-          "3px 0 8px -1px rgba(0,0,0,.5), 0 6px 10px -6px rgba(0,0,0,.9), inset 0 0 0 1px rgba(0,0,0,.22)",
-        background: [
-          "linear-gradient(180deg,rgba(255,255,255,.16) 0 2px,rgba(0,0,0,.34) 2px 4px,rgba(0,0,0,0) 4px 18px)",
-          "linear-gradient(0deg,rgba(255,255,255,.14) 0 2px,rgba(0,0,0,.34) 2px 4px,rgba(0,0,0,0) 4px 20px)",
-          "repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,rgba(0,0,0,.06) 1px 2px)",
-          "linear-gradient(90deg,rgba(0,0,0,.5),rgba(255,255,255,.2) 16%,rgba(255,255,255,.04) 52%,rgba(0,0,0,.28) 82%,rgba(0,0,0,.55))",
-          b.dim.bg,
-        ].join(","),
-      }}
-    >
-      <span
-        className="whitespace-nowrap overflow-hidden"
-        style={{
-          writingMode: "vertical-rl",
-          textOrientation: "upright",
-          font: `700 ${tSize}px/1 ${SERIF}`,
-          letterSpacing: ".02em",
-          maxHeight: 172,
-        }}
-      >
-        {b.titleText}
-      </span>
-      <span
-        className="whitespace-nowrap overflow-hidden opacity-72"
-        style={{
-          writingMode: "vertical-rl",
-          textOrientation: "upright",
-          font: `400 8.5px/1 ${SANS}`,
-          maxHeight: 58,
-        }}
-      >
-        {b.authorText}
-      </span>
-      <span
-        className="w-1.5 h-1.5 rounded-full opacity-70"
-        style={{ background: b.status === "done" ? b.dim.fg : "transparent" }}
-      />
-    </button>
-  );
-}
-
 function FaceButton({
   b,
   onOpen,
@@ -113,7 +56,9 @@ function FaceButton({
     <button
       type="button"
       onClick={() => onOpen(b.id)}
-      className="shrink-0 relative p-0 border-none cursor-pointer overflow-hidden flex items-center justify-center transition-transform duration-[180ms] ease-[cubic-bezier(.2,.8,.2,1)] hover:-translate-y-2.5 hover:-rotate-1"
+      aria-label={`${b.title}${b.author ? ` — ${b.author}` : ""}`}
+      title={b.title}
+      className="reading-shelf-book shrink-0 relative p-0 border-none cursor-pointer overflow-hidden flex items-center justify-center transition-transform duration-[180ms] ease-[cubic-bezier(.2,.8,.2,1)] hover:-translate-y-2.5 hover:-rotate-1"
       style={{
         width: b.faceW,
         height: b.dim.h,
@@ -129,7 +74,7 @@ function FaceButton({
         ref={imgRef}
         src={b.coverUrl ?? undefined}
         alt=""
-        className="block w-full h-full object-cover"
+        className="block w-full h-full object-contain"
         style={{ position: "absolute", inset: 0 }}
         onLoad={(e) => {
           const { naturalWidth, naturalHeight } = e.currentTarget;
@@ -167,14 +112,14 @@ export function Shelf({ books, onOpen }: { books: Book[]; onOpen: (id: number) =
     if (!el) return;
     // Cabinet padding (0 20px = 40) + row padding (0 12px = 24) below.
     const chrome = 64;
-    const update = () => setBudget(Math.max(240, el.clientWidth - chrome));
+    const update = () => setBudget(Math.max(1, el.clientWidth - chrome));
     update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
 
-  const decorated = books.map((b, i) => decorate(b, i, aspects));
+  const decorated = books.map((book) => decorate(book, aspects));
   const rows = packRows(decorated, budget);
 
   return (
@@ -226,7 +171,7 @@ export function Shelf({ books, onOpen }: { books: Book[]; onOpen: (id: number) =
                 b.faceOut ? (
                   <FaceButton key={b.id} b={b} onOpen={onOpen} onMeasure={handleMeasure} />
                 ) : (
-                  <SpineButton key={b.id} b={b} onOpen={onOpen} />
+                  <SpineButton key={b.id} book={b} onOpen={onOpen} />
                 ),
               )}
               <span
