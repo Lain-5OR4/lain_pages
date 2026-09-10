@@ -1,5 +1,5 @@
 // Single source of truth for the reading-log API contract between
-// workers/photo-diary (`GET /api/books`, producer) and the Next.js
+// workers/site-api (`GET /api/books`, producer) and the Next.js
 // frontend (`src/app/reading`, consumer). Both sides re-export from here.
 export type BookKind = "book" | "article";
 export type BookStatus = "to_read" | "reading" | "done";

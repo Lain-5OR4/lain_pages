@@ -20,7 +20,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This repo contains two independent deployable units:
 
 1. **`src/`** — Next.js 15 frontend (portfolio + diary viewer), deployed to GitHub Pages
-2. **`workers/photo-diary/`** — Cloudflare Worker backend API, deployed to `api.mizora.dev`
+2. **`workers/site-api/`** — Cloudflare Worker backend API, deployed to `api.mizora.dev`
 
 ---
 
@@ -72,11 +72,11 @@ Content lives in microCMS (`blogs` endpoint, rich editor). Posts are written as 
 
 ---
 
-## Worker (`workers/photo-diary/`)
+## Worker (`workers/site-api/`)
 
 Hono-based Cloudflare Worker deployed to `api.mizora.dev`. Uses **Drizzle ORM** with Cloudflare **D1** (SQLite) and **R2** for image storage.
 
-### Commands (run from `workers/photo-diary/`)
+### Commands (run from `workers/site-api/`)
 - `npm run dev` — Local worker dev server
 - `npm run deploy` — Deploy to Cloudflare
 - `npm test` — Run vitest (Cloudflare Workers pool)
@@ -112,12 +112,12 @@ Hono-based Cloudflare Worker deployed to `api.mizora.dev`. Uses **Drizzle ORM** 
 1. Admin uploads via browser form → client-side resize to 2048px JPEG via Canvas (EXIF is stripped here) → `exifr` extracts `DateTimeOriginal` before resize and sends as `taken_at` field
 2. Worker stores image in R2, inserts row in D1
 3. `/api/diary` transforms DB rows into `DiaryEntry[]`: maps `title/caption/posted_on` fields, builds absolute image URLs, formats `taken_at` into `stamp` via `formatStamp()`
-4. CORS allowlist lives in `workers/photo-diary/src/cors.ts` (`mizora.dev`, `localhost:3000/3001`) and is shared by `/api` and `/api/blog` routes
+4. CORS allowlist lives in `workers/site-api/src/cors.ts` (`mizora.dev`, `localhost:3000/3001`) and is shared by `/api` and `/api/blog` routes
 
 ### Important Notes
 - Canvas `toBlob()` strips all EXIF including GPS — no GPS data survives in stored images
 - `taken_at` naive timestamps are rendered as-is (camera local time); UTC timestamps are shifted to JST
-- The `DiaryEntry` type is defined once in `shared/types/diary.ts` and re-exported by both `workers/photo-diary/src/types.ts` and `src/data/diary.ts`
+- The `DiaryEntry` type is defined once in `shared/types/diary.ts` and re-exported by both `workers/site-api/src/types.ts` and `src/data/diary.ts`
 - Worker secrets `MICROCMS_SERVICE_DOMAIN` / `MICROCMS_API_KEY` are set via `wrangler secret put`; local dev reads `.dev.vars` (copy from `.dev.vars.example`). Vitest overrides them with dummy values in `vitest.config.mts`
 
 ---
@@ -131,7 +131,7 @@ Hono-based Cloudflare Worker deployed to `api.mizora.dev`. Uses **Drizzle ORM** 
 - Must pass both lint and format checks for CI/CD deployment
 
 ### Deployment
-- **Pushing to main deploys to production.** Both the frontend (Cloudflare Pages) and the worker (Workers Builds) are GitHub-connected and auto-deploy on push; `npm run deploy` in `workers/photo-diary/` is only for manual/emergency deploys. The GitHub Pages workflow (`nextjs.yml`) is manual-only (`workflow_dispatch`)
+- **Pushing to main deploys to production.** Both the frontend (Cloudflare Pages) and the worker (Workers Builds) are GitHub-connected and auto-deploy on push; `npm run deploy` in `workers/site-api/` is only for manual/emergency deploys. The GitHub Pages workflow (`nextjs.yml`) is manual-only (`workflow_dispatch`)
 - Environment variable `GITHUB_PAGES=true` triggers basePath/assetPrefix configuration
 - Static export builds to `out/` directory
 - Deployment fails if lint/format checks don't pass
