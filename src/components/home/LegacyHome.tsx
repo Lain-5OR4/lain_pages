@@ -24,11 +24,13 @@ const QUICK_FACTS: ReactNode[] = [
   </span>,
 ];
 
+/* MINI_APPS — coming soon
 const MINI_APPS = [
   { href: "/text-delta", label: "TextDelta.exe" },
   { href: "/void", label: "Wired_Connection.exe" },
   { href: "/fragments", label: "Fragments.exe" },
 ];
+*/
 
 const GATEWAYS = [
   {
@@ -45,6 +47,7 @@ const GATEWAYS = [
     href: "/diary",
     external: false,
   },
+  /* JOURNAL — coming soon
   {
     title: "JOURNAL",
     blurb: "Decompressing long-form build logs...",
@@ -52,6 +55,7 @@ const GATEWAYS = [
     href: "/blog",
     external: false,
   },
+  */
 ];
 
 function CardHeading({ children }: { children: ReactNode }) {
@@ -143,6 +147,7 @@ export default function Component() {
             {">"} PROJECTS_
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* MINI_APPS — coming soon
             <Card className={`${TERMINAL_CARD} hover:scale-105 transition-transform duration-300`}>
               <CardContent className="p-6">
                 <CardHeading>MINI_APPS</CardHeading>
@@ -162,6 +167,7 @@ export default function Component() {
                 <CardBlinker className="mt-8" />
               </CardContent>
             </Card>
+            */}
 
             {GATEWAYS.map((gw) => (
               <GatewayCard key={gw.title} {...gw} />

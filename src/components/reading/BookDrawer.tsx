@@ -57,13 +57,13 @@ export function BookDrawer({ book, onClose }: { book: Book; onClose: () => void 
       }}
       className="reading-dialog overflow-y-auto animate-[popin_.2s_cubic-bezier(.2,.8,.2,1)]"
       style={{
-        width: 560,
-        maxWidth: "94vw",
-        maxHeight: "88vh",
+        width: 800,
+        maxWidth: "calc(100vw - 24px)",
+        maxHeight: "92dvh",
         background: "#f6efe4",
         borderRadius: 4,
         boxShadow: "0 40px 80px -20px rgba(47,33,24,.55)",
-        padding: "36px 40px 44px",
+        padding: "clamp(20px, 4vw, 44px)",
       }}
     >
       <div className="flex flex-col gap-5">
@@ -77,8 +77,8 @@ export function BookDrawer({ book, onClose }: { book: Book; onClose: () => void 
             aria-label="閉じる"
             className="rounded-full flex items-center justify-center cursor-pointer"
             style={{
-              width: 30,
-              height: 30,
+              width: 40,
+              height: 40,
               border: "1px solid rgba(61,38,24,.2)",
               background: "transparent",
               color: "#2f2118",
