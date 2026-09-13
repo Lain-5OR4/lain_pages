@@ -2,7 +2,8 @@
 
 > [English](README.md) | **日本語**
 
-Next.jsで構築され、GitHub Pagesにデプロイされたミニアプリケーション機能付きの個人ポートフォリオサイト。
+> 開発・CIの最新手順: [DEVELOPMENT.md](DEVELOPMENT.md)。CloudflareのGitHub連携で自動デプロイします。
+Next.jsで構築した個人サイト。Cloudflare PagesのGitHub連携で自動デプロイします。
 
 ## 🌟 機能
 
@@ -15,7 +16,7 @@ Next.jsで構築され、GitHub Pagesにデプロイされたミニアプリケ�
 - **フレームワーク**: Next.js 15 with TypeScript
 - **スタイリング**: Tailwind CSS + shadcn/ui components
 - **コード品質**: Biome (ESLint + Prettier代替)
-- **デプロイ**: GitHub Pages with GitHub Actions
+- **デプロイ**: Cloudflare PagesのGitHub連携
 - **フォント**: LoveLetter、Geist Sans、Geist Monoなどのカスタムフォント
 
 ## 📱 ミニアプリ
@@ -30,20 +31,21 @@ WinMergeにインスパイアされた高機能なテキスト比較ツール：
 ## 🔧 開発
 
 ### 前提条件
-- Node.js 20+
-- npm
+- Node.js 22
+- Bun 1.4.2
 
 ## 🚀 デプロイ
 
-`main`ブランチにコードがプッシュされると、GitHub Actionsを介してGitHub Pagesに自動デプロイされます。
+mainへのpushとPRではコード・型チェックとWorkerテストを実行します。ビルド確認はPR時のみ。デプロイはCloudflareのGitHub連携が担当します。
 
 ### CI/CDパイプライン
 1. **Lint Check**: Biomeリンターによる検証
 2. **Format Check**: コードフォーマットの確認
-3. **Build**: Next.js静的エクスポートの生成
-4. **Deploy**: GitHub Pagesへの自動デプロイ
+3. **Tests**: Workerの型チェック・Vitestテスト
+4. **Build**: PR時のみNext.js静的エクスポートを確認
+5. **Deploy**: CloudflareのGitHub連携による自動デプロイ
 
-リンティングやフォーマットチェックが通らない場合、デプロイが失敗し、コード品質が保たれます。
+CIとCloudflareのデプロイは独立しています。CIの成功をマージ条件にする場合はGitHubのrulesetを設定します。CIがデプロイを自動で停止させる構成ではありません。
 
 ## 🎨 デザイン機能
 

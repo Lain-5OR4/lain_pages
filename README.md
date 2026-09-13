@@ -2,7 +2,8 @@
 
 > **English** | [日本語](README.ja.md)
 
-A personal portfolio website featuring mini applications built with Next.js and deployed on GitHub Pages.
+> 開発・CIの最新手順: [DEVELOPMENT.md](DEVELOPMENT.md)。CloudflareのGitHub連携で自動デプロイします。
+A personal portfolio built with Next.js, automatically deployed to Cloudflare Pages through its GitHub integration.
 
 ## 🌟 Features
 
@@ -15,7 +16,7 @@ A personal portfolio website featuring mini applications built with Next.js and 
 - **Framework**: Next.js 15 with TypeScript
 - **Styling**: Tailwind CSS + shadcn/ui components
 - **Code Quality**: Biome (ESLint + Prettier alternative)
-- **Deployment**: GitHub Pages with GitHub Actions
+- **Deployment**: Cloudflare Pages via GitHub integration
 - **Fonts**: Custom fonts including LoveLetter, Geist Sans, Geist Mono
 
 ## 📱 Mini Apps
@@ -30,16 +31,17 @@ A sophisticated text comparison tool inspired by WinMerge, featuring:
 ## 🔧 Development
 
 ### Prerequisites
-- Node.js 20+
-- npm
+- Node.js 22
+- Bun 1.4.2
 
 ### CI/CD Pipeline
 1. **Lint Check**: Biome linter validation
 2. **Format Check**: Code formatting verification
-3. **Build**: Next.js static export generation
-4. **Deploy**: Automatic deployment to GitHub Pages
+3. **Tests**: Worker type checks and Vitest tests on pushes and PRs
+4. **Build**: Next.js static export verification on PRs only
+5. **Deploy**: Cloudflare GitHub integration handles deployment independently
 
-The deployment fails if linting or formatting checks don't pass, ensuring code quality.
+CI validates pushes and pull requests. Configure required status checks in GitHub rulesets to enforce passing checks before merge; Cloudflare deployment settings are managed separately.
 
 ## 🎨 Design Features
 

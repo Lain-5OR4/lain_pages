@@ -10,7 +10,7 @@
 		"ignore": [
 			"**/node_modules/**"
 		],
-		"include": ["**/*.json", "**/*.ts", "**/*.js", "**/*.tsx", "**/*.jsx"]
+		"include": ["**/*.json", "**/*.ts", "**/*.js", "**/*.mjs", "**/*.tsx", "**/*.jsx"]
 	},
 	"formatter": {
 		"enabled": true,

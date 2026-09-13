@@ -66,9 +66,9 @@ workers/site-api/
 
 ```sh
 bun install --frozen-lockfile
-bun run test --run
-bunx tsc --noEmit
-bunx tsc --noEmit -p test/tsconfig.json
+bun run test:run
+bun run typecheck
+bun run typecheck:test
 ```
 
 管理ルート・表示の分割前後で、既存の5ファイル・54テストと型チェックが成功した。
@@ -100,7 +100,7 @@ Workers Builds は GitHub と連携している。旧パスを参照する外部
 ビルド・デプロイコマンドや監視対象パスに旧パスがあれば同様に更新する。フロント側の監視対象設定も確認する。
 この設定変更はまだ実施・検証していない。
 
-既存の `bun.lockb` を維持し、依存更新は改名と混ぜない。依存を復元した環境で非watchの `vitest run` と `tsc --noEmit` を実行する。
+既存の `bun.lockb` を維持し、`bun install --frozen-lockfile` で復元する。依存更新は今回の改修に含めない。依存を復元した環境で非watchの `vitest run` と `tsc --noEmit` を実行する。
 
 ## 将来の mizora-api 移行
 
@@ -113,3 +113,7 @@ Workers Builds は GitHub と連携している。旧パスを参照する外部
 
 これは移行方針であり、実行時にはCloudflareの現行仕様と実アカウント設定を確認して具体化する。
 今回のコード改名で本番リソース移行やDBマイグレーションは行わない。
+
+## 開発・検証の共通手順
+
+[DEVELOPMENT.md](../../DEVELOPMENT.md) にCIとローカル検証の手順を記載。Worker名は `site-api`。既存Cloudflareリソースへの切り替えは次回デプロイ時に確認する。
