@@ -3,12 +3,12 @@
 import Background from "@/components/background/Background";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import "./linux.css";
+import "./desktop.css";
+import "./desktop-icons.css";
 import { DesktopAudio } from "./DesktopAudio";
+import { DesktopIcon } from "./DesktopIcon";
 
-type Theme = "classic" | "modern" | "wired";
-export function LinuxDesktop({ demo = false }: { demo?: boolean }) {
-  const [theme, setTheme] = useState<Theme>("wired");
+export function LinuxDesktop() {
   const [visible, setVisible] = useState(true);
   const [maximized, setMaximized] = useState(false);
   const [menu, setMenu] = useState(false);
@@ -30,12 +30,6 @@ export function LinuxDesktop({ demo = false }: { demo?: boolean }) {
   useEffect(() => {
     if (lines.length) history.current?.scrollTo(0, history.current.scrollHeight);
   }, [lines]);
-  function changeTheme(next: Theme) {
-    setTheme(next);
-    setPosition({ x: 0, y: 0 });
-    setVisible(true);
-    setMenu(false);
-  }
   function move(x: number, y: number) {
     const d = desktop.current;
     const w = windowRef.current;
@@ -68,59 +62,18 @@ export function LinuxDesktop({ demo = false }: { demo?: boolean }) {
     setCommand("");
   }
   return (
-    <div className={`lx-page lx-${theme} ${demo ? "" : "lx-home"}`} lang="ja">
-      {demo && (
-        <div className="lx-study">
-          <span>LINUX DESKTOP / DESIGN STUDY</span>
-          <fieldset aria-label="見た目の比較">
-            <button
-              type="button"
-              aria-pressed={theme === "wired"}
-              onClick={() => changeTheme("wired")}
-            >
-              03 Wired
-            </button>
-            <button
-              type="button"
-              aria-pressed={theme === "classic"}
-              onClick={() => changeTheme("classic")}
-            >
-              01 古いLinux
-            </button>
-            <button
-              type="button"
-              aria-pressed={theme === "modern"}
-              onClick={() => changeTheme("modern")}
-            >
-              02 今どきのLinux
-            </button>
-          </fieldset>
-          <Link href="/design-cyber/">前のデモ ↗</Link>
-        </div>
-      )}
+    <div className="lx-page lx-wired lx-home" lang="ja">
       <div className="lx-desktop" ref={desktop}>
-        {theme === "wired" && (
-          <div className="lx-wired-scenery" aria-hidden="true">
-            <img
-              className="lx-wired-wallpaper"
-              src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/assets/wired-sky-v2.webp`}
-              alt=""
-            />
-            <span className="lx-wired-label">WIRED / 接続中</span>
-            <span className="lx-wired-shadow" />
-          </div>
-        )}
-        <Background
-          className="lx-rain"
-          color={
-            theme === "wired"
-              ? "rgba(56,67,61,.28)"
-              : theme === "classic"
-                ? "rgba(182,216,210,.25)"
-                : "rgba(224,240,255,.3)"
-          }
-          count={80}
-        />
+        <div className="lx-wired-scenery" aria-hidden="true">
+          <img
+            className="lx-wired-wallpaper"
+            src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/assets/wired-sky-v2.webp`}
+            alt=""
+          />
+          <span className="lx-wired-label">WIRED / 接続中</span>
+          <span className="lx-wired-shadow" />
+        </div>
+        <Background className="lx-rain" color="rgba(56,67,61,.28)" count={80} />
         <header className="lx-panel">
           <button
             type="button"
@@ -128,14 +81,12 @@ export function LinuxDesktop({ demo = false }: { demo?: boolean }) {
             aria-expanded={menu}
             onClick={() => setMenu(!menu)}
           >
-            {theme === "classic" ? "▦ アプリケーション" : "◉ アクティビティ"}
+            ◉ アクティビティ
           </button>
-          <span className="lx-panel-name">
-            {theme === "classic" ? "mizora@wired" : "mizoraのデスクトップ"}
-          </span>
+          <span className="lx-panel-name">mizoraのデスクトップ</span>
           <span className="lx-panel-clock">{clock || "--:--"}</span>
           <DesktopAudio />
-          <span className="lx-panel-status" aria-label="デモの接続表示">
+          <span className="lx-panel-status" aria-label="接続表示">
             ●
           </span>
         </header>
@@ -153,22 +104,24 @@ export function LinuxDesktop({ demo = false }: { demo?: boolean }) {
             <Link href="/reading">▤ 読書記録</Link>
             <Link href="/diary">▧ 写真日記</Link>
             <a href="https://github.com/Lain-5OR4">⌘ GitHub ↗</a>
-            {demo && <Link href="/">現在のトップへ</Link>}
           </nav>
         )}
         <nav className="lx-icons" aria-label="デスクトップ">
           <button type="button" onClick={() => setVisible(true)}>
-            <span className="lx-icon-terminal">&gt;_</span>プロフィール
+            <DesktopIcon kind="profile" />
+            プロフィール
           </button>
           <Link href="/reading">
-            <span className="lx-icon-folder">▤</span>読書記録
+            <DesktopIcon kind="reading" />
+            読書記録
           </Link>
           <Link href="/diary">
-            <span className="lx-icon-photo">▧</span>写真日記
+            <DesktopIcon kind="diary" />
+            写真日記
           </Link>
         </nav>
         <div className="lx-wallpaper-mark" aria-hidden="true">
-          {theme === "classic" ? "wired_" : "w."}
+          w.
           <small>mizora / personal computer</small>
         </div>
         {visible && (
@@ -215,7 +168,7 @@ export function LinuxDesktop({ demo = false }: { demo?: boolean }) {
                   }
                 }}
               >
-                ▣ <span>{theme === "classic" ? "mizora@wired: ~ — Terminal" : "プロフィール"}</span>
+                ▣ <span>プロフィール</span>
               </button>
               <div className="lx-window-buttons">
                 <button type="button" aria-label="最小化" onClick={() => setVisible(false)}>
@@ -292,11 +245,6 @@ export function LinuxDesktop({ demo = false }: { demo?: boolean }) {
               </div>
             </div>
           </section>
-        )}
-        {!visible && (
-          <button type="button" className="lx-restore" onClick={() => setVisible(true)}>
-            ▣ プロフィール端末を開く
-          </button>
         )}
         <footer className="lx-dock">
           <button
