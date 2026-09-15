@@ -1,6 +1,5 @@
 import { SELF, env } from "cloudflare:test";
 import { beforeAll, describe, expect, it } from "vitest";
-import { setupBookSchema } from "./fixtures/books";
 
 const seedBooks = async () => {
   await env.DB.prepare("DELETE FROM books").run();
@@ -16,7 +15,6 @@ const seedBooks = async () => {
 };
 
 beforeAll(async () => {
-  await setupBookSchema();
   await seedBooks();
 });
 

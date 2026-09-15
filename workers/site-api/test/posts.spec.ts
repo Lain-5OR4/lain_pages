@@ -1,9 +1,7 @@
 import { SELF, env } from "cloudflare:test";
-import { afterEach, beforeAll, expect, it, vi } from "vitest";
+import { afterEach, expect, it, vi } from "vitest";
 import { getRecentPosts } from "../src/data/posts";
-import { setupPostSchema } from "./fixtures/posts";
 
-beforeAll(setupPostSchema);
 afterEach(() => vi.restoreAllMocks());
 
 it("returns the latest 50 posts and reads only their images", async () => {

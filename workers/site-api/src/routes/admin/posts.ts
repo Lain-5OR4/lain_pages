@@ -1,16 +1,18 @@
 import { Hono } from "hono";
-import { deletePost, getRecentPosts } from "../../data/posts";
-import { createDb } from "../../db";
-import { postImages, posts } from "../../schema";
-import { mimeForExt, safeExt } from "../../utils";
-import { renderAdminPosts, renderNewPost } from "../../views/admin-posts";
+import { getPendingPostDeletions } from "../../data/post-deletions";
+import { getPendingUploads, getRecentPosts } from "../../data/posts";
+import { PostCreationError, createPost } from "../../services/create-post";
+import { PostDeletionError, deletePost } from "../../services/delete-post";
+import { renderAdminPosts, renderDeleteFailure, renderNewPost } from "../../views/admin-posts";
 
 const admin = new Hono<{ Bindings: Env }>();
 
 admin.get("/", async (c) => {
   const posts = await getRecentPosts(c.env.DB);
+  const pendingDeletions = await getPendingPostDeletions(c.env.DB);
+  const pendingUploads = await getPendingUploads(c.env.DB);
   c.header("Cache-Control", "no-store");
-  return c.html(renderAdminPosts(posts));
+  return c.html(renderAdminPosts(posts, pendingDeletions, pendingUploads));
 });
 
 admin.get("/new", (c) => {
@@ -29,46 +31,61 @@ admin.post("/posts", async (c) => {
   const takenAts = formData.getAll("taken_at").map((v) => String(v ?? ""));
   if (files.length === 0) return c.json({ error: "no images" }, 400);
 
-  const db = createDb(c.env.DB);
-  const [{ postId }] = await db
-    .insert(posts)
-    .values({ title, caption, posted_on })
-    .returning({ postId: posts.id });
-
-  const imageRows = await Promise.all(
-    files.map(async (file, i) => {
-      const ext = safeExt(file.name);
-      const shortHash = crypto.randomUUID().slice(0, 8);
-      const key = `posts/${postId}/${i}-${shortHash}.${ext}`;
-      await c.env.BUCKET.put(key, await file.arrayBuffer(), {
-        httpMetadata: { contentType: mimeForExt(ext) },
-      });
-      return {
-        post_id: postId,
-        r2_key: key,
-        sort_order: i,
-        taken_at: takenAts[i] || null,
-      };
-    }),
-  );
-  await db.insert(postImages).values(imageRows);
-
-  return c.json({ ok: true, id: postId, url: `/post/${postId}` });
+  try {
+    const postId = await createPost(c.env, {
+      title,
+      caption,
+      posted_on,
+      images: files.map((file, i) => ({ file, takenAt: takenAts[i] || null })),
+    });
+    return c.json({ ok: true, id: postId, url: `/post/${postId}` });
+  } catch (error) {
+    console.error(
+      "Post creation failed",
+      error instanceof PostCreationError
+        ? {
+            postId: error.postId,
+            uploadToken: error.uploadToken,
+            attemptedKeys: error.attemptedKeys,
+            cleanupFailures: error.cleanupFailures.map((failure) => failure.step),
+          }
+        : { unexpected: true },
+    );
+    return c.json({ error: "Failed to save post" }, 500);
+  }
 });
 
 admin.delete("/posts/:id{[0-9]+}", async (c) => {
   const id = Number(c.req.param("id"));
-  const ok = await deletePost(c.env, id);
-  if (!ok) return c.json({ error: "not found" }, 404);
-  return c.json({ ok: true });
+  try {
+    const ok = await deletePost(c.env, id);
+    if (!ok) return c.json({ error: "not found" }, 404);
+    return c.json({ ok: true });
+  } catch (error) {
+    logDeletionFailure(id, error);
+    return c.json({ error: "Failed to delete post. Please retry." }, 500);
+  }
 });
 
 // HTML-form-friendly variant (browsers can't POST DELETE from <form>)
 admin.post("/posts/:id{[0-9]+}/delete", async (c) => {
   const id = Number(c.req.param("id"));
-  const ok = await deletePost(c.env, id);
-  if (!ok) return c.notFound();
-  return c.redirect("/admin");
+  try {
+    const ok = await deletePost(c.env, id);
+    if (!ok) return c.notFound();
+    return c.redirect("/admin");
+  } catch (error) {
+    logDeletionFailure(id, error);
+    c.header("Cache-Control", "no-store");
+    return c.html(renderDeleteFailure(id), 500);
+  }
 });
+
+function logDeletionFailure(postId: number, error: unknown) {
+  console.error("Post deletion failed", {
+    postId,
+    step: error instanceof PostDeletionError ? error.step : "unknown",
+  });
+}
 
 export default admin;

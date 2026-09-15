@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { html } from "hono/html";
-import { getPost, getRecentPosts } from "../data/posts";
+import { getPost, getRecentPosts, isPublicPostImage } from "../data/posts";
 import { layout } from "../views/layout";
 import { renderPost } from "../views/posts";
 
@@ -49,6 +49,7 @@ pub.get("/images/:key{.+}", async (c) => {
   const key = c.req.param("key");
   // Only post images are public; never expose other bucket contents.
   if (!key.startsWith("posts/")) return c.notFound();
+  if (!(await isPublicPostImage(c.env.DB, key))) return c.notFound();
   const obj = await c.env.BUCKET.get(key);
   if (!obj) return c.notFound();
 

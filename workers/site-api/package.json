@@ -8,6 +8,7 @@
     "start": "wrangler dev",
     "test": "vitest",
     "cf-typegen": "wrangler types",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
     "test:run": "vitest run",
     "typecheck": "tsc --noEmit",
     "typecheck:test": "tsc --noEmit -p test/tsconfig.json",

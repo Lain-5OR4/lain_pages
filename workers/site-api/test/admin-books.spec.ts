@@ -1,9 +1,7 @@
 import { SELF, env } from "cloudflare:test";
 import { beforeEach, describe, expect, it } from "vitest";
-import { setupBookSchema } from "./fixtures/books";
 
 beforeEach(async () => {
-  await setupBookSchema();
   await env.DB.prepare("DELETE FROM books").run();
 });
 

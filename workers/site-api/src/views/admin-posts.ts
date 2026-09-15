@@ -3,7 +3,11 @@ import type { PostWithImages } from "../data/posts";
 import { layout } from "./layout";
 import { UPLOAD_SCRIPT } from "./upload-script";
 
-export const renderAdminPosts = (posts: PostWithImages[]) => {
+export const renderAdminPosts = (
+  posts: PostWithImages[],
+  pendingDeletions: number[] = [],
+  pendingUploads: { id: number; title: string; created_at: string }[] = [],
+) => {
   const total = posts.length;
   return layout({
     title: "admin — photo-diary",
@@ -12,6 +16,38 @@ export const renderAdminPosts = (posts: PostWithImages[]) => {
     issue: `${total} ${total === 1 ? "Entry" : "Entries"}`,
     body: html`
 				<a class="new-entry-cta" href="/admin/new">+ New Entry</a>
+        ${
+          pendingUploads.length > 0
+            ? html`<section aria-label="Pending uploads">
+          <h2>保存中・未完了の投稿</h2>
+          <p>これらの投稿はまだ公開されていません。送信元の画面で保存が終了・中断していることを確認してから削除してください。</p>
+          <ul>${pendingUploads.map(
+            (post) => html`<li>
+            <span>#${post.id} ${post.title || "(untitled)"} / ${post.created_at}</span>
+            <form method="POST" action="/admin/posts/${post.id}/delete"
+              onsubmit="return confirm('アップロードが終了・中断していることを確認しましたか？')">
+              <button type="submit">未完了の投稿を削除</button>
+            </form>
+          </li>`,
+          )}</ul>
+        </section>`
+            : null
+        }
+        ${
+          pendingDeletions.length > 0
+            ? html`<section aria-label="Pending deletions">
+          <h2>写真の削除が完了していない投稿</h2>
+          <p>削除した投稿や保存に失敗した投稿の写真が残っています。削除を再試行してください。</p>
+          <ul>${pendingDeletions.map(
+            (id) => html`<li>
+            <form method="POST" action="/admin/posts/${id}/delete">
+              <span>投稿 #${id}</span> <button type="submit">削除を再試行</button>
+            </form>
+          </li>`,
+          )}</ul>
+        </section>`
+            : null
+        }
 				${
           posts.length === 0
             ? html`<p class="empty">No entries yet — start with a new one.</p>`
@@ -48,6 +84,16 @@ export const renderAdminPosts = (posts: PostWithImages[]) => {
 			`,
   });
 };
+
+export const renderDeleteFailure = (id: number) =>
+  layout({
+    title: "削除を再試行",
+    noStore: true,
+    body: html`<h1>削除を完了できませんでした</h1>
+    <p>しばらくしてから、もう一度お試しください。</p>
+    <form method="POST" action="/admin/posts/${id}/delete"><button type="submit">削除を再試行</button></form>
+    <p><a href="/admin">管理画面に戻る</a></p>`,
+  });
 
 export const renderNewPost = (today: string) => {
   return layout({

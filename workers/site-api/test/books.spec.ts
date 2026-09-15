@@ -1,10 +1,8 @@
 import { env } from "cloudflare:test";
 import { beforeEach, describe, expect, it } from "vitest";
 import { createBook, deleteBook, getBook, getBooks, updateBook } from "../src/data/books";
-import { setupBookSchema } from "./fixtures/books";
 
 beforeEach(async () => {
-  await setupBookSchema();
   await env.DB.prepare("DELETE FROM books").run();
 });
 

@@ -1,6 +1,5 @@
 import { SELF, env } from "cloudflare:test";
 import { beforeAll, describe, expect, it } from "vitest";
-import { setupPostSchema } from "./fixtures/posts";
 
 const JPEG_BYTES = new Uint8Array([0xff, 0xd8, 0xff, 0xe0]);
 
@@ -36,7 +35,6 @@ const seedTwoPosts = async () => {
 };
 
 beforeAll(async () => {
-  await setupPostSchema();
   await seedTwoPosts();
 });
 

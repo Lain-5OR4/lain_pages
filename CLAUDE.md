@@ -5,21 +5,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Essential Commands
 
 ### Development
-- `npm run dev` - Start development server with Turbopack
-- `npm run build` - Build for production
-- `npm run build:github` - Build for GitHub Pages deployment (sets GITHUB_PAGES=true)
-- `npm start` - Start production server
+- `bun run dev` - Start development server with Turbopack
+- `bun run build` - Build the static export for Cloudflare
+- `bun run check:export` - Verify the generated static export
 
 ### Code Quality
-- `npm run lint` - Run Biome linter on src/ directory
-- `npm run format` - Run Biome formatter and auto-fix issues
-- `npx @biomejs/biome check ./src` - Check formatting without fixing
+- `bun run check` - Check frontend, shared types, scripts, and Worker code
+- `bun run format` - Run Biome formatter and auto-fix issues
+- `bun run typecheck` / `bun run check:worker` - Check types and run Worker tests
+- See DEVELOPMENT.md for Bun 1.4.2 installation and frozen-lockfile commands.
 
 ## Architecture Overview
 
 This repo contains two independent deployable units:
 
-1. **`src/`** — Next.js 15 frontend (portfolio + diary viewer), deployed to GitHub Pages
+1. **`src/`** — Next.js 15 frontend (portfolio + diary viewer), deployed to Cloudflare Pages
 2. **`workers/site-api/`** — Cloudflare Worker backend API, deployed to `api.mizora.dev`
 
 ---
@@ -28,14 +28,13 @@ This repo contains two independent deployable units:
 
 ### Core Structure
 - **App Router**: Uses Next.js app directory structure
-- **Static Export**: Configured for GitHub Pages deployment via `output: "export"`
-- **Conditional Deployment**: Handles both local development and GitHub Pages with different base paths
+- **Static Export**: Configured for Cloudflare deployment via `output: "export"`
+- **Deployment**: Cloudflare GitHub integration; GitHub Pages support has been removed
 
 ### Key Components Architecture
-- **ConditionalBackground**: Renders animated rain effect on homepage only (disabled on `/text-delta`)
-- **BackgroundMusicPlayer**: Global audio player with user interaction requirement
-- **WalkingCharacter**: Animated character component on homepage
-- **Footer**: Persistent footer across all pages
+- **LinuxDesktop**: Current homepage and profile desktop
+- **DesktopAudio**: Current desktop audio controls; retains the shared rain audio asset
+- The unused LegacyHome and its jellyfish, typing effect, audio hook, footer, and glitch CSS have been removed.
 
 ### Styling System
 - **Tailwind CSS**: Primary styling framework
@@ -44,7 +43,7 @@ This repo contains two independent deployable units:
 - **shadcn/ui**: Component library for UI elements
 
 ### Pages
-- `/` — Homepage with Matrix rain + walking character
+- `/` — Linux-style desktop with profile window and rain
 - `/diary` — Photo diary (corkboard aesthetic)
 - `/blog` — "mizora journal" blog (editorial paper theme, microCMS-backed)
 - `/text-delta` — Text diff viewer mini-app
@@ -106,7 +105,7 @@ Hono-based Cloudflare Worker deployed to `api.mizora.dev`. Uses **Drizzle ORM** 
   - `category` is a free-text genre carried over from Notion's `種別` property (e.g. 数学/統計学/情報技術) — distinct from `kind`
   - `amazon_url` is the Amazon product-page link (Notion's `リンク` property), separate from `cover_url`
   - `cover_url` is a plain pasted URL (Amazon product image) — no scraping/upload pipeline
-  - Schema changes to this table must ship as additive-only files under `migrations/` (`CREATE TABLE IF NOT EXISTS`) and applied to prod with `wrangler d1 execute --remote`. Never re-run `schema.sql` against prod — it starts with `DROP TABLE IF EXISTS` for every table
+  - SQL migrations are the source of truth; keep Drizzle definitions aligned. Use additive migrations and never rewrite applied history. Tests initialize through the same migrations. See `workers/site-api/DATABASE.md` before migrating any existing DB: legacy manual applications may have no migration tracking. `reset-dev.sql` is destructive and local-only; `schema.sql` was removed.
 
 ### Data Flow
 1. Admin uploads via browser form → client-side resize to 2048px JPEG via Canvas (EXIF is stripped here) → `exifr` extracts `DateTimeOriginal` before resize and sends as `taken_at` field
