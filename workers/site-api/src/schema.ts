@@ -61,8 +61,6 @@ export const books = sqliteTable(
     finished_on: text("finished_on"),
     created_at: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
     updated_at: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
-    // Historical inert column retained by migration 0004; not exposed in the UI.
-    face_out: integer("face_out"),
   },
   (table) => [index("idx_books_status").on(table.status, table.id)],
 );

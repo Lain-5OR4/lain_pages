@@ -17,9 +17,10 @@ bun run db:migrate:local
 - `0000_create_posts.sql`: 写真テーブル・外部キー・UNIQUE・インデックス。旧 `schema.sql` の初期定義を移したもの。
 - `0001_add_books.sql`: 読書テーブル。
 - `0002_seed_books.sql` / `0003_set_cover_urls.sql`: 過去の読書データ移入。適用済み履歴を変えないため、そのまま保存している。
-- `0004_add_face_out.sql`: 過去に追加した未使用列。削除せずDrizzleにも定義する。
+- `0004_add_face_out.sql`: 過去に追加した未使用列。0007で削除した。
 - `0005_add_post_deletions.sql`: 投稿削除後も画像キーを保持する削除作業記録。投稿への外部キーは設けない。
 - `0006_add_post_upload_state.sql`: 公開状態・アップロード識別子・保存予定キー。既存投稿はpublished、識別子なし、予定キーなしとして保持する。
+- `0007_drop_face_out.sql`: `books.face_out` を削除。アプリケーションコードから一度も読み書きされておらず、本番でも全行NULLだったことを確認済み(2026-09-15)。
 
 新規DBには歴史的な読書データも入る。今後の検証データはmigrationへ追加せず、fixtureや開発用seedに分離する。`seed-dev.sql` は写真の検証データ用であり、対応するR2オブジェクトは別途必要。
 
@@ -48,12 +49,12 @@ bun run db:migrate:local
 
 1. `sqlite_master`、`PRAGMA table_info`、`foreign_key_list`、`index_list` で構造を確認する。
 2. `d1_migrations` の有無と適用記録を確認する。
-3. 0002/0003によるデータ投入履歴と `books.face_out` の有無を確認する。
+3. 0002/0003によるデータ投入履歴を確認する。
 4. 実構造と履歴を突き合わせ、適用済み履歴の登録・未適用SQLの実行手順を個別に決める。
 
 履歴なしのDBへ一括適用すると、読書データの重複、表紙URLの上書き、既存列の追加エラーが起き得る。0000の `IF NOT EXISTS` も既存テーブルの制約不足を修復するものではない。今回のテストは履歴を管理したDBの移行を確認しており、実本番DBの構造・適用履歴は未確認。本番へのSQL実行や自動migrationは追加していない。
 
-Drizzleの日時既定値をSQL式に直した変更は今後のINSERTに作用する。過去に保存された文字列 `CURRENT_TIMESTAMP` は自動修復しない。また、Drizzleが参照する `face_out` が対象DBに存在することをデプロイ前に確認する。
+Drizzleの日時既定値をSQL式に直した変更は今後のINSERTに作用する。過去に保存された文字列 `CURRENT_TIMESTAMP` は自動修復しない。
 
 ## 削除処理のデプロイ前確認
 

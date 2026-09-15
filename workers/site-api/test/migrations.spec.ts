@@ -121,7 +121,7 @@ it("upgrades a populated pre-0004 database to the same schema without changing u
   const before = await snapshot();
   await applyD1Migrations(db, env.TEST_MIGRATIONS);
   const after = await snapshot();
-  expect(after[0].map(({ face_out, ...row }) => row)).toEqual(before[0]);
+  expect(after[0]).toEqual(before[0]);
   expect(after[1].map(({ publication_state, upload_token, upload_keys, ...row }) => row)).toEqual(
     before[1],
   );

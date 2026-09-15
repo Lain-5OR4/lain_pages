@@ -67,11 +67,22 @@ export interface DecoratedBook extends Book {
 }
 
 const DEFAULT_COVER_ASPECT = 0.66;
+// Roughly matches the old "every 5th book" rate, without the visible period.
+const FACE_OUT_RATE = 0.2;
 
-// No curated "featured" flag in the schema, so face every 5th covered book
-// out, the same way a real shelf occasionally turns one forward.
+// Scrambles a book id into [0, 1) so face-out picks look scattered rather
+// than arithmetic, while staying deterministic (same book, same result).
+function hashUnit(id: number): number {
+  let h = Math.imul(id ^ 0x9e3779b9, 0x45d9f3b);
+  h = Math.imul(h ^ (h >>> 16), 0x45d9f3b);
+  h ^= h >>> 16;
+  return (h >>> 0) / 0xffffffff;
+}
+
+// No curated "featured" flag in the schema, so face a pseudo-random ~1-in-5
+// covered books out, the same way a real shelf occasionally turns one forward.
 function isFeaturedFaceOut(book: Book): boolean {
-  return !!(book.coverUrl && book.id % 5 === 0);
+  return !!(book.coverUrl && hashUnit(book.id) < FACE_OUT_RATE);
 }
 
 export function decorate(b: Book, aspects: Record<number, number> = {}): DecoratedBook {
