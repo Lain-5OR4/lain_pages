@@ -7,7 +7,7 @@ import {
 } from "../src/data/post-deletions";
 import { getPost, getRecentPosts } from "../src/data/posts";
 import app from "../src/index";
-import { PostDeletionError, deletePost } from "../src/services/delete-post";
+import { deletePost, PostDeletionError } from "../src/services/delete-post";
 
 afterEach(() => vi.restoreAllMocks());
 

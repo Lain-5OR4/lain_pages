@@ -3,7 +3,7 @@ import { stageFailedPostCleanup } from "../data/post-deletions";
 import { createDb } from "../db";
 import { postImages, posts } from "../schema";
 import { mimeForExt, safeExt } from "../utils";
-import { PostDeletionError, cleanupPostImages } from "./delete-post";
+import { cleanupPostImages, PostDeletionError } from "./delete-post";
 
 type Storage = Pick<Env, "DB" | "BUCKET">;
 type ImageInput = { file: File; takenAt: string | null };

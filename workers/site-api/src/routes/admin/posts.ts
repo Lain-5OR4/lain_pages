@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { getPendingPostDeletions } from "../../data/post-deletions";
 import { getPendingUploads, getRecentPosts } from "../../data/posts";
-import { PostCreationError, createPost } from "../../services/create-post";
-import { PostDeletionError, deletePost } from "../../services/delete-post";
+import { createPost, PostCreationError } from "../../services/create-post";
+import { deletePost, PostDeletionError } from "../../services/delete-post";
 import { renderAdminPosts, renderDeleteFailure, renderNewPost } from "../../views/admin-posts";
 
 const admin = new Hono<{ Bindings: Env }>();

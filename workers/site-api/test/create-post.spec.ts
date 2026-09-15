@@ -2,7 +2,7 @@ import { env } from "cloudflare:test";
 import { afterEach, expect, it, vi } from "vitest";
 import { getPendingPostDeletions, getPostDeletion } from "../src/data/post-deletions";
 import app from "../src/index";
-import { PostCreationError, createPost } from "../src/services/create-post";
+import { createPost, PostCreationError } from "../src/services/create-post";
 import { deletePost } from "../src/services/delete-post";
 
 afterEach(() => vi.restoreAllMocks());

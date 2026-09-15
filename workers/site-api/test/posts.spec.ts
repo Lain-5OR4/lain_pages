@@ -1,4 +1,4 @@
-import { SELF, env } from "cloudflare:test";
+import { env, SELF } from "cloudflare:test";
 import { afterEach, expect, it, vi } from "vitest";
 import { getRecentPosts } from "../src/data/posts";
 
