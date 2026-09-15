@@ -61,7 +61,9 @@ export async function fetchPostById(id: string): Promise<MicroCMSBlogPost | null
       contentId: id,
     });
   } catch (e) {
-    if (e instanceof Error && /404/.test(e.message)) return null;
+    // The SDK throws a plain Error with no structured status field; it always
+    // formats the message as "fetch API response status: {code}...".
+    if (e instanceof Error && /^fetch API response status: 404\b/.test(e.message)) return null;
     throw e;
   }
 }

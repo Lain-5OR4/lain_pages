@@ -15,4 +15,15 @@ export const corsMiddleware: MiddlewareHandler<{ Bindings: Env }> = async (c, ne
   }
 };
 
-export const preflight = () => new Response(null, { status: 204 });
+export const preflight: MiddlewareHandler<{ Bindings: Env }> = async (c) => {
+  const origin = c.req.header("Origin") ?? "";
+  const headers = new Headers();
+  if (ALLOWED_ORIGINS.has(origin)) {
+    headers.set("Access-Control-Allow-Origin", origin);
+    headers.set("Vary", "Origin");
+    headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+    headers.set("Access-Control-Allow-Headers", "Content-Type");
+    headers.set("Access-Control-Max-Age", "86400");
+  }
+  return new Response(null, { status: 204, headers });
+};

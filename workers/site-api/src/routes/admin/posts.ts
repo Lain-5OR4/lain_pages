@@ -27,17 +27,20 @@ admin.post("/posts", async (c) => {
   const caption = String(formData.get("caption") ?? "").trim();
   const today = new Date().toISOString().slice(0, 10);
   const posted_on = String(formData.get("posted_on") ?? today) || today;
-  const files = formData.getAll("images").filter((v): v is File => v instanceof File && v.size > 0);
-  const takenAts = formData.getAll("taken_at").map((v) => String(v ?? ""));
-  if (files.length === 0) return c.json({ error: "no images" }, 400);
+  // Pair each image with its taken_at before filtering, so dropping a
+  // zero-byte file can't shift a later image's taken_at onto it.
+  const rawTakenAts = formData.getAll("taken_at");
+  const images = formData
+    .getAll("images")
+    .map((file, i) => ({ file, takenAt: String(rawTakenAts[i] ?? "") || null }))
+    .filter(
+      (image): image is { file: File; takenAt: string | null } =>
+        image.file instanceof File && image.file.size > 0,
+    );
+  if (images.length === 0) return c.json({ error: "no images" }, 400);
 
   try {
-    const postId = await createPost(c.env, {
-      title,
-      caption,
-      posted_on,
-      images: files.map((file, i) => ({ file, takenAt: takenAts[i] || null })),
-    });
+    const postId = await createPost(c.env, { title, caption, posted_on, images });
     return c.json({ ok: true, id: postId, url: `/post/${postId}` });
   } catch (error) {
     console.error(

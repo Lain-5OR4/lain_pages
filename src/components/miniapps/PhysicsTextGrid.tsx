@@ -60,8 +60,8 @@ export default function PhysicsTextGrid() {
     ];
     Matter.Composite.add(world, walls);
 
-    const cols = Math.ceil(w / CELL_SIZE);
-    const rows = Math.ceil(h / CELL_SIZE);
+    let cols = Math.ceil(w / CELL_SIZE);
+    let rows = Math.ceil(h / CELL_SIZE);
     const textChars = [...TEXT_SOURCE];
     const gridChars: string[] = new Array(cols * rows);
     for (let i = 0; i < gridChars.length; i++) {
@@ -235,9 +235,9 @@ export default function PhysicsTextGrid() {
       walls[2] = Matter.Bodies.rectangle(w + 25, h / 2, 50, h, { isStatic: true });
       Matter.Composite.add(world, walls);
 
-      const newCols = Math.ceil(w / CELL_SIZE);
-      const newRows = Math.ceil(h / CELL_SIZE);
-      gridChars.length = newCols * newRows;
+      cols = Math.ceil(w / CELL_SIZE);
+      rows = Math.ceil(h / CELL_SIZE);
+      gridChars.length = cols * rows;
       for (let i = 0; i < gridChars.length; i++) {
         if (!gridChars[i]) gridChars[i] = textChars[i % textChars.length];
       }

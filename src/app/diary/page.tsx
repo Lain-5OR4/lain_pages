@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Component, Suspense, use, useState } from "react";
+import { Component, Suspense, use, useEffect, useState } from "react";
 import DiaryCard from "@/components/diary/DiaryCard";
 import PhotoLightbox from "@/components/diary/PhotoLightbox";
 import { Button } from "@/components/ui/button";
@@ -105,7 +105,13 @@ function DiaryGrid({
 }
 
 export default function DiaryPage() {
-  const [promise, setPromise] = useState(fetchEntries);
+  // Lazy-inits would run fetchEntries during the static-export prerender pass,
+  // making the production build depend on a live API call. Fetch in an
+  // effect instead, which only ever runs client-side after mount.
+  const [promise, setPromise] = useState<Promise<DiaryEntry[]> | null>(null);
+  useEffect(() => {
+    setPromise((current) => current ?? fetchEntries());
+  }, []);
   const [lightbox, setLightbox] = useState<{ entry: DiaryEntry; photoIndex: number } | null>(null);
 
   const handlePhotoClick = (entry: DiaryEntry, photoIndex: number) => {
@@ -258,9 +264,13 @@ export default function DiaryPage() {
 
         <main className="relative max-w-[110rem] mx-auto px-6 sm:px-10 md:px-14 pt-20 pb-32 z-2">
           <DiaryErrorBoundary onRetry={() => setPromise(fetchEntries())}>
-            <Suspense fallback={<DiaryLoading />}>
-              <DiaryGrid promise={promise} onPhotoClick={handlePhotoClick} />
-            </Suspense>
+            {promise ? (
+              <Suspense fallback={<DiaryLoading />}>
+                <DiaryGrid promise={promise} onPhotoClick={handlePhotoClick} />
+              </Suspense>
+            ) : (
+              <DiaryLoading />
+            )}
           </DiaryErrorBoundary>
         </main>
       </div>

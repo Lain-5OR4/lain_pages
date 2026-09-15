@@ -115,6 +115,7 @@ export default function VoidSpace() {
       coreMat.dispose();
       particlesGeo.dispose();
       particlesMat.dispose();
+      renderer.dispose();
     };
   }, []);
 

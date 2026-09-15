@@ -12,6 +12,7 @@ export default function Microscope() {
     const container = containerRef.current;
 
     let p5Instance: P5 | null = null;
+    let unmounted = false;
 
     function loadP5(): Promise<typeof P5> {
       const w = window as Window & { p5?: typeof P5 };
@@ -945,10 +946,12 @@ export default function Microscope() {
         };
       };
 
+      if (unmounted) return;
       p5Instance = new P5Ctor(sketch, container);
     });
 
     return () => {
+      unmounted = true;
       if (p5Instance) {
         p5Instance.remove();
       }
