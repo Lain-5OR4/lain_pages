@@ -1,13 +1,13 @@
-export const safeExt = (name: string, fallback = "jpg"): string => {
+export type ImageExt = "jpg" | "jpeg" | "png" | "webp" | "gif" | "avif";
+const ALLOWED_EXTS: readonly string[] = ["jpg", "jpeg", "png", "webp", "gif", "avif"];
+
+export const safeExt = (name: string, fallback: ImageExt = "jpg"): ImageExt => {
   const m = /\.([a-zA-Z0-9]{1,5})$/.exec(name);
   const ext = m ? m[1].toLowerCase() : fallback;
-  const allowed = new Set(["jpg", "jpeg", "png", "webp", "gif", "avif"]);
-  return allowed.has(ext) ? ext : fallback;
+  return ALLOWED_EXTS.includes(ext) ? (ext as ImageExt) : fallback;
 };
 
-// Content type is derived from the whitelisted extension, never from the
-// client-supplied MIME (which could smuggle text/html into R2).
-const MIME_BY_EXT: Record<string, string> = {
+const MIME_BY_EXT: Record<ImageExt, string> = {
   jpg: "image/jpeg",
   jpeg: "image/jpeg",
   png: "image/png",
@@ -16,7 +16,7 @@ const MIME_BY_EXT: Record<string, string> = {
   avif: "image/avif",
 };
 
-export const mimeForExt = (ext: string): string => MIME_BY_EXT[ext] ?? "image/jpeg";
+export const mimeForExt = (ext: ImageExt): string => MIME_BY_EXT[ext];
 
 // Workers run in UTC. EXIF DateTimeOriginal is the camera's local time without a
 // timezone, so new uploads store a naive "YYYY-MM-DDTHH:MM:SS" we render byte-for-byte.

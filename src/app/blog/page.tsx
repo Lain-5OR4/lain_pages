@@ -1,7 +1,7 @@
+import Link from "next/link";
 import { JournalFooter, JournalHeader } from "@/components/blog/JournalChrome";
 import { JOURNAL } from "@/components/blog/theme";
 import { getAllPosts } from "@/data/blog-posts";
-import Link from "next/link";
 
 export default async function BlogIndexPage() {
   const posts = await getAllPosts();
@@ -10,7 +10,6 @@ export default async function BlogIndexPage() {
     <div className="max-w-[64rem] mx-auto px-6 sm:px-10 py-16 md:py-24">
       <JournalHeader command="ls -lh" />
 
-      {/* masthead */}
       <h1
         className="text-5xl md:text-6xl leading-[1.05] tracking-tight font-medium mb-3"
         style={{ fontFamily: JOURNAL.serif }}
@@ -23,7 +22,6 @@ export default async function BlogIndexPage() {
 
       <hr className="my-12 border-stone-300" />
 
-      {/* post list */}
       {posts.length === 0 && (
         <p className="text-[0.78rem] text-stone-500" style={{ fontFamily: JOURNAL.mono }}>
           ls: no entries yet. check back soon.

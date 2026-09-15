@@ -1,18 +1,16 @@
-import { Hono } from "hono";
+import { type Context, Hono } from "hono";
 import {
-  type NewBook,
   createBook,
   deleteBook,
   getBook,
   getBooks,
+  type NewBook,
   updateBook,
 } from "../../data/books";
-import { STATUSES, parseBookForm } from "../../inputs/book-form";
+import { parseBookForm, STATUSES } from "../../inputs/book-form";
 import { renderAdminBooks, renderEditBook, renderNewBook } from "../../views/admin-books";
 
 const admin = new Hono<{ Bindings: Env }>();
-
-// --- books (reading log) ---
 
 admin.get("/books", async (c) => {
   const books = await getBooks(c.env.DB);
@@ -51,10 +49,7 @@ admin.post("/books/:id{[0-9]+}", async (c) => {
   return c.redirect("/admin/books");
 });
 
-// Quick status change from the list row — deliberately narrow (only touches
-// `status`) instead of routing through parseBookForm/the full edit POST,
-// which would null out every other field not present in a status-only form.
-admin.post("/books/:id{[0-9]+}/status", async (c) => {
+const updateBookStatusOnly = async (c: Context<{ Bindings: Env }>) => {
   const id = Number(c.req.param("id"));
   const formData = await c.req.formData();
   const status = String(formData.get("status") ?? "");
@@ -62,7 +57,8 @@ admin.post("/books/:id{[0-9]+}/status", async (c) => {
   const book = await updateBook(c.env.DB, id, { status: status as NewBook["status"] });
   if (!book) return c.notFound();
   return c.redirect("/admin/books");
-});
+};
+admin.post("/books/:id{[0-9]+}/status", updateBookStatusOnly);
 
 admin.post("/books/:id{[0-9]+}/delete", async (c) => {
   const id = Number(c.req.param("id"));

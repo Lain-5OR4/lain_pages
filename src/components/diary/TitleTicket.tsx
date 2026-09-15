@@ -1,25 +1,10 @@
 import { NOTE_COLORS, NOTE_ROTATIONS, TICKET_MASK } from "./constants";
 
-/**
- * タイトルチケットコンポーネントのプロパティ。
- */
 interface TitleTicketProps {
-  /** エントリーのタイトル文字列。空文字・undefined の場合はコンポーネント自体を非表示にする。 */
   title: string;
-  /** カードのゼロ始まりインデックス。色・回転角の循環選択に使う。 */
   index: number;
 }
 
-/**
- * 映画半券風のタイトルチケットを表示するコンポーネント。
- *
- * 左右両端に半円ノッチを持つチケット形状で、左側に連番（No.XX）、右側にタイトルを表示する。
- * 背景は古びた紙を模した複数の radial-gradient とノイズ SVG で構成されており、
- * ノッチは CSS `mask-composite: intersect` で実現している。
- *
- * @param props - {@link TitleTicketProps} を参照。
- * @returns タイトルチケット要素。`title` が空の場合は `null`。
- */
 export default function TitleTicket({ title, index }: TitleTicketProps) {
   return (
     <div className="min-w-0 flex-1 pt-1">

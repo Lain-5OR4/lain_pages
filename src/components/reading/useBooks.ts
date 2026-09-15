@@ -1,7 +1,7 @@
 "use client";
 
-import type { Book } from "@/data/books";
 import { useEffect, useState } from "react";
+import type { Book } from "@/data/books";
 
 const API_BASE = process.env.NEXT_PUBLIC_DIARY_API ?? "https://api.mizora.dev";
 type BooksState =
@@ -9,7 +9,6 @@ type BooksState =
   | { status: "error"; message: string }
   | { status: "ready"; books: Book[] };
 
-// Fetch only in the browser: static exports do not depend on the live API.
 export function useBooks() {
   const [state, setState] = useState<BooksState>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);

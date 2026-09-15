@@ -1,29 +1,12 @@
 import { ZIGZAG_TAPE_EDGES } from "./constants";
 
-/**
- * 説明文付箋コンポーネントのプロパティ。
- */
 interface DescriptionNoteProps {
-  /** 付箋に表示するエントリーの説明文。 */
   description: string;
-  /** 付箋の傾き角度（度）。正で時計回り、負で反時計回り。 */
   rotation: number;
-  /** 上部マスキングテープの色。`TAPE_COLORS` から選択した CSS カラー文字列。 */
   tapeColor: string;
-  /** 付箋本体の背景色。`STICKY_COLORS` から選択した CSS カラー文字列。 */
   stickyColor: string;
 }
 
-/**
- * エントリーの説明文を表示する付箋コンポーネント。
- *
- * 写真エリアの右下に絶対配置され、上部にマスキングテープが貼られた付箋を模している。
- * テープの傾きは付箋の回転方向と逆向きにすることで、貼り付けた自然さを演出する。
- * `pointer-events-none` を付与しているため、写真クリックの妨げにならない。
- *
- * @param props - {@link DescriptionNoteProps} を参照。
- * @returns 付箋スタイルの説明文要素。
- */
 export default function DescriptionNote({
   description,
   rotation,

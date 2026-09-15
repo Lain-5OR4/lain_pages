@@ -11,12 +11,10 @@ export default function VoidSpace() {
 
     const container = containerRef.current;
 
-    // Setup Scene
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
     scene.fog = new THREE.FogExp2(0x000000, 0.002);
 
-    // Setup Camera
     const camera = new THREE.PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
@@ -25,13 +23,11 @@ export default function VoidSpace() {
     );
     camera.position.z = 50;
 
-    // Setup Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     container.appendChild(renderer.domElement);
 
-    // 1. Wired Torus Knot
     const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16);
     const material = new THREE.MeshBasicMaterial({
       color: 0x00ff00,
@@ -42,7 +38,6 @@ export default function VoidSpace() {
     const torusKnot = new THREE.Mesh(geometry, material);
     scene.add(torusKnot);
 
-    // 2. Inner Glowing Core
     const coreGeo = new THREE.IcosahedronGeometry(4, 0);
     const coreMat = new THREE.MeshBasicMaterial({
       color: 0x00ff00,
@@ -53,7 +48,6 @@ export default function VoidSpace() {
     const core = new THREE.Mesh(coreGeo, coreMat);
     scene.add(core);
 
-    // 3. Particles / Data Bits
     const particlesGeo = new THREE.BufferGeometry();
     const particleCount = 2000;
     const posArray = new Float32Array(particleCount * 3);
@@ -72,7 +66,6 @@ export default function VoidSpace() {
     const particlesMesh = new THREE.Points(particlesGeo, particlesMat);
     scene.add(particlesMesh);
 
-    // Animation Loop
     let frameId: number;
     let mouseX = 0;
     let mouseY = 0;
@@ -80,7 +73,6 @@ export default function VoidSpace() {
     const animate = () => {
       frameId = requestAnimationFrame(animate);
 
-      // Rotations
       torusKnot.rotation.x += 0.01;
       torusKnot.rotation.y += 0.01;
 
@@ -89,7 +81,6 @@ export default function VoidSpace() {
 
       particlesMesh.rotation.y += 0.002;
 
-      // Mouse Parallax
       camera.position.x += (mouseX * 5 - camera.position.x) * 0.05;
       camera.position.y += (-mouseY * 5 - camera.position.y) * 0.05;
       camera.lookAt(scene.position);
@@ -99,7 +90,6 @@ export default function VoidSpace() {
 
     animate();
 
-    // Event Listeners
     const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
@@ -114,7 +104,6 @@ export default function VoidSpace() {
     window.addEventListener("resize", handleResize);
     window.addEventListener("mousemove", handleMouseMove);
 
-    // Cleanup
     return () => {
       cancelAnimationFrame(frameId);
       window.removeEventListener("resize", handleResize);

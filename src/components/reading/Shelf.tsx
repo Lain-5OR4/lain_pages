@@ -1,20 +1,13 @@
 "use client";
 
-import type { Book } from "@/data/books";
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { Book } from "@/data/books";
 
 import { SpineButton } from "./SpineButton";
 import { type DecoratedBook, decorate } from "./theme";
 
-// Fallback row-packing budget used only for the first render, before the
-// container has been measured (see Shelf's ResizeObserver below).
 const DEFAULT_BUDGET = 1280;
 
-// Pack decorated books into shelf rows, wrapping once a row's total slot
-// width would exceed budget (matches the reference design's row-packing).
-// Books have fixed pixel widths (shrink-0), so budget must track the real
-// available width or narrow viewports would overflow the cabinet instead
-// of wrapping into more rows.
 function packRows(books: DecoratedBook[], budget: number): DecoratedBook[][] {
   const rows: DecoratedBook[][] = [];
   let cur: DecoratedBook[] = [];
@@ -94,23 +87,16 @@ function FaceButton({
 }
 
 export function Shelf({ books, onOpen }: { books: Book[]; onOpen: (id: number) => void }) {
-  // Real cover aspect ratios, measured on image load and keyed by book id.
-  // Until an image loads, decorate() falls back to DEFAULT_COVER_ASPECT so
-  // face-out boxes still render at a reasonable width immediately.
   const [aspects, setAspects] = useState<Record<number, number>>({});
   const handleMeasure = useCallback((id: number, aspect: number) => {
     setAspects((prev) => (prev[id] === aspect ? prev : { ...prev, [id]: aspect }));
   }, []);
 
-  // Books render at fixed pixel widths, so row-packing has to track the
-  // container's real width — otherwise a row packed for a wide viewport
-  // just overflows a narrower one instead of wrapping.
   const containerRef = useRef<HTMLDivElement>(null);
   const [budget, setBudget] = useState(DEFAULT_BUDGET);
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    // Cabinet padding (0 20px = 40) + row padding (0 12px = 24) below.
     const chrome = 64;
     const update = () => setBudget(Math.max(1, el.clientWidth - chrome));
     update();
@@ -135,7 +121,6 @@ export function Shelf({ books, onOpen }: { books: Book[]; onOpen: (id: number) =
           boxShadow: "0 40px 70px -34px rgba(35,22,14,.72), inset 0 2px 0 rgba(255,255,255,.14)",
         }}
       >
-        {/* crown */}
         <div
           style={{
             height: 26,
@@ -149,9 +134,11 @@ export function Shelf({ books, onOpen }: { books: Book[]; onOpen: (id: number) =
           }}
         />
 
-        {rows.map((row, ri) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: rows are re-packed on every render, no stable identity
-          <div key={ri} className="flex flex-col relative">
+        {rows.map((row) => (
+          <div
+            key={row.length ? row.map((b) => b.id).join("-") : "empty"}
+            className="flex flex-col relative"
+          >
             <div
               className="flex items-end relative"
               style={{
@@ -185,7 +172,6 @@ export function Shelf({ books, onOpen }: { books: Book[]; onOpen: (id: number) =
                 }}
               />
             </div>
-            {/* shelf plank top */}
             <div
               style={{
                 height: 9,
@@ -197,7 +183,6 @@ export function Shelf({ books, onOpen }: { books: Book[]; onOpen: (id: number) =
                 boxShadow: "inset 0 1px 0 rgba(255,255,255,.4)",
               }}
             />
-            {/* shelf plank front edge */}
             <div
               style={{
                 height: 15,
@@ -212,7 +197,6 @@ export function Shelf({ books, onOpen }: { books: Book[]; onOpen: (id: number) =
           </div>
         ))}
 
-        {/* base */}
         <div
           style={{
             height: 34,

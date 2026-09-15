@@ -1,4 +1,4 @@
-import { SELF, fetchMock } from "cloudflare:test";
+import { fetchMock, SELF } from "cloudflare:test";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 
 // MICROCMS_SERVICE_DOMAIN is pinned to "test-service" in vitest.config.mts

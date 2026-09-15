@@ -1,6 +1,6 @@
+import Link from "next/link";
 import Microscope from "@/components/miniapps/Microscope";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 export default function MicroscopePage() {
   return (
@@ -18,7 +18,6 @@ export default function MicroscopePage() {
         </Link>
       </div>
 
-      {/* UI Panel */}
       <div className="absolute top-8 right-8 z-50 pointer-events-none font-mono text-xs text-green-400/80 bg-black/60 backdrop-blur-sm border border-green-500/30 px-4 py-3 space-y-1 leading-relaxed">
         <div className="text-green-500 font-bold tracking-wider">◉ MICROSCOPE VIEW</div>
         <div className="text-green-500/30">─────────────────</div>
@@ -32,7 +31,6 @@ export default function MicroscopePage() {
         <div className="text-green-500/50">[1-5] Change stain</div>
       </div>
 
-      {/* Magnification display */}
       <div
         id="mag-display"
         className="absolute bottom-8 right-8 z-50 pointer-events-none font-mono text-2xl text-green-500/60 font-bold tracking-widest"

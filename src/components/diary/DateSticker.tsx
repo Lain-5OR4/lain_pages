@@ -1,28 +1,12 @@
 import { ZIGZAG_BOTTOM } from "./constants";
 
-/**
- * カレンダーページ風の日付シールコンポーネントのプロパティ。
- */
 interface DateStickerProps {
-  /** 月名の略称（例: "JAN"）。 */
   month: string;
-  /** 2 桁ゼロ埋めの日付文字列（例: "07"）。 */
   day: string;
-  /** 曜日名の略称（例: "MON"）。 */
   weekday: string;
-  /** 傾き角度（度）。正で時計回り、負で反時計回り。 */
   rotation: number;
 }
 
-/**
- * カレンダーページを模した日付シールを表示するコンポーネント。
- *
- * 上部の赤いバー（月名）と下部のベージュのボディ（日・曜日）で構成される。
- * 上端はジグザグクリップパスでミシン目のような切り取り線を表現している。
- *
- * @param props - {@link DateStickerProps} を参照。
- * @returns カレンダーページ風の日付シール要素。
- */
 export default function DateSticker({ month, day, weekday, rotation }: DateStickerProps) {
   return (
     <div

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Caveat, DotGothic16, Kaisei_Decol, Reggae_One } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
+
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",

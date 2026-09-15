@@ -1,8 +1,8 @@
 "use client";
 
-import Background from "@/components/background/Background";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import Background from "@/components/background/Background";
 import "./desktop.css";
 import "./desktop-icons.css";
 import { DesktopAudio } from "./DesktopAudio";
@@ -86,7 +86,7 @@ export function LinuxDesktop() {
           <span className="lx-panel-name">mizoraのデスクトップ</span>
           <span className="lx-panel-clock">{clock || "--:--"}</span>
           <DesktopAudio />
-          <span className="lx-panel-status" aria-label="接続表示">
+          <span className="lx-panel-status" role="img" aria-label="接続表示">
             ●
           </span>
         </header>
@@ -194,7 +194,7 @@ export function LinuxDesktop() {
                 mizora@wired:~$ <span>whoami --profile</span>
               </p>
               <div className="lx-profile">
-                <div className="lx-avatar" aria-label="プロフィール画像の仮アイコン">
+                <div className="lx-avatar" role="img" aria-label="プロフィール画像の仮アイコン">
                   m<span>●</span>
                 </div>
                 <div>

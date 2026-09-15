@@ -1,5 +1,6 @@
 "use client";
 
+import type P5 from "p5";
 import { useEffect, useRef } from "react";
 
 export default function Microscope() {
@@ -10,25 +11,21 @@ export default function Microscope() {
     if (!containerRef.current) return;
     const container = containerRef.current;
 
-    // biome-ignore lint/suspicious/noExplicitAny: p5 loaded dynamically via CDN
-    let p5Instance: any = null;
+    let p5Instance: P5 | null = null;
 
-    // biome-ignore lint/suspicious/noExplicitAny: p5 loaded dynamically via CDN
-    function loadP5(): Promise<any> {
-      const w = window as Window & { p5?: unknown };
+    function loadP5(): Promise<typeof P5> {
+      const w = window as Window & { p5?: typeof P5 };
       if (w.p5) return Promise.resolve(w.p5);
       return new Promise((resolve) => {
         const script = document.createElement("script");
         script.src = "https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/p5.min.js";
-        script.onload = () => resolve((window as Window & { p5?: unknown }).p5);
+        script.onload = () => resolve((window as Window & { p5?: typeof P5 }).p5 as typeof P5);
         document.head.appendChild(script);
       });
     }
 
-    loadP5().then((P5) => {
-      // biome-ignore lint/suspicious/noExplicitAny: p5 instance mode
-      const sketch = (p: any) => {
-        // ============ State ============
+    loadP5().then((P5Ctor) => {
+      const sketch = (p: P5) => {
         let organisms: Organism[] = [];
         const debris: DebrisObj[] = [];
         let zoom = 1;
@@ -52,7 +49,6 @@ export default function Microscope() {
           return stainModes[stainIndexRef.current];
         }
 
-        // ============ Organism base ============
         interface Organism {
           x: number;
           y: number;
@@ -63,7 +59,6 @@ export default function Microscope() {
           energy?: number;
         }
 
-        // ============ Amoeba ============
         class Amoeba implements Organism {
           x: number;
           y: number;
@@ -187,7 +182,6 @@ export default function Microscope() {
           }
         }
 
-        // ============ Paramecium ============
         class Paramecium implements Organism {
           x: number;
           y: number;
@@ -240,7 +234,6 @@ export default function Microscope() {
             p.translate(this.x, this.y);
             p.rotate(this.angle);
 
-            // Cilia
             p.stroke(stain.tint[0], stain.tint[1], stain.tint[2], 60);
             p.strokeWeight(1);
             for (let i = 0; i < 40; i++) {
@@ -263,7 +256,6 @@ export default function Microscope() {
               );
             }
 
-            // Body
             p.fill(stain.tint[0], stain.tint[1], stain.tint[2], 25);
             p.stroke(stain.tint[0], stain.tint[1], stain.tint[2], 120);
             p.strokeWeight(2);
@@ -283,7 +275,6 @@ export default function Microscope() {
             }
             p.endShape(p.CLOSE);
 
-            // Oral groove
             p.noFill();
             p.stroke(stain.tint[0], stain.tint[1], stain.tint[2], 80);
             p.strokeWeight(1);
@@ -294,15 +285,12 @@ export default function Microscope() {
             }
             p.endShape();
 
-            // Macronucleus
             p.fill(stain.tint[0], stain.tint[1], stain.tint[2], 50);
             p.noStroke();
             p.ellipse(0, 0, this.length * 0.3, this.w * 0.5);
-            // Micronucleus
             p.fill(stain.tint[0], stain.tint[1], stain.tint[2], 100);
             p.ellipse(this.length * 0.05, -this.w * 0.1, 8, 8);
 
-            // Contractile vacuoles
             p.noFill();
             p.stroke(stain.tint[0], stain.tint[1], stain.tint[2], 100);
             p.strokeWeight(1);
@@ -321,7 +309,6 @@ export default function Microscope() {
           }
         }
 
-        // ============ Euglena ============
         class Euglena implements Organism {
           x: number;
           y: number;
@@ -360,7 +347,6 @@ export default function Microscope() {
             p.translate(this.x, this.y);
             p.rotate(this.angle);
 
-            // Flagellum
             p.noFill();
             p.stroke(stain.tint[0], stain.tint[1], stain.tint[2], 80);
             p.strokeWeight(1);
@@ -374,7 +360,6 @@ export default function Microscope() {
             }
             p.endShape();
 
-            // Body
             p.fill(stain.tint[0], stain.tint[1], stain.tint[2], 35);
             p.stroke(stain.tint[0], stain.tint[1], stain.tint[2], 100);
             p.strokeWeight(1.5);
@@ -395,7 +380,6 @@ export default function Microscope() {
             }
             p.endShape(p.CLOSE);
 
-            // Chloroplasts
             p.fill(100, 200, 100, 60);
             p.noStroke();
             for (let i = 0; i < 8; i++) {
@@ -407,11 +391,9 @@ export default function Microscope() {
               );
             }
 
-            // Eyespot
             p.fill(255, 100, 100, 150);
             p.ellipse(this.length * 0.3, -this.length * 0.05, 5, 5);
 
-            // Nucleus
             p.fill(stain.tint[0], stain.tint[1], stain.tint[2], 60);
             p.ellipse(-this.length * 0.1, 0, this.length * 0.2, this.length * 0.15);
 
@@ -419,7 +401,6 @@ export default function Microscope() {
           }
         }
 
-        // ============ Bacteria ============
         class Bacteria implements Organism {
           x: number;
           y: number;
@@ -471,7 +452,6 @@ export default function Microscope() {
             } else if (this.type === 1) {
               p.arc(-this.size, 0, this.size, this.size, p.HALF_PI, -p.HALF_PI);
               p.arc(this.size, 0, this.size, this.size, -p.HALF_PI, p.HALF_PI);
-              // Flagellum
               p.noFill();
               p.stroke(stain.tint[0], stain.tint[1], stain.tint[2], 60);
               p.beginShape();
@@ -505,7 +485,6 @@ export default function Microscope() {
           }
         }
 
-        // ============ Diatom ============
         class Diatom implements Organism {
           x: number;
           y: number;
@@ -601,7 +580,6 @@ export default function Microscope() {
           }
         }
 
-        // ============ Rotifer ============
         class Rotifer implements Organism {
           x: number;
           y: number;
@@ -645,7 +623,6 @@ export default function Microscope() {
             p.translate(this.x, this.y);
             p.rotate(this.angle + p.HALF_PI);
 
-            // Corona cilia
             p.stroke(stain.tint[0], stain.tint[1], stain.tint[2], 80);
             p.strokeWeight(1);
             for (let side = -1; side <= 1; side += 2) {
@@ -663,7 +640,6 @@ export default function Microscope() {
               }
             }
 
-            // Body segments
             p.fill(stain.tint[0], stain.tint[1], stain.tint[2], 30);
             p.stroke(stain.tint[0], stain.tint[1], stain.tint[2], 100);
             p.strokeWeight(1.5);
@@ -697,11 +673,9 @@ export default function Microscope() {
             }
             p.endShape(p.CLOSE);
 
-            // Head
             p.fill(stain.tint[0], stain.tint[1], stain.tint[2], 40);
             p.ellipse(0, -this.size * 0.35, this.size * 0.4, this.size * 0.25);
 
-            // Mastax
             p.fill(stain.tint[0], stain.tint[1], stain.tint[2], 100);
             p.noStroke();
             const mastaxY = -this.size * 0.15;
@@ -712,7 +686,6 @@ export default function Microscope() {
             p.line(-3, mastaxY, -3 - p.cos(jawAngle) * 4, mastaxY + p.sin(jawAngle) * 4);
             p.line(3, mastaxY, 3 + p.cos(jawAngle) * 4, mastaxY + p.sin(jawAngle) * 4);
 
-            // Gut
             p.noFill();
             p.stroke(stain.tint[0], stain.tint[1], stain.tint[2], 50);
             p.beginShape();
@@ -729,7 +702,6 @@ export default function Microscope() {
           }
         }
 
-        // ============ Debris ============
         interface DebrisObj {
           x: number;
           y: number;
@@ -784,7 +756,6 @@ export default function Microscope() {
           };
         }
 
-        // ============ Helpers ============
         function addRandomOrganism() {
           const type = p.floor(p.random(6));
           const x = p.random(p.width * 0.2, p.width * 0.8);
@@ -835,7 +806,6 @@ export default function Microscope() {
           }
         }
 
-        // ============ p5 lifecycle ============
         p.setup = () => {
           p.createCanvas(window.innerWidth, window.innerHeight);
           for (let i = 0; i < 8; i++) addRandomOrganism();
@@ -861,7 +831,6 @@ export default function Microscope() {
           p.scale(zoom);
           p.translate(-p.width / 2 + offsetX, -p.height / 2 + offsetY);
 
-          // Brownian particles
           p.noStroke();
           for (const bp of brownianParticles) {
             bp.x += p.random(-2, 2);
@@ -870,13 +839,11 @@ export default function Microscope() {
             p.ellipse(bp.x, bp.y, bp.size / zoom);
           }
 
-          // Debris
           for (const d of debris) {
             d.update();
             d.display();
           }
 
-          // Organisms
           for (let i = organisms.length - 1; i >= 0; i--) {
             organisms[i].update();
             organisms[i].display();
@@ -888,17 +855,14 @@ export default function Microscope() {
 
           p.pop();
 
-          // Vignette
           drawVignette();
 
-          // Lens artifacts
           p.noStroke();
           for (let i = 0; i < 3; i++) {
             p.fill(stain.tint[0], stain.tint[1], stain.tint[2], 5);
             p.ellipse(p.width * 0.3 + i * p.width * 0.2, p.height * 0.2, 100, 30);
           }
 
-          // UI updates
           const countEl = document.getElementById("organism-count");
           const fpsEl = document.getElementById("fps-display");
           const magEl = document.getElementById("mag-display");
@@ -972,7 +936,7 @@ export default function Microscope() {
             offsetY = 0;
           }
           if (p.key >= "1" && p.key <= "5") {
-            stainIndexRef.current = Number.parseInt(p.key) - 1;
+            stainIndexRef.current = Number.parseInt(p.key, 10) - 1;
           }
         };
 
@@ -981,7 +945,7 @@ export default function Microscope() {
         };
       };
 
-      p5Instance = new P5(sketch, container);
+      p5Instance = new P5Ctor(sketch, container);
     });
 
     return () => {

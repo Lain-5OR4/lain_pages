@@ -1,5 +1,3 @@
-// Inline ES module served inside <script type="module"> on the admin/new page.
-// Handles dropzone, thumbnail grid, EXIF extraction, canvas resize, and form submission.
 export const UPLOAD_SCRIPT = `
 import exifr from "https://esm.sh/exifr@7";
 

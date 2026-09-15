@@ -1,6 +1,6 @@
+import Link from "next/link";
 import VoidSpace from "@/components/miniapps/VoidSpace";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 export default function VoidPage() {
   return (

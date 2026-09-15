@@ -47,7 +47,6 @@ pub.get("/post/:id{[0-9]+}", async (c) => {
 
 pub.get("/images/:key{.+}", async (c) => {
   const key = c.req.param("key");
-  // Only post images are public; never expose other bucket contents.
   if (!key.startsWith("posts/")) return c.notFound();
   if (!(await isPublicPostImage(c.env.DB, key))) return c.notFound();
   const obj = await c.env.BUCKET.get(key);

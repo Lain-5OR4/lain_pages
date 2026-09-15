@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { type CoverPalette, extractPalette } from "./coverPalette";
 
-// URL-keyed promises deduplicate requests across filtering and shelf remounts.
 const paletteCache = new Map<string, Promise<CoverPalette | null>>();
 const SAMPLE_SIZE = 32;
 

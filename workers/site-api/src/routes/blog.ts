@@ -17,7 +17,6 @@ function microCMSHeaders(env: Env): HeadersInit {
   return { "X-MICROCMS-API-KEY": env.MICROCMS_API_KEY };
 }
 
-// GET /api/blog — list (content excluded to keep payload light)
 blog.get("/", async (c) => {
   const url = new URL(microCMSBase(c.env));
   url.searchParams.set("limit", "100");
@@ -32,7 +31,6 @@ blog.get("/", async (c) => {
   return c.json(data.contents);
 });
 
-// GET /api/blog/:id — single post with full HTML content
 // Pass ?draftKey=xxx to preview unpublished content
 blog.get("/:id", async (c) => {
   const id = c.req.param("id");
@@ -46,7 +44,6 @@ blog.get("/:id", async (c) => {
   if (!res.ok) return c.json({ error: "microCMS error", status: res.status }, 502);
 
   const data = await res.json();
-  // Don't cache drafts
   c.header("Cache-Control", draftKey ? "private, no-store" : "public, max-age=60, s-maxage=300");
   return c.json(data);
 });

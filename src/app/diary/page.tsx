@@ -1,23 +1,20 @@
 "use client";
 
+import Link from "next/link";
+import { Component, Suspense, use, useState } from "react";
 import DiaryCard from "@/components/diary/DiaryCard";
 import PhotoLightbox from "@/components/diary/PhotoLightbox";
 import { Button } from "@/components/ui/button";
 import { type DiaryEntry, mockEntries } from "@/data/diary";
-import Link from "next/link";
-import { Component, Suspense, use, useState } from "react";
 
 const DIARY_API_BASE = process.env.NEXT_PUBLIC_DIARY_API ?? "https://api.mizora.dev";
 
 async function fetchEntries(): Promise<DiaryEntry[]> {
-  // Dev: use mock data to preview the layout with multiple entries.
   if (process.env.NODE_ENV === "development") return mockEntries;
   const res = await fetch(`${DIARY_API_BASE}/api/diary`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json() as Promise<DiaryEntry[]>;
 }
-
-// --- ErrorBoundary ---
 
 interface ErrorBoundaryProps {
   onRetry: () => void;
@@ -56,8 +53,6 @@ class DiaryErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryStat
   }
 }
 
-// --- Loading fallback ---
-
 function DiaryLoading() {
   return (
     <div className="flex items-center justify-center py-32">
@@ -65,8 +60,6 @@ function DiaryLoading() {
     </div>
   );
 }
-
-// --- Grid (unwraps the promise via use()) ---
 
 function DiaryGrid({
   promise,
@@ -111,8 +104,6 @@ function DiaryGrid({
   );
 }
 
-// --- Page ---
-
 export default function DiaryPage() {
   const [promise, setPromise] = useState(fetchEntries);
   const [lightbox, setLightbox] = useState<{ entry: DiaryEntry; photoIndex: number } | null>(null);
@@ -156,10 +147,6 @@ export default function DiaryPage() {
             "inset 0 0 0 1px rgba(0,0,0,0.55), inset 0 0 30px rgba(0,0,0,0.55), inset 0 10px 20px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.55)",
         }}
       >
-        {/* Fairy lights draped along the top of the corkboard.
-            Wire is an SVG that stretches with the container; bulbs are
-            HTML wrappers with fixed-size inner SVGs so they stay circular
-            regardless of viewport width. */}
         <div
           className="absolute left-0 right-0 top-6 w-full h-32 pointer-events-none z-1"
           aria-hidden
@@ -170,7 +157,6 @@ export default function DiaryPage() {
             viewBox="0 0 1000 128"
             preserveAspectRatio="none"
           >
-            {/* wire shadow */}
             <path
               d="M 0 20 Q 500 100 1000 26"
               fill="none"
@@ -178,7 +164,6 @@ export default function DiaryPage() {
               strokeWidth="2.4"
               transform="translate(1.5, 2.5)"
             />
-            {/* wire */}
             <path
               d="M 0 20 Q 500 100 1000 26"
               fill="none"
@@ -253,7 +238,6 @@ export default function DiaryPage() {
               </svg>
             </div>
           ))}
-          {/* anchor nails at the wire ends */}
           <div
             className="absolute w-2 h-2 rounded-full bg-stone-950"
             style={{

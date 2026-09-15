@@ -1,7 +1,7 @@
 "use client";
 
 import type { Book } from "@/data/books";
-import { SANS, SERIF, STATUS_LABEL, decorate, stars } from "./theme";
+import { decorate, SANS, SERIF, STATUS_LABEL, stars } from "./theme";
 
 export function BookList({ books, onOpen }: { books: Book[]; onOpen: (id: number) => void }) {
   const decorated = books.map((book) => decorate(book));

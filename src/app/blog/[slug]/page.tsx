@@ -1,8 +1,8 @@
-import { JournalFooter, JournalHeader } from "@/components/blog/JournalChrome";
-import { JOURNAL } from "@/components/blog/theme";
-import { PLACEHOLDER_SLUG, getAllPosts, getPostBySlug, placeholderPost } from "@/data/blog-posts";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { JournalFooter, JournalHeader } from "@/components/blog/JournalChrome";
+import { JOURNAL } from "@/components/blog/theme";
+import { getAllPosts, getPostBySlug, PLACEHOLDER_SLUG, placeholderPost } from "@/data/blog-posts";
 
 const BYLINE = "mizora";
 
@@ -53,11 +53,7 @@ function FrontMatterRow({
   );
 }
 
-export default async function BlogPostPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const post = await resolvePost(slug);
   if (!post) notFound();
@@ -76,7 +72,6 @@ export default async function BlogPostPage({
         </div>
       </JournalHeader>
 
-      {/* eyecatch */}
       {post.eyecatch && (
         <div className="mb-10 -mx-1 sm:-mx-3 overflow-hidden rounded-sm">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -91,7 +86,6 @@ export default async function BlogPostPage({
         </div>
       )}
 
-      {/* title */}
       <h1
         className="text-4xl md:text-5xl leading-[1.15] tracking-tight font-medium mb-10"
         style={{ fontFamily: JOURNAL.serif }}
@@ -101,10 +95,9 @@ export default async function BlogPostPage({
 
       <hr className="my-10 border-stone-300" />
 
-      {/* body — rich editor HTML */}
       <div
         className="rich-content"
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: trusted microCMS rich editor output
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: author-only microCMS content, no public submission path
         dangerouslySetInnerHTML={{ __html: post.contentHtml }}
       />
 

@@ -1,15 +1,12 @@
 "use client";
 
-import type { Book } from "@/data/books";
 import { useEffect, useRef, useState } from "react";
+import type { Book } from "@/data/books";
 import { SANS, SERIF, STATUS_LABEL, stars } from "./theme";
 
 const COVER_HEIGHT = 212;
 const DEFAULT_COVER_ASPECT = 0.66;
 
-// Read-only: this is the public page, so no editing controls here. Writing
-// (rating/status/memo/cover edits, add, delete) belongs to the future
-// Cloudflare Access-protected admin view, which will reuse this same shell.
 export function BookDrawer({ book, onClose }: { book: Book; onClose: () => void }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   useEffect(() => {

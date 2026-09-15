@@ -1,26 +1,42 @@
-/** Resynthesis from the supplied powerline clip's measured spectrum (not a sample). */
+const DURATION_SECONDS = 20;
+const OUTPUT_GAIN = 0.78;
+
+// Resynthesis from the supplied powerline clip's measured spectrum (not a sample).
+const FUNDAMENTAL_HZ = 119.5;
+// Weaker odd harmonics of the fundamental (orders 2 and 6 measured negligible).
+const HARMONICS: { order: number; weight: number }[] = [
+  { order: 1, weight: 1 },
+  { order: 2, weight: 0.015 },
+  { order: 3, weight: 0.17 },
+  { order: 4, weight: 0.008 },
+  { order: 5, weight: 0.05 },
+  { order: 7, weight: 0.014 },
+];
+// Two independent tones measured alongside the fundamental, not harmonically related to it.
+const EXTRA_TONES: { hz: number; weight: number }[] = [
+  { hz: 60.5, weight: 0.018 },
+  { hz: 90, weight: 0.012 },
+];
+const BASE_PULSE = 0.97;
+const PULSE_MODULATION: { hz: number; weight: number }[] = [
+  { hz: 0.25, weight: 0.02 },
+  { hz: 0.65, weight: 0.01 },
+];
+
 export function createElectricalHum(context: BaseAudioContext): AudioBuffer {
-  const duration = 20;
-  const buffer = context.createBuffer(1, context.sampleRate * duration, context.sampleRate);
+  const buffer = context.createBuffer(1, context.sampleRate * DURATION_SECONDS, context.sampleRate);
   const samples = buffer.getChannelData(0);
   const tau = Math.PI * 2;
-  // Dominant line at 119.5 Hz, with much weaker odd harmonics around 358.5/597.5 Hz.
-  // All frequencies and modulation complete integer cycles in this loop.
   for (let i = 0; i < samples.length; i++) {
     const t = i / context.sampleRate;
-    const phase = tau * 119.5 * t;
-    const pulse = 0.97 + 0.02 * Math.sin(tau * 0.25 * t) + 0.01 * Math.sin(tau * 0.65 * t);
-    samples[i] =
-      0.78 *
-      pulse *
-      (Math.sin(phase) +
-        0.015 * Math.sin(phase * 2) +
-        0.17 * Math.sin(phase * 3) +
-        0.008 * Math.sin(phase * 4) +
-        0.05 * Math.sin(phase * 5) +
-        0.014 * Math.sin(phase * 7) +
-        0.018 * Math.sin(tau * 60.5 * t) +
-        0.012 * Math.sin(tau * 90 * t));
+    const phase = tau * FUNDAMENTAL_HZ * t;
+    const pulse =
+      BASE_PULSE +
+      PULSE_MODULATION.reduce((sum, { hz, weight }) => sum + weight * Math.sin(tau * hz * t), 0);
+    const tone =
+      HARMONICS.reduce((sum, { order, weight }) => sum + weight * Math.sin(phase * order), 0) +
+      EXTRA_TONES.reduce((sum, { hz, weight }) => sum + weight * Math.sin(tau * hz * t), 0);
+    samples[i] = OUTPUT_GAIN * pulse * tone;
   }
   return buffer;
 }

@@ -3,8 +3,6 @@ import type { NewBook } from "../data/books";
 const KINDS = new Set(["book", "article"]);
 export const STATUSES = new Set(["to_read", "reading", "done"]);
 
-// Every editable field lives on this one form (see renderBookForm) so status,
-// rating, dates, and cover/amazon links can all be set without Notion.
 export const parseBookForm = (formData: FormData): Partial<NewBook> => {
   const str = (key: string) => {
     const v = String(formData.get(key) ?? "").trim();

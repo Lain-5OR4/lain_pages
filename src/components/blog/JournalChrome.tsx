@@ -1,6 +1,6 @@
-import { JOURNAL } from "@/components/blog/theme";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { JOURNAL } from "@/components/blog/theme";
 
 function PromptLine({ command }: { command: string }) {
   return (
@@ -14,9 +14,6 @@ function PromptLine({ command }: { command: string }) {
   );
 }
 
-// Fake shell prompt shown at the top of every journal page. `href` turns the
-// prompt line into a link (used on detail pages to go back to the index);
-// `children` renders below the divider (front-matter block on detail pages).
 export function JournalHeader({
   command,
   href,

@@ -1,7 +1,7 @@
-import { JOURNAL } from "@/components/blog/theme";
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import type { ReactNode } from "react";
+import { JOURNAL } from "@/components/blog/theme";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],

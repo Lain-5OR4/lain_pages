@@ -1,4 +1,4 @@
-import { SELF, env } from "cloudflare:test";
+import { env, SELF } from "cloudflare:test";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const JPEG_BYTES = new Uint8Array([0xff, 0xd8, 0xff, 0xe0]);

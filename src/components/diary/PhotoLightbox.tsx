@@ -1,7 +1,7 @@
 "use client";
 
-import type { DiaryEntry } from "@/data/diary";
 import { useCallback, useEffect, useState } from "react";
+import type { DiaryEntry } from "@/data/diary";
 
 interface PhotoLightboxProps {
   entry: DiaryEntry;

@@ -1,43 +1,19 @@
 import { STICKY_COLORS, TAPE_COLORS, ZIGZAG_TAPE_EDGES } from "./constants";
 
-/**
- * ポラロイド写真コンポーネントのプロパティ。
- */
 interface PolaroidPhotoProps {
-  /** 表示する写真データ。 */
   photo: {
-    /** 画像 URL。 */
     src: string;
-    /** スクリーンリーダー向けの代替テキスト。 */
     alt: string;
-    /** ポラロイド下部に印字するスタンプ文字列（例: 撮影日時）。省略可。 */
     stamp?: string;
   };
-  /** 親カードのゼロ始まりインデックス。テープ色の循環選択に使う。 */
   cardIndex: number;
-  /** カード内での写真のゼロ始まりインデックス。テープ色の循環選択に使う。 */
   photoIndex: number;
-  /** 写真の傾き角度（度）。 */
   rotation: number;
-  /** 表示上限（3枚）を超えた写真の枚数。オーバーフロータグのラベルに使う。 */
   extra: number;
-  /** `true` のとき、3枚目の写真の右上にオーバーフロー枚数タグを表示する。 */
   showOverflowTag: boolean;
-  /** 写真クリック時のコールバック。ライトボックスを開くために使う。 */
   onClick: () => void;
 }
 
-/**
- * ポラロイド写真 1 枚を表示するコンポーネント。
- *
- * ポラロイド本体（白い枠 + 画像 + スタンプ）と上部のマスキングテープで構成される。
- * `showOverflowTag` が `true` のとき、表示されていない写真の枚数を示す
- * 付箋スタイルのオーバーフロータグを右上に重ねて表示する。
- * クリックするとライトボックスが開く。
- *
- * @param props - {@link PolaroidPhotoProps} を参照。
- * @returns ポラロイド写真のボタン要素。
- */
 export default function PolaroidPhoto({
   photo,
   cardIndex,
@@ -66,7 +42,6 @@ export default function PolaroidPhoto({
           </span>
         )}
       </div>
-      {/* マスキングテープ */}
       <span
         aria-hidden
         className="absolute -top-2 left-1/2 w-16 h-5 -translate-x-1/2 shadow-[0_1px_2px_rgba(0,0,0,0.3)]"
@@ -76,7 +51,6 @@ export default function PolaroidPhoto({
           clipPath: ZIGZAG_TAPE_EDGES,
         }}
       />
-      {/* 3枚目右上に表示するオーバーフロー枚数タグ */}
       {showOverflowTag && (
         <div
           className="absolute z-40 pointer-events-none"

@@ -1,8 +1,6 @@
-import type { Book, BookStatus } from "@/data/books";
 import type { CSSProperties } from "react";
+import type { Book, BookStatus } from "@/data/books";
 
-// Fonts: Zen Old Mincho (headings/spines), Zen Kaku Gothic New (UI). Loaded
-// via next/font/google in layout.tsx and exposed as CSS variables.
 export const SERIF = "var(--font-zen-old-mincho), serif";
 export const SANS = "var(--font-zen-kaku), sans-serif";
 
@@ -13,8 +11,6 @@ export const STATUS_LABEL: Record<BookStatus, string> = {
   done: "読了",
 };
 
-// Book jacket color pairs (cloth / foil-stamp text), matched deterministically
-// per book below so the same book always renders the same color.
 const CLOTHS: [string, string][] = [
   ["#7d2f2a", "#f0dcc0"],
   ["#2f4a5c", "#e8dcc4"],
@@ -48,10 +44,6 @@ export function starBtnStyle(active: boolean, size: number): CSSProperties {
   };
 }
 
-// Deterministic pseudo-random dimensions/color for a book's spine, derived
-// from title length + book id so the same book always looks the same
-// (no `pages` field in our schema, unlike the original design reference —
-// title length stands in for it).
 export interface BookDeco {
   bg: string;
   fg: string;
@@ -59,7 +51,8 @@ export interface BookDeco {
   h: number;
 }
 
-export function deco(title: string, i: number): BookDeco {
+// Title length stands in for a `pages` field the schema doesn't have.
+export function spineDeco(title: string, i: number): BookDeco {
   const [bg, fg] = CLOTHS[(title.length + i * 3) % CLOTHS.length];
   const w = 40 + ((title.length * 2 + i * 5) % 18);
   const h = 196 + ((title.length * 7 + i * 13) % 46);
@@ -73,16 +66,17 @@ export interface DecoratedBook extends Book {
   slotW: number;
 }
 
-// Fallback cover aspect ratio (width/height) used until the real image has
-// loaded and its natural size is known — see FaceButton in Shelf.tsx.
 const DEFAULT_COVER_ASPECT = 0.66;
 
+// No curated "featured" flag in the schema, so face every 5th covered book
+// out, the same way a real shelf occasionally turns one forward.
+function isFeaturedFaceOut(book: Book): boolean {
+  return !!(book.coverUrl && book.id % 5 === 0);
+}
+
 export function decorate(b: Book, aspects: Record<number, number> = {}): DecoratedBook {
-  const d = deco(b.title, b.id);
-  // No curated "featured" flag in the schema, so face a deterministic ~1-in-5
-  // covered books outward — same spirit as occasionally turning a book face-out
-  // on a real shelf, without needing real curation data.
-  const faceOut = !!(b.coverUrl && b.id % 5 === 0);
+  const d = spineDeco(b.title, b.id);
+  const faceOut = isFeaturedFaceOut(b);
   const faceW = Math.min(200, Math.round(d.h * (aspects[b.id] ?? DEFAULT_COVER_ASPECT)));
   return {
     ...b,

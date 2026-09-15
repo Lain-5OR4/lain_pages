@@ -1,13 +1,12 @@
+import { marked } from "marked";
 import {
-  type MicroCMSBlogPost,
   fetchAllPosts,
   fetchPostById,
   isMicroCMSConfigured,
+  type MicroCMSBlogPost,
 } from "@/lib/microcms";
-import { marked } from "marked";
 
 export function estimateReadingMinutes(md: string): number {
-  // Mixed Japanese/English; ~600 visible chars/min is a reasonable rough rate.
   const chars = md.replace(/\s+/g, "").length;
   return Math.max(1, Math.round(chars / 600));
 }
@@ -43,7 +42,6 @@ async function fromMicroCMS(item: MicroCMSBlogPost): Promise<BlogPost> {
   };
 }
 
-// Dev seed rendered as HTML so the layout works without a microCMS account.
 const DEV_SEED_MD = `Cloudflare Workers + D1 + R2 で小さな photo-diary を運用している。アップロード画面はクライアント側で exifr に EXIF を読ませて、D1 に行を書き、公開フィードでは現像写真っぽいタイムスタンプを焼き込んで表示する。dev では特に異常なし。ところがある日、すべての写真が撮影時刻ぴったり 9 時間前で焼かれていることに気付いた。
 
 ## exifr が実際に返してくるもの
@@ -100,8 +98,6 @@ export function placeholderPost(): BlogPost {
   };
 }
 
-// Seed posts are dev-only: a production build without microCMS env vars gets
-// an empty blog instead of publishing the placeholder article.
 function fallbackPosts(): Promise<BlogPost[]> {
   console.warn("[blog] microCMS env not set — using local dev seed posts");
   if (process.env.NODE_ENV === "production") return Promise.resolve([]);

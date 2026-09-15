@@ -1,5 +1,5 @@
-import { LinuxDesktop } from "@/components/desktop/LinuxDesktop";
 import type { Metadata } from "next";
+import { LinuxDesktop } from "@/components/desktop/LinuxDesktop";
 
 export const metadata: Metadata = {
   title: "mizora — Wired Desktop",

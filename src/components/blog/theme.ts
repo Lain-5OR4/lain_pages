@@ -1,4 +1,3 @@
-// Editorial paper palette + type stacks shared by /blog pages.
 export const JOURNAL = {
   bg: "#f7f3ec",
   ink: "#1a1714",

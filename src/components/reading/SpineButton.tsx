@@ -7,7 +7,10 @@ import { useCoverPalette } from "./useCoverPalette";
 export function SpineButton({
   book,
   onOpen,
-}: { book: DecoratedBook; onOpen: (id: number) => void }) {
+}: {
+  book: DecoratedBook;
+  onOpen: (id: number) => void;
+}) {
   const { ref, palette } = useCoverPalette(book.coverUrl);
   return (
     <button

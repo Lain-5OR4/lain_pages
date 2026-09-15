@@ -1,7 +1,7 @@
 "use client";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useState } from "react";
 
 type DiffMode = "unified" | "github";
 type DiffLevel = "line" | "character";
@@ -23,14 +23,12 @@ export default function TextDiffPage() {
   const [diffLevel, setDiffLevel] = useState<DiffLevel>("line");
   const [diffResult, setDiffResult] = useState<DiffLine[]>([]);
 
-  // ベストプラクティス: 環境変数から取得
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
   const logoPath = `${basePath}/assets/textdelta.png`;
 
   const calculateCharDiff = (str1: string, str2: string) => {
     const result: Array<{ type: "context" | "added" | "removed"; text: string }> = [];
 
-    // LCS (Longest Common Subsequence) based diff algorithm
     const lcs = (s1: string, s2: string): string[][] => {
       const m = s1.length;
       const n = s2.length;
@@ -48,7 +46,6 @@ export default function TextDiffPage() {
         }
       }
 
-      // Backtrack to find the actual diff
       const diff: string[][] = [];
       let i = m;
       let j = n;
@@ -72,7 +69,6 @@ export default function TextDiffPage() {
 
     const diffArray = lcs(str1, str2);
 
-    // Merge consecutive chars of same type for better readability
     let currentType = "";
     let currentText = "";
 

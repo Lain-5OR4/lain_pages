@@ -11,9 +11,6 @@ export const STATUS_OPTIONS: Array<[Book["status"], string]> = [
   ["done", "読了"],
 ];
 
-// Shared form for both /admin/books/new (empty book) and /admin/books/:id/edit
-// (prefilled) — every editable field lives here so status changes, ratings,
-// dates, and cover/amazon links can all be set without touching Notion.
 export const renderBookForm = (opts: {
   action: string;
   submitLabel: string;

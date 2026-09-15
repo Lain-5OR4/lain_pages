@@ -9,7 +9,6 @@ type RainProps = {
 
 type Drop = { x: number; y: number; length: number; speed: number };
 
-/** Shared decorative rain. Speed is measured in CSS pixels per second. */
 export default function Background({
   className = "fixed inset-0 z-10 w-full h-full pointer-events-none",
   color = "rgba(0, 180, 200, 0.6)",
@@ -55,7 +54,6 @@ export default function Background({
 
     function tick(time: number) {
       frame = null;
-      // Clamp long pauses to prevent a jump when rendering resumes.
       const delta = previous === null ? 0 : Math.min((time - previous) / 1000, 0.05);
       previous = time;
       paint(delta);

@@ -1,5 +1,6 @@
 import { desc, sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import type { BookKind, BookStatus } from "../../../shared/types/book";
 
 export const postDeletions = sqliteTable("post_deletions", {
   post_id: integer("post_id").primaryKey(),
@@ -41,23 +42,15 @@ export const postImages = sqliteTable(
   (table) => [index("idx_post_images_post").on(table.post_id, table.sort_order)],
 );
 
-// kind: 'book' | 'article'
-// status: 'to_read' | 'reading' | 'done'
-// category is a free-text genre/subject label (e.g. 数学/統計学/情報技術),
-// carried over from the Notion "種別" property — distinct from `kind`.
-// rating is 1-5, set once status is 'done'.
-// cover_url is a plain URL string (Amazon product image, pasted manually) — no
-// scraping or upload pipeline. amazon_url is the separate product-page link
-// (Notion's "リンク" property).
 export const books = sqliteTable(
   "books",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
     title: text("title").notNull(),
     author: text("author"),
-    kind: text("kind").notNull().default("book"),
+    kind: text("kind").$type<BookKind>().notNull().default("book"),
     category: text("category"),
-    status: text("status").notNull().default("to_read"),
+    status: text("status").$type<BookStatus>().notNull().default("to_read"),
     rating: integer("rating"),
     isbn: text("isbn"),
     cover_url: text("cover_url"),

@@ -1,13 +1,4 @@
-// microCMS client wrapper around the official SDK.
-//
-// Reads two env vars (server-side only — never `NEXT_PUBLIC_*` prefixed):
-//   MICROCMS_SERVICE_DOMAIN   subdomain part of `<x>.microcms.io`
-//   MICROCMS_API_KEY          read-only API key
-//
-// Used exclusively at build time by Next.js (output: "export"), so the key
-// never leaves the build container.
-
-import { type MicroCMSQueries, createClient } from "microcms-js-sdk";
+import { createClient, type MicroCMSQueries } from "microcms-js-sdk";
 
 const ENDPOINT = "blogs";
 
@@ -23,9 +14,9 @@ export interface MicroCMSImage {
 //   eyecatch   画像 (optional)
 //   category   コンテンツ参照 (optional)
 export interface MicroCMSBlogPost {
-  id: string; // contentId — used as our URL slug
+  id: string;
   title: string;
-  content: string; // HTML from rich editor
+  content: string;
   eyecatch?: MicroCMSImage;
   category?: { id: string; name: string } | null;
   publishedAt: string;

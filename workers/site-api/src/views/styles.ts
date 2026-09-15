@@ -21,7 +21,6 @@ body {
 }
 .page { max-width: 48rem; margin: 0 auto; padding: 3rem 2rem 5rem; }
 
-/* masthead */
 .masthead {
 	display: grid; grid-template-columns: 1fr auto; align-items: end;
 	padding-bottom: 1.25rem; border-bottom: 2px solid var(--ink); margin-bottom: 0.6rem;
@@ -44,12 +43,10 @@ body {
 	font-variant-numeric: tabular-nums;
 }
 
-/* back link */
 .back { font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); margin: 0 0 2rem; }
 .back a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
 .back a:hover { color: var(--ink); border-color: var(--ink); }
 
-/* numbered field */
 .field {
 	display: grid; grid-template-columns: 2.5rem 1fr; gap: 1.5rem; align-items: baseline;
 	padding: 1.5rem 0; border-bottom: 1px solid var(--rule);
@@ -64,7 +61,6 @@ body {
 	text-transform: uppercase; color: var(--muted); margin-bottom: 0.6rem;
 }
 
-/* inputs */
 input[type=text], input[type=date] {
 	font-family: inherit; font-size: 1.05rem; color: var(--ink);
 	border: none; border-bottom: 1px solid var(--ink); background: transparent;
@@ -79,7 +75,6 @@ textarea {
 }
 textarea:focus { border-color: var(--accent); }
 
-/* dropzone + thumbs */
 .thumbs {
 	display: grid; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
 	gap: 0.6rem; margin-bottom: 0.75rem;
@@ -115,7 +110,6 @@ textarea:focus { border-color: var(--accent); }
 }
 .dropzone:hover, .dropzone.over { background: var(--ink); color: var(--paper); }
 
-/* date split */
 .date-display {
 	font-family: "Playfair Display", Georgia, serif; font-size: 1.3rem;
 	color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: 0.05em;
@@ -123,7 +117,6 @@ textarea:focus { border-color: var(--accent); }
 }
 .date-display em { font-style: italic; color: var(--muted); margin: 0 0.5em; }
 
-/* submit row */
 .submit-row {
 	display: flex; align-items: center; gap: 1.5rem; padding-top: 2rem;
 }
@@ -146,7 +139,6 @@ button[type=submit]:disabled { opacity: 0.4; cursor: not-allowed; }
 	font-variant-numeric: tabular-nums;
 }
 
-/* admin entries list */
 .entries { list-style: none; margin: 0; padding: 0; }
 .entries li {
 	display: grid;
@@ -188,7 +180,6 @@ button[type=submit]:disabled { opacity: 0.4; cursor: not-allowed; }
 }
 .new-entry-cta:hover { background: var(--ink); color: var(--paper); }
 
-/* select inputs (books admin) */
 select {
 	font-family: inherit; font-size: 1.05rem; color: var(--ink);
 	border: none; border-bottom: 1px solid var(--ink); background: transparent;
@@ -196,7 +187,6 @@ select {
 }
 select:focus { border-color: var(--accent); }
 
-/* admin books list */
 .books { list-style: none; margin: 0; padding: 0; }
 .books li {
 	display: grid;
@@ -234,7 +224,6 @@ select:focus { border-color: var(--accent); }
 }
 .books .del button:hover { color: var(--accent); border-color: var(--accent); }
 
-/* public feed posts */
 .post { margin: 0 0 4rem; }
 .post header {
 	display: flex; justify-content: space-between; align-items: baseline;
@@ -260,7 +249,6 @@ select:focus { border-color: var(--accent); }
 	font-size: 1.05rem; padding: 2rem 0;
 }
 
-/* footer */
 footer {
 	margin-top: 5rem; padding-top: 1.25rem; border-top: 1px solid var(--rule);
 	display: flex; justify-content: space-between; font-size: 0.6rem;
